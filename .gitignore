@@ -2,3 +2,4 @@ node_modules
 .idea
 dist
 __test__
+jest.config.js

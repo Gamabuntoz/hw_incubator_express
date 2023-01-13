@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "name": "hw_02",
   "builds": [
     { "src": "src/index.ts", "use": "@vercel/node" }
