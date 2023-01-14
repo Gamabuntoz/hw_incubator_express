@@ -1,4 +1,4 @@
-import express, {NextFunction, Response, Request} from "express";
+import {NextFunction, Response, Request} from "express";
 import {header, body, validationResult, ValidationError} from "express-validator";
 import {sendStatus} from "../routes/send-status-collections";
 import {blogsRepository} from "../repositories/blogs-repository";

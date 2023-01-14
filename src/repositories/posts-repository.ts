@@ -1,4 +1,3 @@
-import {usersRepository} from "./users-repository";
 import {blogsRepository} from "./blogs-repository";
 
 type postsType = {
@@ -14,8 +13,8 @@ let postsArray: postsArrayType = []
 
 export const postsRepository = {
     findPostById(id: string) {
-            let foundPostsById = postsArray.find(p => p.id === id)
-            return foundPostsById
+        return postsArray.find(p => p.id === id)
+
     },
     findAllPosts() {
         return postsArray

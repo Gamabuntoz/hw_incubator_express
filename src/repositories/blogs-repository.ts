@@ -1,5 +1,3 @@
-import {usersRepository} from "./users-repository";
-
 export type blogsType = {
     id: string
     name: string
