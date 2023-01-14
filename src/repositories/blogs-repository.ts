@@ -17,8 +17,7 @@ export const blogsRepository = {
             let foundBlogById = blogsArray.find(b => b.id === id)
             return foundBlogById!
     },
-    createBlog(authorization: string | undefined, name: string, description: string, website: string) {
-        if (authorization && usersRepository.find(u => u.loginPass === authorization)) {
+    createBlog(name: string, description: string, website: string) {
             const newBlog: blogsType = {
                 id: (blogsArray.length + 1).toString(),
                 name: name,
@@ -27,11 +26,8 @@ export const blogsRepository = {
             }
             blogsArray.push(newBlog)
             return newBlog
-        }
-        return
     },
-    updateBlog(authorization: string | undefined, id: string, name: string, description: string, website: string) {
-        if (authorization && usersRepository.find(u => u.loginPass === authorization)) {
+    updateBlog(id: string, name: string, description: string, website: string) {
             let foundBlogById = blogsArray.find(b => b.id === id)
             if (foundBlogById) {
                 foundBlogById.name = name
@@ -40,19 +36,14 @@ export const blogsRepository = {
                 return true
             }
             return 'Not found'
-        }
-        return
     },
-    deleteBlog(authorization: string | undefined, id: string) {
-        if (authorization && usersRepository.find(u => u.loginPass === authorization)) {
+    deleteBlog(id: string) {
             let foundBlogById = blogsArray.find(b => b.id === id)
             if (foundBlogById) {
                 blogsArray = blogsArray.filter(b => b !== foundBlogById)
                 return true
             }
             return 'Not found'
-        }
-        return
     },
     deleteAllBlogs() {
         blogsArray.splice(0, blogsArray.length)

@@ -1,7 +1,11 @@
 import {Request, Response, Router} from "express";
 import {postsRepository} from "../repositories/posts-repository";
 import {sendStatus} from "./send-status-collections";
-import {inputPostsValidation, inputValidationErrors} from "../middlewares/input-validation-middleware";
+import {
+    authorizationValidation,
+    inputPostsValidation,
+    inputValidationErrors
+} from "../middlewares/input-validation-middleware";
 export const postsRouter = Router()
 
 postsRouter.get('/', (req: Request, res: Response) => {
@@ -17,56 +21,45 @@ postsRouter.get('/:id', (req: Request, res: Response) => {
 })
 
 postsRouter.post('/',
+    authorizationValidation,
     inputPostsValidation.title,
     inputPostsValidation.shortDescription,
     inputPostsValidation.content,
     inputPostsValidation.blogId,
     inputValidationErrors,
     (req: Request, res: Response) => {
-    const authorization = req.headers.authorization
     const title = req.body.title
     const shortDescription = req.body.shortDescription
     const content = req.body.content
     const blogId = req.body.blogId
-    const newPost = postsRepository.createPost(authorization, title, shortDescription, content, blogId)
-    if (newPost) {
+    const newPost = postsRepository.createPost(title, shortDescription, content, blogId)
         res.status(sendStatus.CREATED_201).send(newPost)
-        return
-    }
-    res.sendStatus(sendStatus.UNAUTHORIZED_401)
 })
 postsRouter.put('/:id',
+    authorizationValidation,
     inputPostsValidation.title,
     inputPostsValidation.shortDescription,
     inputPostsValidation.content,
     inputPostsValidation.blogId,
     inputValidationErrors,
     (req: Request, res: Response) => {
-    const authorization = req.headers.authorization
     const id = req.params.id
     const title = req.body.title
     const shortDescription = req.body.shortDescription
     const content = req.body.content
     const blogId = req.body.blogId
-    const updatePost = postsRepository.updatePost(authorization, id, title, shortDescription, content, blogId)
-    if (!updatePost) {
-        return res.sendStatus(sendStatus.UNAUTHORIZED_401)
-        }
+    const updatePost = postsRepository.updatePost(id, title, shortDescription, content, blogId)
     if (updatePost === 'Not found') {
         return res.sendStatus(sendStatus.NOT_FOUND_404)
     }
     res.sendStatus(sendStatus.NO_CONTENT_204)
 })
-postsRouter.delete('/:id', (req: Request, res: Response) => {
-    const authorization = req.headers.authorization
-    const foundPost = postsRepository.deletePost(authorization, req.params.id)
+postsRouter.delete('/:id',
+    authorizationValidation,
+    (req: Request, res: Response) => {
+    const foundPost = postsRepository.deletePost(req.params.id)
     if (foundPost === 'Not found') {
-        res.sendStatus(sendStatus.NOT_FOUND_404)
-        return
-    }
-    if (!foundPost) {
-        res.sendStatus(sendStatus.UNAUTHORIZED_401)
-        return
+        return res.sendStatus(sendStatus.NOT_FOUND_404)
     }
     res.sendStatus(sendStatus.NO_CONTENT_204)
 })

@@ -1,8 +1,15 @@
-import {NextFunction, Response, Request} from "express";
-import {body, validationResult, ValidationError} from "express-validator";
+import express, {NextFunction, Response, Request} from "express";
+import {header, body, validationResult, ValidationError} from "express-validator";
 import {sendStatus} from "../routes/send-status-collections";
 import {blogsRepository} from "../repositories/blogs-repository";
+import {usersRepository} from "../repositories/users-repository";
 
+
+export const authorizationValidation = header('authorization').custom(value => {
+    if (!usersRepository.find(u => u.loginPass === value)) {
+        throw new Error('UNAUTHORIZED_401');
+    }
+})
 export const inputBlogsValidation = {
     name: body('name')
         .trim().isString().withMessage('Must be a string')
@@ -39,6 +46,9 @@ export const inputValidationErrors = (req: Request, res: Response, next: NextFun
     }
     const errors = validationResult(req).formatWith(errorFormat)
     if (!errors.isEmpty()) {
+        if (errors.array().find(e => e.message = 'UNAUTHORIZED_401')) {
+            res.sendStatus(sendStatus.UNAUTHORIZED_401)
+        }
         res.status(sendStatus.BAD_REQUEST_400)
             .json({errorsMessages: errors.array()})
         return

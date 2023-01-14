@@ -20,8 +20,7 @@ export const postsRepository = {
     findAllPosts() {
         return postsArray
     },
-    createPost(authorization: string | undefined, title: string, shortDescription: string, content: string, blogId: string) {
-        if (authorization && usersRepository.find(u => u.loginPass === authorization)) {
+    createPost(title: string, shortDescription: string, content: string, blogId: string) {
             const postById = blogsRepository.findBlogById(blogId)
             const newPost: postsType = {
                 id: (postsArray.length + 1).toString(),
@@ -33,11 +32,8 @@ export const postsRepository = {
             }
             postsArray.push(newPost)
             return newPost
-        }
-        return
     },
-    updatePost(authorization: string | undefined, id: string, title: string, shortDescription: string, content: string, blogId: string) {
-        if (authorization && usersRepository.find(u => u.loginPass === authorization)) {
+    updatePost(id: string, title: string, shortDescription: string, content: string, blogId: string) {
             let foundPostById = postsArray.find(p => p.id === id)
             if (foundPostById) {
                 foundPostById.title = title
@@ -47,19 +43,14 @@ export const postsRepository = {
                 return true
             }
             return 'Not found'
-        }
-        return
     },
-    deletePost(authorization: string | undefined, id: string) {
-        if (authorization && usersRepository.find(u => u.loginPass === authorization)) {
+    deletePost(id: string) {
             let foundPostById = postsArray.find(p => p.id === id)
             if (foundPostById) {
                 postsArray = postsArray.filter(p => p !== foundPostById)
                 return true
             }
             return 'Not found'
-        }
-        return
     },
     deleteAllPosts() {
         postsArray.splice(0, postsArray.length)
