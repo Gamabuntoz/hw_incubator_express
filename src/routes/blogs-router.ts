@@ -21,8 +21,6 @@ blogsRouter.get('/:id', (req: Request, res: Response) => {
     res.status(sendStatus.OK_200).send(foundBlog)
 })
 
-
-
 blogsRouter.post('/',
     authorizationValidation,
     inputBlogsValidation.name,
