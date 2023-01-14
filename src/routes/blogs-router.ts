@@ -53,6 +53,7 @@ blogsRouter.put('/:id',
 })
 blogsRouter.delete('/:id',
     authorizationValidation,
+    inputValidationErrors,
     (req: Request, res: Response) => {
     const foundBlog = blogsRepository.deleteBlog(req.params.id)
     if (foundBlog === 'Not found') {

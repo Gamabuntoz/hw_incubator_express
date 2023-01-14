@@ -56,6 +56,7 @@ postsRouter.put('/:id',
 })
 postsRouter.delete('/:id',
     authorizationValidation,
+    inputValidationErrors,
     (req: Request, res: Response) => {
     const foundPost = postsRepository.deletePost(req.params.id)
     if (foundPost === 'Not found') {
