@@ -2,7 +2,6 @@ import {Request, Response, Router} from "express";
 import {postsRepository} from "../repositories/posts-repository";
 import {sendStatus} from "./send-status-collections";
 import {inputPostsValidation, inputValidationErrors} from "../middlewares/input-validation-middleware";
-import {blogsArrayType, blogsRepository, blogsType} from "../repositories/blogs-repository";
 export const postsRouter = Router()
 
 postsRouter.get('/', (req: Request, res: Response) => {
@@ -50,13 +49,11 @@ postsRouter.put('/:id',
     const content = req.body.content
     const blogId = req.body.blogId
     const updatePost = postsRepository.updatePost(authorization, id, title, shortDescription, content, blogId)
-    if (updatePost === 'Not found') {
-        res.sendStatus(sendStatus.NOT_FOUND_404)
-        return
-    }
     if (!updatePost) {
-        res.sendStatus(sendStatus.UNAUTHORIZED_401)
-        return
+        return res.sendStatus(sendStatus.UNAUTHORIZED_401)
+        }
+    if (updatePost === 'Not found') {
+        return res.sendStatus(sendStatus.NOT_FOUND_404)
     }
     res.sendStatus(sendStatus.NO_CONTENT_204)
 })

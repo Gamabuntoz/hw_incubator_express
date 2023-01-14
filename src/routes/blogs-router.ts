@@ -49,14 +49,15 @@ blogsRouter.put('/:id',
     const description = req.body.description
     const website = req.body.websiteUrl
     const updateBlog = blogsRepository.updateBlog(authorization, id, name, description, website)
-    if (updateBlog === 'Not found') {
+        if (!updateBlog) {
+            res.sendStatus(sendStatus.UNAUTHORIZED_401)
+            return
+        }
+        if (updateBlog === 'Not found') {
         res.sendStatus(sendStatus.NOT_FOUND_404)
         return
     }
-    if (!updateBlog) {
-        res.sendStatus(sendStatus.UNAUTHORIZED_401)
-        return
-    }
+
     res.sendStatus(sendStatus.NO_CONTENT_204)
 })
 blogsRouter.delete('/:id', (req: Request, res: Response) => {
