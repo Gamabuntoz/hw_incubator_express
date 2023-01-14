@@ -19,7 +19,6 @@ blogsRouter.get('/:id', (req: Request, res: Response) => {
 
 
 
-
 blogsRouter.post('/',
     inputBlogsValidation.name,
     inputBlogsValidation.description,
