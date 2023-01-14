@@ -11,8 +11,6 @@ export const inputBlogsValidation = {
         .trim().isString().withMessage('Must be a string')
         .isLength({min: 1, max: 500}).withMessage('Length must be from 1 to 500 symbols'),
     websiteUrl: body('websiteUrl')
-        .isString().withMessage('Must be a string')
-        .isLength({min: 1, max: 100}).withMessage('Length must be from 1 to 500 symbols')
         .isURL().withMessage('Must be URL')
 }
 export const inputPostsValidation =  {
@@ -41,7 +39,8 @@ export const inputValidationErrors = (req: Request, res: Response, next: NextFun
     }
     const errors = validationResult(req).formatWith(errorFormat)
     if (!errors.isEmpty()) {
-        res.status(sendStatus.BAD_REQUEST_400).json({errorsMessages: errors.array()})
+        res.status(sendStatus.BAD_REQUEST_400)
+            .json({errorsMessages: errors.array()})
         return
     } else {
         next()
