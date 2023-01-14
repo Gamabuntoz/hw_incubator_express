@@ -1,14 +1,15 @@
 import {Request, Response, Router} from "express";
 import {blogsRepository} from "../repositories/blogs-repository";
 import {sendStatus} from "./send-status-collections";
+import {inputBlogsValidation, inputValidationErrors,} from "../middlewares/input-validation-middleware";
 export const blogsRouter = Router()
 
 blogsRouter.get('/', (req: Request, res: Response) => {
-    const allBlogs = blogsRepository.findBlogs(+req.params.id)
+    const allBlogs = blogsRepository.findAllBlogs()
     res.status(sendStatus.OK_200).send(allBlogs)
 })
 blogsRouter.get('/:id', (req: Request, res: Response) => {
-    const foundBlog = blogsRepository.findBlogs(+req.params.id)
+    const foundBlog = blogsRepository.findBlogById(req.params.id)
     if (!foundBlog) {
         res.sendStatus(sendStatus.NOT_FOUND_404)
         return
@@ -16,7 +17,15 @@ blogsRouter.get('/:id', (req: Request, res: Response) => {
     res.status(sendStatus.OK_200).send(foundBlog)
 })
 
-blogsRouter.post('/', (req: Request, res: Response) => {
+
+
+
+blogsRouter.post('/',
+    inputBlogsValidation.name,
+    inputBlogsValidation.description,
+    inputBlogsValidation.websiteUrl,
+    inputValidationErrors,
+    (req: Request, res: Response) => {
     const authorization = req.headers.authorization
     const name = req.body.name
     const description = req.body.description
@@ -28,9 +37,14 @@ blogsRouter.post('/', (req: Request, res: Response) => {
     }
     res.sendStatus(sendStatus.UNAUTHORIZED_401)
 })
-blogsRouter.put('/:id', (req: Request, res: Response) => {
+blogsRouter.put('/:id',
+    inputBlogsValidation.name,
+    inputBlogsValidation.description,
+    inputBlogsValidation.websiteUrl,
+    inputValidationErrors,
+    (req: Request, res: Response) => {
     const authorization = req.headers.authorization
-    const id = +req.params.id
+    const id = req.params.id
     const name = req.body.name
     const description = req.body.description
     const website = req.body.websiteUrl
@@ -47,7 +61,7 @@ blogsRouter.put('/:id', (req: Request, res: Response) => {
 })
 blogsRouter.delete('/:id', (req: Request, res: Response) => {
     const authorization = req.headers.authorization
-    const foundBlog = blogsRepository.deleteBlog(authorization, +req.params.id)
+    const foundBlog = blogsRepository.deleteBlog(authorization, req.params.id)
     if (foundBlog === 'Not found') {
         res.sendStatus(sendStatus.NOT_FOUND_404)
         return

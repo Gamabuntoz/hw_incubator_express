@@ -1,29 +1,21 @@
 import {usersRepository} from "./users-repository";
 
-type blogsType = {
+export type blogsType = {
     id: string
     name: string
     description: string
     websiteUrl: string
 }
-type blogsArrayType = Array<blogsType>
-let blogsArray: blogsArrayType = [
-    {
-    id: '1',
-    name: 'First blog',
-    description: 'Long',
-    websiteUrl: 'Incorrect'
-    }
-]
+export type blogsArrayType = Array<blogsType>
+let blogsArray: blogsArrayType = []
 
 export const blogsRepository = {
-    findBlogs(id: number) {
-        if (id) {
-            let foundBlogById = blogsArray.find(b => +b.id === id)
-            return foundBlogById
-        } else {
-            return blogsArray
-        }
+    findAllBlogs(): blogsArrayType {
+        return blogsArray
+    },
+    findBlogById(id: string): blogsType {
+            let foundBlogById = blogsArray.find(b => b.id === id)
+            return foundBlogById!
     },
     createBlog(authorization: string | undefined, name: string, description: string, website: string) {
         if (authorization && usersRepository.find(u => u.loginPass === authorization)) {
@@ -38,9 +30,9 @@ export const blogsRepository = {
         }
         return
     },
-    updateBlog(authorization: string | undefined, id: number, name: string, description: string, website: string) {
+    updateBlog(authorization: string | undefined, id: string, name: string, description: string, website: string) {
         if (authorization && usersRepository.find(u => u.loginPass === authorization)) {
-            let foundBlogById = blogsArray.find(b => +b.id === id)
+            let foundBlogById = blogsArray.find(b => b.id === id)
             if (foundBlogById) {
                 foundBlogById.name = name
                 foundBlogById.description = description
@@ -51,9 +43,9 @@ export const blogsRepository = {
         }
         return
     },
-    deleteBlog(authorization: string | undefined, id: number) {
+    deleteBlog(authorization: string | undefined, id: string) {
         if (authorization && usersRepository.find(u => u.loginPass === authorization)) {
-            let foundBlogById = blogsArray.find(b => +b.id === id)
+            let foundBlogById = blogsArray.find(b => b.id === id)
             if (foundBlogById) {
                 blogsArray = blogsArray.filter(b => b !== foundBlogById)
                 return true

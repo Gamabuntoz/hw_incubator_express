@@ -1,21 +1,29 @@
 import {Request, Response, Router} from "express";
 import {postsRepository} from "../repositories/posts-repository";
 import {sendStatus} from "./send-status-collections";
+import {inputPostsValidation, inputValidationErrors} from "../middlewares/input-validation-middleware";
+import {blogsArrayType, blogsRepository, blogsType} from "../repositories/blogs-repository";
 export const postsRouter = Router()
 
 postsRouter.get('/', (req: Request, res: Response) => {
-    const allPosts = postsRepository.findPosts(+req.params.id)
+    const allPosts = postsRepository.findAllPosts()
     res.status(sendStatus.OK_200).send(allPosts)
 })
 postsRouter.get('/:id', (req: Request, res: Response) => {
-    const foundPost = postsRepository.findPosts(+req.params.id)
+    const foundPost = postsRepository.findPostById(req.params.id)
     if (!foundPost) {
         res.sendStatus(sendStatus.NOT_FOUND_404)
     }
     res.status(sendStatus.OK_200).send(foundPost)
 })
 
-postsRouter.post('/', (req: Request, res: Response) => {
+postsRouter.post('/',
+    inputPostsValidation.title,
+    inputPostsValidation.shortDescription,
+    inputPostsValidation.content,
+    inputPostsValidation.blogId,
+    inputValidationErrors,
+    (req: Request, res: Response) => {
     const authorization = req.headers.authorization
     const title = req.body.title
     const shortDescription = req.body.shortDescription
@@ -28,9 +36,15 @@ postsRouter.post('/', (req: Request, res: Response) => {
     }
     res.sendStatus(sendStatus.UNAUTHORIZED_401)
 })
-postsRouter.put('/:id', (req: Request, res: Response) => {
+postsRouter.put('/:id',
+    inputPostsValidation.title,
+    inputPostsValidation.shortDescription,
+    inputPostsValidation.content,
+    inputPostsValidation.blogId,
+    inputValidationErrors,
+    (req: Request, res: Response) => {
     const authorization = req.headers.authorization
-    const id = +req.params.id
+    const id = req.params.id
     const title = req.body.title
     const shortDescription = req.body.shortDescription
     const content = req.body.content
@@ -48,7 +62,7 @@ postsRouter.put('/:id', (req: Request, res: Response) => {
 })
 postsRouter.delete('/:id', (req: Request, res: Response) => {
     const authorization = req.headers.authorization
-    const foundPost = postsRepository.deletePost(authorization, +req.params.id)
+    const foundPost = postsRepository.deletePost(authorization, req.params.id)
     if (foundPost === 'Not found') {
         res.sendStatus(sendStatus.NOT_FOUND_404)
         return
