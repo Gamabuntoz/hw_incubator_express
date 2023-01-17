@@ -44,5 +44,8 @@ export const blogsRepository = {
     },
     deleteAllBlogs() {
         blogsArray.splice(0, blogsArray.length)
+    },
+    checkBlogById(id: string):blogsType | undefined {
+        return blogsArray.find(b => b.id === id)
     }
 }
