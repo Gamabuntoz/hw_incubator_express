@@ -1,6 +1,6 @@
 import {blogsRepository} from "./blogs-repository";
 
-type postsType = {
+export type postsType = {
     id: string
     title: string
     shortDescription: string
@@ -8,31 +8,30 @@ type postsType = {
     blogId: string
     blogName: string
 }
-type postsArrayType = Array<postsType>
+export type postsArrayType = Array<postsType>
 let postsArray: postsArrayType = []
 
 export const postsRepository = {
-    findPostById(id: string) {
-        return postsArray.find(p => p.id === id)
-
-    },
-    findAllPosts() {
+    async findAllPosts(): Promise<postsArrayType> {
         return postsArray
     },
-    createPost(title: string, shortDescription: string, content: string, blogId: string) {
-            const postById = blogsRepository.findBlogById(blogId)
+    async findPostById(id: string): Promise<postsType | undefined> {
+        return postsArray.find(p => p.id === id)
+    },
+    async createPost(title: string, shortDescription: string, content: string, blogId: string):Promise<postsType> {
+            const postById = await blogsRepository.findBlogById(blogId)
             const newPost: postsType = {
                 id: (postsArray.length + 1).toString(),
                 title: title,
                 shortDescription: shortDescription,
                 content: content,
-                blogId: postById.id,
-                blogName: postById.name,
+                blogId: postById!.id,
+                blogName: postById!.name,
             }
             postsArray.push(newPost)
             return newPost
     },
-    updatePost(id: string, title: string, shortDescription: string, content: string, blogId: string) {
+    async updatePost(id: string, title: string, shortDescription: string, content: string, blogId: string):Promise<boolean> {
             let foundPostById = postsArray.find(p => p.id === id)
             if (foundPostById) {
                 foundPostById.title = title
@@ -41,15 +40,15 @@ export const postsRepository = {
                 foundPostById.blogId = blogId
                 return true
             }
-            return 'Not found'
+            return false
     },
-    deletePost(id: string) {
+    async deletePost(id: string):Promise<boolean> {
             let foundPostById = postsArray.find(p => p.id === id)
             if (foundPostById) {
                 postsArray = postsArray.filter(p => p !== foundPostById)
                 return true
             }
-            return 'Not found'
+            return false
     },
     deleteAllPosts() {
         postsArray.splice(0, postsArray.length)

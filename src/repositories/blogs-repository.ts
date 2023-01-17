@@ -8,14 +8,14 @@ export type blogsArrayType = Array<blogsType>
 let blogsArray: blogsArrayType = []
 
 export const blogsRepository = {
-    findAllBlogs(): blogsArrayType {
+    async findAllBlogs():Promise<blogsArrayType> {
         return blogsArray
     },
-    findBlogById(id: string): blogsType {
+    async findBlogById(id: string):Promise<blogsType | undefined> {
             let foundBlogById = blogsArray.find(b => b.id === id)
-            return foundBlogById!
+            return foundBlogById
     },
-    createBlog(name: string, description: string, website: string) {
+    async createBlog(name: string, description: string, website: string):Promise<blogsType> {
             const newBlog: blogsType = {
                 id: (blogsArray.length + 1).toString(),
                 name: name,
@@ -25,7 +25,7 @@ export const blogsRepository = {
             blogsArray.push(newBlog)
             return newBlog
     },
-    updateBlog(id: string, name: string, description: string, website: string) {
+    async updateBlog(id: string, name: string, description: string, website: string):Promise<boolean> {
             let foundBlogById = blogsArray.find(b => b.id === id)
             if (foundBlogById) {
                 foundBlogById.name = name
@@ -33,15 +33,15 @@ export const blogsRepository = {
                 foundBlogById.websiteUrl = website
                 return true
             }
-            return 'Not found'
+            return false
     },
-    deleteBlog(id: string) {
+    async deleteBlog(id: string):Promise<boolean> {
             let foundBlogById = blogsArray.find(b => b.id === id)
             if (foundBlogById) {
                 blogsArray = blogsArray.filter(b => b !== foundBlogById)
                 return true
             }
-            return 'Not found'
+            return false
     },
     deleteAllBlogs() {
         blogsArray.splice(0, blogsArray.length)

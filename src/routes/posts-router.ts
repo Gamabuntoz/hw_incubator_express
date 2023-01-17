@@ -1,19 +1,19 @@
-import {Request, Response, Router} from "express";
-import {postsRepository} from "../repositories/posts-repository";
+import {NextFunction, Request, Response, Router} from "express";
+import {postsArrayType, postsRepository, postsType} from "../repositories/posts-repository";
 import {sendStatus} from "./send-status-collections";
 import {
-    authorizationValidation,
+    authMiddleware,
     inputPostsValidation,
     inputValidationErrors
 } from "../middlewares/input-validation-middleware";
 export const postsRouter = Router()
 
-postsRouter.get('/', (req: Request, res: Response) => {
-    const allPosts = postsRepository.findAllPosts()
+postsRouter.get('/', async (req: Request, res: Response) => {
+    const allPosts: postsArrayType = await postsRepository.findAllPosts()
     res.status(sendStatus.OK_200).send(allPosts)
 })
-postsRouter.get('/:id', (req: Request, res: Response) => {
-    const foundPost = postsRepository.findPostById(req.params.id)
+postsRouter.get('/:id', async (req: Request, res: Response) => {
+    const foundPost: postsType | undefined = await postsRepository.findPostById(req.params.id)
     if (!foundPost) {
         res.sendStatus(sendStatus.NOT_FOUND_404)
     }
@@ -21,45 +21,51 @@ postsRouter.get('/:id', (req: Request, res: Response) => {
 })
 
 postsRouter.post('/',
-    authorizationValidation,
+    (req: Request, res: Response, next: NextFunction) => {
+        authMiddleware(req, res, next)
+    },
     inputPostsValidation.title,
     inputPostsValidation.shortDescription,
     inputPostsValidation.content,
     inputPostsValidation.blogId,
     inputValidationErrors,
-    (req: Request, res: Response) => {
+    async (req: Request, res: Response) => {
     const title = req.body.title
     const shortDescription = req.body.shortDescription
     const content = req.body.content
     const blogId = req.body.blogId
-    const newPost = postsRepository.createPost(title, shortDescription, content, blogId)
+    const newPost: postsType = await postsRepository.createPost(title, shortDescription, content, blogId)
         res.status(sendStatus.CREATED_201).send(newPost)
 })
 postsRouter.put('/:id',
-    authorizationValidation,
+    (req: Request, res: Response, next: NextFunction) => {
+        authMiddleware(req, res, next)
+    },
     inputPostsValidation.title,
     inputPostsValidation.shortDescription,
     inputPostsValidation.content,
     inputPostsValidation.blogId,
     inputValidationErrors,
-    (req: Request, res: Response) => {
+    async (req: Request, res: Response) => {
     const id = req.params.id
     const title = req.body.title
     const shortDescription = req.body.shortDescription
     const content = req.body.content
     const blogId = req.body.blogId
-    const updatePost = postsRepository.updatePost(id, title, shortDescription, content, blogId)
-    if (updatePost === 'Not found') {
+    const updatePost: boolean = await postsRepository.updatePost(id, title, shortDescription, content, blogId)
+    if (!updatePost) {
         return res.sendStatus(sendStatus.NOT_FOUND_404)
     }
     res.sendStatus(sendStatus.NO_CONTENT_204)
 })
 postsRouter.delete('/:id',
-    authorizationValidation,
+    (req: Request, res: Response, next: NextFunction) => {
+        authMiddleware(req, res, next)
+    },
     inputValidationErrors,
-    (req: Request, res: Response) => {
-    const foundPost = postsRepository.deletePost(req.params.id)
-    if (foundPost === 'Not found') {
+    async (req: Request, res: Response) => {
+    const foundPost: boolean = await postsRepository.deletePost(req.params.id)
+    if (!foundPost) {
         return res.sendStatus(sendStatus.NOT_FOUND_404)
     }
     res.sendStatus(sendStatus.NO_CONTENT_204)
