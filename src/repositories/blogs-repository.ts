@@ -12,8 +12,7 @@ export const blogsRepository = {
         return blogsArray
     },
     async findBlogById(id: string):Promise<blogsType | undefined> {
-            let foundBlogById = blogsArray.find(b => b.id === id)
-            return foundBlogById
+        return blogsArray.find(b => b.id === id)
     },
     async createBlog(name: string, description: string, website: string):Promise<blogsType> {
             const newBlog: blogsType = {
