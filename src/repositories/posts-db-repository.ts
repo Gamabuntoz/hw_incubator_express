@@ -32,7 +32,14 @@ export const postsRepository = {
         )
     },
     async findPostById(id: string): Promise<postsType | null | boolean> {
-        const result = await postsCollection.findOne({_id: new ObjectId(id)})
+        let postId: ObjectId;
+        try {
+            postId = new ObjectId(id)
+        } catch (e){
+            console.log(e)
+            return false
+        }
+        const result = await postsCollection.findOne({_id: postId})
         if (!result) {
             return false
         }
@@ -73,7 +80,14 @@ export const postsRepository = {
         return result.matchedCount === 1
     },
     async deletePost(id: string):Promise<boolean> {
-        const result = await postsCollection.deleteOne({_id: new ObjectId(id)})
+        let postId: ObjectId;
+        try {
+            postId = new ObjectId(id)
+        } catch (e){
+            console.log(e)
+            return false
+        }
+        const result = await postsCollection.deleteOne({_id: postId})
         return result.deletedCount === 1
     },
     async deleteAllPosts():Promise<boolean> {

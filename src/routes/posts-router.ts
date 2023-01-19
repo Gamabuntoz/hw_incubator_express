@@ -15,7 +15,7 @@ postsRouter.get('/', async (req: Request, res: Response) => {
 postsRouter.get('/:id', async (req: Request, res: Response) => {
     const foundPost: postsType | null | boolean = await postsRepository.findPostById(req.params.id)
     if (!foundPost) {
-        res.sendStatus(sendStatus.NOT_FOUND_404)
+       return  res.sendStatus(sendStatus.NOT_FOUND_404)
     }
     res.status(sendStatus.OK_200).send(foundPost)
 })
