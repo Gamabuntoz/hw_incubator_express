@@ -14,7 +14,6 @@ export type postsType = {
 }
 
 export type postsArrayType = Array<postsType>
-let postsArray: postsArrayType = []
 
 const postsCollection = client.db().collection<postsType>("posts")
 

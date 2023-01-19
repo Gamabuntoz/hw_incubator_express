@@ -10,7 +10,6 @@ export type blogsType = {
     _id?: ObjectId
 }
 export type blogsArrayType = Array<blogsType>
-let blogsArray: blogsArrayType = []
 
 const blogsCollection = client.db().collection<blogsType>("blogs")
 
