@@ -8,7 +8,7 @@ export type postsType = {
     title: string
     shortDescription: string
     content: string
-    blogId: string
+    blogId: string | undefined
     blogName: string
     createdAt: string
 }
@@ -52,8 +52,8 @@ export const postsRepository = {
             title: title,
             shortDescription: shortDescription,
             content: content,
-            blogId: postById.id,
-            blogName: postById.name,
+            blogId: typeof postById !== "boolean" ? postById.id : "f",
+            blogName: typeof postById !== "boolean" ? postById.name : "f",
             createdAt: new Date().toISOString()
         }
         const result = await postsCollection.insertOne(newPost)
@@ -64,7 +64,7 @@ export const postsRepository = {
             content: newPost.content,
             blogId: newPost.blogId,
             blogName: newPost.blogName,
-            createdAt: newPost.createdAt
+            createdAt: newPost.createdAt,
         }
     },
     async updatePost(id: string, title: string, shortDescription: string, content: string, blogId: string):Promise<boolean> {
@@ -79,5 +79,5 @@ export const postsRepository = {
     async deleteAllPosts():Promise<boolean> {
         const result = await postsCollection.deleteMany({})
         return result.deletedCount === 1
-    },
+    }
 }

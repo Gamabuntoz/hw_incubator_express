@@ -14,7 +14,7 @@ export type blogsArrayType = Array<blogsType>
 const blogsCollection = client.db().collection<blogsType>("blogs")
 
 export const blogsRepository = {
-    async findAllBlogs(): Promise<any> {
+    async findAllBlogs(): Promise<blogsArrayType> {
         const result = await blogsCollection.find({}).toArray()
         return result.map(b => ({
             id: b._id!.toString(),
@@ -25,7 +25,7 @@ export const blogsRepository = {
             })
         )
     },
-    async findBlogById(id: string): Promise<any> {
+    async findBlogById(id: string): Promise<boolean | blogsType> {
         const result = await blogsCollection.findOne({_id: new ObjectId(id)})
         if (!result) {
             return false

@@ -13,7 +13,7 @@ postsRouter.get('/', async (req: Request, res: Response) => {
     res.status(sendStatus.OK_200).send(allPosts)
 })
 postsRouter.get('/:id', async (req: Request, res: Response) => {
-    const foundPost: postsType | null = await postsRepository.findPostById(req.params.id)
+    const foundPost: postsType | null | boolean = await postsRepository.findPostById(req.params.id)
     if (!foundPost) {
         res.sendStatus(sendStatus.NOT_FOUND_404)
     }
@@ -21,9 +21,7 @@ postsRouter.get('/:id', async (req: Request, res: Response) => {
 })
 
 postsRouter.post('/',
-    (req: Request, res: Response, next: NextFunction) => {
-        authMiddleware(req, res, next)
-    },
+    authMiddleware,
     inputPostsValidation.title,
     inputPostsValidation.shortDescription,
     inputPostsValidation.content,
@@ -38,9 +36,7 @@ postsRouter.post('/',
         res.status(sendStatus.CREATED_201).send(newPost)
 })
 postsRouter.put('/:id',
-    (req: Request, res: Response, next: NextFunction) => {
-        authMiddleware(req, res, next)
-    },
+    authMiddleware,
     inputPostsValidation.title,
     inputPostsValidation.shortDescription,
     inputPostsValidation.content,
@@ -59,10 +55,7 @@ postsRouter.put('/:id',
     res.sendStatus(sendStatus.NO_CONTENT_204)
 })
 postsRouter.delete('/:id',
-    (req: Request, res: Response, next: NextFunction) => {
-        authMiddleware(req, res, next)
-    },
-    inputValidationErrors,
+    authMiddleware,
     async (req: Request, res: Response) => {
     const foundPost: boolean = await postsRepository.deletePost(req.params.id)
     if (!foundPost) {

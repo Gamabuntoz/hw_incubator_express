@@ -13,7 +13,7 @@ blogsRouter.get('/', async (req: Request, res: Response) => {
     res.status(sendStatus.OK_200).send(allBlogs)
 })
 blogsRouter.get('/:id',  async (req: Request, res: Response) => {
-    const foundBlog: blogsType | undefined | null = await blogsRepository.findBlogById(req.params.id)
+    const foundBlog: blogsType | boolean | null = await blogsRepository.findBlogById(req.params.id)
     if (!foundBlog) {
         res.sendStatus(sendStatus.NOT_FOUND_404)
         return
@@ -22,9 +22,7 @@ blogsRouter.get('/:id',  async (req: Request, res: Response) => {
 })
 
 blogsRouter.post('/',
-    (req: Request, res: Response, next: NextFunction) => {
-        authMiddleware(req, res, next)
-    },
+    authMiddleware,
     inputBlogsValidation.name,
     inputBlogsValidation.description,
     inputBlogsValidation.websiteUrl,
@@ -37,9 +35,7 @@ blogsRouter.post('/',
            res.status(sendStatus.CREATED_201).send(newBlogCreate)
 })
 blogsRouter.put('/:id',
-    (req: Request, res: Response, next: NextFunction) => {
-        authMiddleware(req, res, next)
-    },
+    authMiddleware,
     inputBlogsValidation.name,
     inputBlogsValidation.description,
     inputBlogsValidation.websiteUrl,
@@ -56,9 +52,7 @@ blogsRouter.put('/:id',
     res.sendStatus(sendStatus.NO_CONTENT_204)
 })
 blogsRouter.delete('/:id',
-    (req: Request, res: Response, next: NextFunction) => {
-        authMiddleware(req, res, next)
-    },
+    authMiddleware,
     inputValidationErrors,
     async (req: Request, res: Response) => {
     const foundBlog: boolean = await blogsRepository.deleteBlog(req.params.id)
