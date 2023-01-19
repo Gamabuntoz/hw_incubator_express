@@ -20,10 +20,32 @@ const postsCollection = client.db().collection<postsType>("posts")
 
 export const postsRepository = {
     async findAllPosts():Promise<postsArrayType> {
-        return await postsCollection.find({}).toArray()
+        const result = await postsCollection.find({}).toArray()
+        return result.map(p => ({
+            id: p._id!.toString(),
+            title: p.title,
+            shortDescription: p.shortDescription,
+            content: p.content,
+            blogId: p.blogId,
+            blogName: p.blogName,
+            createdAt: p.createdAt
+            })
+        )
     },
-    async findPostById(id: string): Promise<postsType | null> {
-        return await postsCollection.findOne({_id: new ObjectId(id)})
+    async findPostById(id: string): Promise<postsType | null | boolean> {
+        const result = await postsCollection.findOne({_id: new ObjectId(id)})
+        if (!result) {
+            return false
+        }
+        return {
+            id: result._id!.toString(),
+            title: result.title,
+            shortDescription: result.shortDescription,
+            content: result.content,
+            blogId: result.blogId,
+            blogName: result.blogName,
+            createdAt: result.createdAt
+        }
     },
     async createPost(title: string, shortDescription: string, content: string, blogId: string):Promise<postsType> {
         const postById = await blogsRepository.findBlogById(blogId)
@@ -31,8 +53,8 @@ export const postsRepository = {
             title: title,
             shortDescription: shortDescription,
             content: content,
-            blogId: postById!._id!.toString(),
-            blogName: postById!.name,
+            blogId: postById.id,
+            blogName: postById.name,
             createdAt: new Date().toISOString()
         }
         const result = await postsCollection.insertOne(newPost)
