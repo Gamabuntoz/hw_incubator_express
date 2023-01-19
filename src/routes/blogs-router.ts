@@ -53,12 +53,12 @@ blogsRouter.put('/:id',
 })
 blogsRouter.delete('/:id',
     authMiddleware,
-    inputValidationErrors,
     async (req: Request, res: Response) => {
-    const foundBlog: boolean = await blogsRepository.deleteBlog(req.params.id)
+    const foundBlog = await blogsRepository.findBlogById(req.params.id)
     if (!foundBlog) {
         return res.sendStatus(sendStatus.NOT_FOUND_404)
     }
+    const result = await blogsRepository.deleteBlog(req.params.id)
     res.sendStatus(sendStatus.NO_CONTENT_204)
 })
 

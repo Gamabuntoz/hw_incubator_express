@@ -1,4 +1,4 @@
-import {NextFunction, Request, Response, Router} from "express";
+import {Request, Response, Router} from "express";
 import {postsArrayType, postsRepository, postsType} from "../repositories/posts-db-repository";
 import {sendStatus} from "./send-status-collections";
 import {
@@ -57,9 +57,10 @@ postsRouter.put('/:id',
 postsRouter.delete('/:id',
     authMiddleware,
     async (req: Request, res: Response) => {
-    const foundPost: boolean = await postsRepository.deletePost(req.params.id)
+    const foundPost = await postsRepository.findPostById(req.params.id)
     if (!foundPost) {
         return res.sendStatus(sendStatus.NOT_FOUND_404)
     }
+    const result = await postsRepository.deletePost(req.params.id)
     res.sendStatus(sendStatus.NO_CONTENT_204)
 })
