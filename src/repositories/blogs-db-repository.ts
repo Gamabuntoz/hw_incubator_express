@@ -1,10 +1,13 @@
 import {client} from "./db";
+import {ObjectId} from "mongodb";
 
 export type blogsType = {
-    id: string
+    createdAt: string
     name: string
     description: string
     websiteUrl: string
+    id?: string
+    _id?: ObjectId
 }
 export type blogsArrayType = Array<blogsType>
 let blogsArray: blogsArrayType = []
@@ -16,25 +19,31 @@ export const blogsRepository = {
         return await blogsCollection.find({}).toArray()
     },
     async findBlogById(id: string):Promise<blogsType | null> {
-        return blogsCollection.findOne({id})
+        return await blogsCollection.findOne({_id: new ObjectId(id)})
     },
     async createBlog(name: string, description: string, website: string):Promise<blogsType> {
         const newBlog: blogsType = {
-            id: (blogsArray.length + 1).toString(),
+            createdAt: new Date().toISOString(),
             name: name,
             description: description,
             websiteUrl: website,
         }
         const result = await blogsCollection.insertOne(newBlog)
-        return newBlog
+        return {
+            id: newBlog._id!.toString(),
+            name: newBlog.name,
+            description: newBlog.description,
+            websiteUrl: newBlog.websiteUrl,
+            createdAt: newBlog.createdAt,
+        }
     },
     async updateBlog(id: string, name: string, description: string, website: string):Promise<boolean> {
         const result = await blogsCollection
-            .updateOne({id: id}, {$set: {name: name, description: description, websiteUrl: website}})
+            .updateOne({_id: new ObjectId(id)}, {$set: {name: name, description: description, websiteUrl: website}})
         return result.matchedCount === 1
     },
     async deleteBlog(id: string):Promise<boolean> {
-        const result = await blogsCollection.deleteOne({id: id})
+        const result = await blogsCollection.deleteOne({_id: new ObjectId(id)})
         return result.deletedCount === 1
     },
     async deleteAllBlogs():Promise<boolean> {
