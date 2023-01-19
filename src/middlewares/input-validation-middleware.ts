@@ -34,8 +34,6 @@ export const inputPostsValidation = {
         .trim().isString().withMessage('Must be a string')
         .isLength({min: 1, max: 1000}).withMessage('Length must be from 1 to 1000 symbols'),
     blogId: body('blogId')
-        .trim().isString().withMessage('Must be a string')
-        .isLength({min: 1, max: 100}).withMessage('Length must be from 1 to 100 symbols')
         .custom (value => {
             if (!blogsRepository.findBlogById(value)) {
                 throw new Error('Blog is not found');
