@@ -39,8 +39,9 @@ export const inputPostsValidation = {
             const result = blogsRepository.findBlogById(value)
             if (!result) {
                 throw new Error('Blog is not found');
+            } else {
+                return true;
             }
-            return true;
         })
 }
 export const inputValidationErrors = (req: Request, res: Response, next: NextFunction) => {
