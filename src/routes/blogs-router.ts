@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response, Router} from "express";
-import {blogsArrayType, blogsRepository, blogsType} from "../repositories/blogs-repository";
+import {blogsArrayType, blogsRepository, blogsType} from "../repositories/blogs-db-repository";
 import {sendStatus} from "./send-status-collections";
 import {
     authMiddleware,
@@ -13,7 +13,7 @@ blogsRouter.get('/', async (req: Request, res: Response) => {
     res.status(sendStatus.OK_200).send(allBlogs)
 })
 blogsRouter.get('/:id',  async (req: Request, res: Response) => {
-    const foundBlog: blogsType | undefined = await blogsRepository.findBlogById(req.params.id)
+    const foundBlog: blogsType | undefined | null = await blogsRepository.findBlogById(req.params.id)
     if (!foundBlog) {
         res.sendStatus(sendStatus.NOT_FOUND_404)
         return

@@ -1,4 +1,4 @@
-import {blogsRepository} from "./blogs-repository";
+import {blogsRepository} from "./blogs-in-memory-repository";
 
 export type postsType = {
     id: string

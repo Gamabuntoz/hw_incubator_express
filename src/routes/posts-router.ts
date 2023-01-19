@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response, Router} from "express";
-import {postsArrayType, postsRepository, postsType} from "../repositories/posts-repository";
+import {postsArrayType, postsRepository, postsType} from "../repositories/posts-db-repository";
 import {sendStatus} from "./send-status-collections";
 import {
     authMiddleware,
@@ -13,7 +13,7 @@ postsRouter.get('/', async (req: Request, res: Response) => {
     res.status(sendStatus.OK_200).send(allPosts)
 })
 postsRouter.get('/:id', async (req: Request, res: Response) => {
-    const foundPost: postsType | undefined = await postsRepository.findPostById(req.params.id)
+    const foundPost: postsType | null = await postsRepository.findPostById(req.params.id)
     if (!foundPost) {
         res.sendStatus(sendStatus.NOT_FOUND_404)
     }

@@ -4,8 +4,10 @@
   "main": "src/index.ts",
   "license": "MIT",
   "dependencies": {
+    "dotenv": "^16.0.3",
     "express": "^4.18.2",
-    "express-validator": "^6.14.2"
+    "express-validator": "^6.14.2",
+    "mongodb": "^4.13.0"
   },
   "scripts": {
     "watch": "tsc -w",
