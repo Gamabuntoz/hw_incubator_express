@@ -1,4 +1,4 @@
-import {blogsRepository} from "./blogs-in-memory-repository";
+import {blogsRepository} from "./blogs-db-repository";
 import {client} from "./db";
 
 export type postsType = {
@@ -29,8 +29,8 @@ export const postsRepository = {
             title: title,
             shortDescription: shortDescription,
             content: content,
-            blogId: postById!.id,
-            blogName: postById!.name,
+            blogId: postById!["id"],
+            blogName: postById!["name"],
         }
         const result = await postsCollection.insertOne(newPost)
         return newPost
@@ -47,5 +47,5 @@ export const postsRepository = {
     async deleteAllPosts():Promise<boolean> {
         const result = await postsCollection.deleteMany({})
         return result.deletedCount === 1
-    }
+    },
 }

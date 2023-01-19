@@ -16,7 +16,7 @@ export const blogsRepository = {
         return await blogsCollection.find({}).toArray()
     },
     async findBlogById(id: string):Promise<blogsType | null> {
-        return await blogsCollection.findOne({id: id})
+        return blogsCollection.findOne({id})
     },
     async createBlog(name: string, description: string, website: string):Promise<blogsType> {
         const newBlog: blogsType = {
