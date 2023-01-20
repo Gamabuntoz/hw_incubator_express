@@ -58,7 +58,7 @@ export const blogsRepository = {
             name: newBlog.name,
             description: newBlog.description,
             websiteUrl: newBlog.websiteUrl,
-            createdAt: newBlog.createdAt
+            createdAt: newBlog.createdAt,
         }
     },
     async updateBlog(id: string, name: string, description: string, website: string): Promise<boolean> {
