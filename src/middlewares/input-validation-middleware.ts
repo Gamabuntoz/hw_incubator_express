@@ -1,14 +1,14 @@
 import {NextFunction, Response, Request} from "express";
 import {body, validationResult, ValidationError} from "express-validator";
-import {sendStatus} from "../routes/send-status-collections";
-import {blogsRepository} from "../repositories/blogs-db-repository";
-import {usersCollection} from "../repositories/users-db-repository";
+import {sendStatus} from "../routes/send-status-collection";
+import {blogsRepository} from "../repositories/blogs-repositories/blogs-command-repository";
+import {usersCollection} from "../repositories/users-repository";
 
 
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     const findUser = await usersCollection.findOne({loginPass: req.headers.authorization})
     if (!findUser) {
-       return res.sendStatus(sendStatus.UNAUTHORIZED_401)
+        return res.sendStatus(sendStatus.UNAUTHORIZED_401)
     }
     next()
 }
@@ -35,7 +35,7 @@ export const inputPostsValidation = {
         .isLength({min: 1, max: 1000}).withMessage('Length must be from 1 to 1000 symbols'),
     blogId: body('blogId')
         .trim().isString().withMessage('Must be a string')
-        .custom (async value => {
+        .custom(async value => {
             const result = await blogsRepository.findBlogById(value)
             if (!result) {
                 throw new Error('Blog is not found');
