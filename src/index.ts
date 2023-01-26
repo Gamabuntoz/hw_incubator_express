@@ -1,17 +1,21 @@
 import express from 'express'
 import bodyParser from 'body-parser'
 import {runDb} from "./repositories/db";
-import {blogsCommandRouter} from "./routes/blogs-routes/blogs-command-router";
+import {blogsCommandsRouter} from "./routes/blogs-routes/blogs-commands-router";
 import {postsCommandRouter} from "./routes/posts-routes/posts-command-router";
 import {testingRouter} from "./routes/testing-router";
+import {blogsQueryRouter} from "./routes/blogs-routes/blogs-query-router";
+import {postsQueryRouter} from "./routes/posts-routes/posts-query-router";
 
 export const app = express()
 const port = process.env.PORT || 5000
 const parserMiddleware = bodyParser({})
 app.use(parserMiddleware)
 
-app.use('/blogs-routes', blogsCommandRouter)
-app.use('/posts-routes', postsCommandRouter)
+app.use('/blogs', blogsCommandsRouter)
+app.use('/blogs', blogsQueryRouter)
+app.use('/posts', postsCommandRouter)
+app.use('/posts', postsQueryRouter)
 app.use('/testing', testingRouter)
 
 const startApp = async () => {

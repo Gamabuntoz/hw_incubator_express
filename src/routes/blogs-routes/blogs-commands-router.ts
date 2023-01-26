@@ -1,16 +1,17 @@
 import {Request, Response, Router} from "express";
-import {blogsType} from "../../repositories/blogs-repositories/blogs-command-repository";
-import {sendStatus} from "../send-status-collection";
+import {blogsType, postsType} from "../../repositories/types/types";
+import {sendStatus} from "../../repositories/status-collection";
 import {
     authMiddleware,
     inputBlogsValidation,
+    inputPostsValidation,
     inputValidationErrors,
 } from "../../middlewares/input-validation-middleware";
 import {blogsService} from "../../domain/blogs-service";
 
-export const blogsCommandRouter = Router()
+export const blogsCommandsRouter = Router()
 
-blogsCommandRouter.post('/',
+blogsCommandsRouter.post('/',
     authMiddleware,
     inputBlogsValidation.name,
     inputBlogsValidation.description,
@@ -23,7 +24,22 @@ blogsCommandRouter.post('/',
         const newBlogCreate: blogsType = await blogsService.createBlog(name, description, website)
         res.status(sendStatus.CREATED_201).send(newBlogCreate)
     })
-blogsCommandRouter.put('/:id',
+blogsCommandsRouter.post('/:id/posts',
+    authMiddleware,
+    inputPostsValidation.title,
+    inputPostsValidation.shortDescription,
+    inputPostsValidation.content,
+    inputPostsValidation.blogIdQuery,
+    inputValidationErrors,
+    async (req: Request, res: Response) => {
+        const title = req.body.title
+        const shortDescription = req.body.shortDescription
+        const content = req.body.content
+        const blogId = req.params.id
+        const newPost: postsType | boolean = await blogsService.createPostById(title, shortDescription, content, blogId)
+        res.status(sendStatus.CREATED_201).send(newPost)
+    })
+blogsCommandsRouter.put('/:id',
     authMiddleware,
     inputBlogsValidation.name,
     inputBlogsValidation.description,
@@ -40,7 +56,7 @@ blogsCommandRouter.put('/:id',
         }
         res.sendStatus(sendStatus.NO_CONTENT_204)
     })
-blogsCommandRouter.delete('/:id',
+blogsCommandsRouter.delete('/:id',
     authMiddleware,
     async (req: Request, res: Response) => {
         const foundBlog = await blogsService.deleteBlog(req.params.id)

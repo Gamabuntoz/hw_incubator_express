@@ -1,36 +1,12 @@
-import {client} from "../db";
 import {ObjectId} from "mongodb";
-
-export type blogsType = {
-    createdAt: string
-    name: string
-    description: string
-    websiteUrl: string
-    id?: string
-    _id?: ObjectId
-}
-export type blogsArrayType = Array<blogsType>
-
-const blogsCollection = client.db().collection<blogsType>("blogs-routes")
+import {blogsCollection} from "../db";
+import {blogsType} from "../types/types";
 
 
-export const blogsRepository = {
-    async findAllBlogs(): Promise<blogsArrayType> {
-        const result = await blogsCollection.find({}).toArray()
-        return result.map(b => ({
-                id: b._id!.toString(),
-                name: b.name,
-                description: b.description,
-                websiteUrl: b.websiteUrl,
-                createdAt: b.createdAt
-            })
-        )
+export const blogsCommandsRepository = {
+    async findBlogById(blogId: ObjectId): Promise<null | blogsType> {
+        return blogsCollection.findOne({_id: blogId})
     },
-    async findBlogById(postId: ObjectId): Promise<null | blogsType> {
-        return blogsCollection.findOne({_id: postId})
-    },
-
-
     async createBlog(newBlog: blogsType): Promise<blogsType> {
         const result = await blogsCollection.insertOne(newBlog)
         return newBlog

@@ -1,5 +1,6 @@
 import {MongoClient} from 'mongodb'
 import * as dotenv from 'dotenv'
+import {blogsType, postsType} from "./types/types";
 
 dotenv.config()
 
@@ -8,6 +9,8 @@ if (!mongoUri) {
     throw new Error("URL doesn't found")
 }
 export const client = new MongoClient(mongoUri);
+export const postsCollection = client.db().collection<postsType>("posts")
+export const blogsCollection = client.db().collection<blogsType>("blogs")
 
 export async function runDb() {
     try {
