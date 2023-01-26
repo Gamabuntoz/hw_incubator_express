@@ -1,6 +1,6 @@
 import {Request, Response, Router} from "express";
-import {postsArrayType, postsRepository, postsType} from "../../repositories/posts-repositories/posts-command-repository";
-import {sendStatus} from "../send-status-collection";
+import {postsType} from "../../repositories/types/types";
+import {sendStatus} from "../../repositories/status-collection";
 import {
     authMiddleware,
     inputPostsValidation,
@@ -10,17 +10,6 @@ import {postsService} from "../../domain/posts-service";
 
 export const postsCommandRouter = Router()
 
-postsCommandRouter.get('/', async (req: Request, res: Response) => {
-    const allPosts: postsArrayType = await postsRepository.findAllPosts()
-    res.status(sendStatus.OK_200).send(allPosts)
-})
-postsCommandRouter.get('/:id', async (req: Request, res: Response) => {
-    const foundPost: postsType | null | boolean = await postsRepository.findPostById(req.params.id)
-    if (!foundPost) {
-        return res.sendStatus(sendStatus.NOT_FOUND_404)
-    }
-    res.status(sendStatus.OK_200).send(foundPost)
-})
 
 postsCommandRouter.post('/',
     authMiddleware,
@@ -34,7 +23,7 @@ postsCommandRouter.post('/',
         const shortDescription = req.body.shortDescription
         const content = req.body.content
         const blogId = req.body.blogId
-        const newPost: postsType = await postsService.createPost(title, shortDescription, content, blogId)
+        const newPost: postsType | boolean = await postsService.createPost(title, shortDescription, content, blogId)
         res.status(sendStatus.CREATED_201).send(newPost)
     })
 postsCommandRouter.put('/:id',

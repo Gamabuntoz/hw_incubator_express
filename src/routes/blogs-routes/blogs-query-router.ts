@@ -1,54 +1,56 @@
 import {Request, Response, Router} from "express";
-import {blogsArrayType, blogsRepository, blogsType} from "../../repositories/blogs-repositories/blogs-command-repository";
-import {sendStatus} from "../send-status-collection";
+import {blogsType, findBlogsType, findPostsType} from "../../repositories/types/types";
+import {sendStatus} from "../../repositories/status-collection";
 import {ObjectId} from "mongodb";
+import {blogsQueryRepository} from "../../repositories/blogs-repositories/blogs-query-repository";
 
 export const blogsQueryRouter = Router()
 
 blogsQueryRouter.get('/', async (req: Request, res: Response) => {
-    const allBlogs: blogsArrayType = await blogsRepository.findAllBlogs()
-
+    const searchNameTerm = req.query.searchNameTerm
+    const sortBy = req.query.sortBy
+    const sortDirection = req.query.sortDirection
+    const pageNumber = +(req.query.pageNumber ?? 1)
+    const pageSize = +(req.query.pageSize ?? 10)
+    const allBlogs: findBlogsType = await blogsQueryRepository
+        .findAllBlogs(searchNameTerm as string, sortBy as string, sortDirection as string, pageNumber, pageSize)
     res.status(sendStatus.OK_200).send(allBlogs)
 })
 
+blogsQueryRouter.get('/:id', async (req: Request, res: Response) => {
+    let blogId: ObjectId;
+    try {
+        blogId = new ObjectId(req.params.id)
+    } catch (e) {
+        res.sendStatus(sendStatus.NOT_FOUND_404)
+        return false
+    }
+
+    const foundBlog: blogsType | null = await blogsQueryRepository.findBlogById(blogId)
+    if (!foundBlog) {
+        res.sendStatus(sendStatus.NOT_FOUND_404)
+        return
+    }
+
+    res.status(sendStatus.OK_200).send(foundBlog)
+
+})
 
 blogsQueryRouter.get('/:id/posts', async (req: Request, res: Response) => {
-    let postId: ObjectId;
+    const sortBy = req.query.sortBy
+    const sortDirection = req.query.sortDirection
+    const pageNumber = +(req.query.pageNumber ?? 1)
+    const pageSize = +(req.query.pageSize ?? 10)
+    let blogId: string;
     try {
-        postId = new ObjectId(req.params.id)
+        blogId = new ObjectId(req.params.id).toString()
     } catch (e) {
-        console.log(e)
+        res.sendStatus(sendStatus.NOT_FOUND_404)
         return false
     }
-    const foundBlog: blogsType | boolean | null = await blogsRepository.findBlogById(postId)
-    if (!foundBlog) {
-        res.sendStatus(sendStatus.NOT_FOUND_404)
-        return
-    }
-    res.status(sendStatus.OK_200).send(foundBlog)
+    const allPostsByBlogId: findPostsType | null = await blogsQueryRepository
+        .findAllPostsByBlogId(sortBy as string, sortDirection as string, pageNumber, pageSize, blogId)
+    res.status(sendStatus.OK_200).send(allPostsByBlogId)
 })
 
 
-blogsQueryRouter.get('/:id', async (req: Request, res: Response) => {
-    let postId: ObjectId;
-    try {
-        postId = new ObjectId(req.params.id)
-    } catch (e) {
-        console.log(e)
-        return false
-    }
-    const foundBlog: blogsType | null = await blogsRepository.findBlogById(postId)
-    if (!foundBlog) {
-        res.sendStatus(sendStatus.NOT_FOUND_404)
-        return
-    }
-    const result = {
-        id: foundBlog._id!.toString(),
-        name: foundBlog.name,
-        description: foundBlog.description,
-        websiteUrl: foundBlog.websiteUrl,
-        createdAt: foundBlog.createdAt
-    }
-    res.status(sendStatus.OK_200).send(result)
-
-})

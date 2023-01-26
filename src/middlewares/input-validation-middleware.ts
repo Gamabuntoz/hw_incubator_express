@@ -1,8 +1,9 @@
-import {NextFunction, Response, Request} from "express";
-import {body, validationResult, ValidationError} from "express-validator";
-import {sendStatus} from "../routes/send-status-collection";
-import {blogsRepository} from "../repositories/blogs-repositories/blogs-command-repository";
+import {NextFunction, Request, Response} from "express";
+import {body, param, ValidationError, validationResult} from "express-validator";
+import {sendStatus} from "../repositories/status-collection";
+import {blogsCommandsRepository} from "../repositories/blogs-repositories/blogs-commands-repository";
 import {usersCollection} from "../repositories/users-repository";
+import {ObjectId} from "mongodb";
 
 
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
@@ -15,28 +16,48 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
 
 export const inputBlogsValidation = {
     name: body('name')
-        .trim().isString().withMessage('Must be a string')
+        .isString().trim().withMessage('Must be a string')
         .isLength({min: 1, max: 15}).withMessage('Length must be from 1 to 15 symbols'),
     description: body('description')
-        .trim().isString().withMessage('Must be a string')
+        .isString().trim().withMessage('Must be a string')
         .isLength({min: 1, max: 500}).withMessage('Length must be from 1 to 500 symbols'),
     websiteUrl: body('websiteUrl')
         .isURL().withMessage('Must be URL')
 }
 export const inputPostsValidation = {
     title: body('title')
-        .trim().isString().withMessage('Must be a string')
+        .isString().trim().withMessage('Must be a string')
         .isLength({min: 1, max: 30}).withMessage('Length must be from 1 to 30 symbols'),
     shortDescription: body('shortDescription')
-        .trim().isString().withMessage('Must be a string')
+        .isString().trim().withMessage('Must be a string')
         .isLength({min: 1, max: 100}).withMessage('Length must be from 1 to 100 symbols'),
     content: body('content')
-        .trim().isString().withMessage('Must be a string')
+        .isString().trim().withMessage('Must be a string')
         .isLength({min: 1, max: 1000}).withMessage('Length must be from 1 to 1000 symbols'),
     blogId: body('blogId')
-        .trim().isString().withMessage('Must be a string')
         .custom(async value => {
-            const result = await blogsRepository.findBlogById(value)
+            let blogId: ObjectId;
+            try {
+                blogId = new ObjectId(value)
+            } catch (e) {
+                throw new Error('Blog is not found');
+            }
+            const result = await blogsCommandsRepository.findBlogById(blogId)
+            if (!result) {
+                throw new Error('Blog is not found');
+            } else {
+                return true;
+            }
+        }),
+    blogIdQuery: param('id')
+        .custom(async value => {
+            let blogId: ObjectId;
+            try {
+                blogId = new ObjectId(value)
+            } catch (e) {
+                throw new Error('Blog is not found');
+            }
+            const result = await blogsCommandsRepository.findBlogById(blogId)
             if (!result) {
                 throw new Error('Blog is not found');
             } else {

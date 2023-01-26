@@ -1,23 +1,8 @@
-import {blogsRepository} from "../blogs-repositories/blogs-command-repository";
-import {client} from "../db";
+import {postsCollection} from "../db";
 import {ObjectId} from "mongodb";
+import {postsArrayType, postsType} from "../types/types";
 
-export type postsType = {
-    id?: string
-    _id?: ObjectId
-    title: string
-    shortDescription: string
-    content: string
-    blogId: string | undefined
-    blogName: string
-    createdAt: string
-}
-
-export type postsArrayType = Array<postsType>
-
-const postsCollection = client.db().collection<postsType>("posts-routes")
-
-export const postsRepository = {
+export const postsCommandsRepository = {
     async findAllPosts(): Promise<postsArrayType> {
         const result = await postsCollection.find({}).toArray()
         return result.map(p => ({
