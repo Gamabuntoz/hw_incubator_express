@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response} from "express";
-import {body, param, ValidationError, validationResult} from "express-validator";
+import {body, oneOf, param, ValidationError, validationResult} from "express-validator";
 import {sendStatus} from "../repositories/status-collection";
 import {blogsCommandsRepository} from "../repositories/blogs-repositories/blogs-commands-repository";
 import {usersCollection} from "../repositories/users-repository";
@@ -72,7 +72,7 @@ export const inputValidationErrors = (req: Request, res: Response, next: NextFun
     const errors = validationResult(req).formatWith(errorFormat)
     if (!errors.isEmpty()) {
         res.status(sendStatus.BAD_REQUEST_400)
-            .json({errorsMessages: errors.array()})
+            .json({errorsMessages: errors.array({onlyFirstError: true})})
         return
     } else {
         next()
