@@ -2,7 +2,7 @@ import {Request, Response, Router} from "express";
 import {blogsType, postsType} from "../../repositories/types/types";
 import {sendStatus} from "../../repositories/status-collection";
 import {
-    authMiddleware,
+    authMiddleware, blogIdQueryMiddleware,
     inputBlogsValidation,
     inputPostsValidation,
     inputValidationErrors,
@@ -26,10 +26,10 @@ blogsCommandsRouter.post('/',
     })
 blogsCommandsRouter.post('/:id/posts',
     authMiddleware,
+    blogIdQueryMiddleware,
     inputPostsValidation.title,
     inputPostsValidation.shortDescription,
     inputPostsValidation.content,
-    inputPostsValidation.blogIdQuery,
     inputValidationErrors,
     async (req: Request, res: Response) => {
         const title = req.body.title
