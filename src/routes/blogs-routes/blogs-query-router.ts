@@ -48,8 +48,14 @@ blogsQueryRouter.get('/:id/posts', async (req: Request, res: Response) => {
         res.sendStatus(sendStatus.NOT_FOUND_404)
         return false
     }
+    const founBlogById: blogsType | null = await blogsQueryRepository.findBlogById(new ObjectId(blogId))
+    if (!founBlogById) {
+        res.sendStatus(sendStatus.NOT_FOUND_404)
+        return
+    }
     const allPostsByBlogId: findPostsType | null = await blogsQueryRepository
         .findAllPostsByBlogId(sortBy as string, sortDirection as string, pageNumber, pageSize, blogId)
+
     res.status(sendStatus.OK_200).send(allPostsByBlogId)
 })
 
