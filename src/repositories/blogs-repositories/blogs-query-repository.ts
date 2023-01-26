@@ -7,7 +7,7 @@ export const blogsQueryRepository = {
     async findAllBlogs(searchNameTerm: string | undefined, sortBy: string | undefined, sortDirection: string | undefined, pageNumber: number, pageSize: number): Promise<findBlogsType> {
         const filter: Filter<blogsType> = {}
         if (searchNameTerm) {
-            filter.name = {$regex: searchNameTerm}
+            filter.name = {$regex: searchNameTerm.toLowerCase()}
         }
         let sort = "createdAt"
         if (sortBy) {

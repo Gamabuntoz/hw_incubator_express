@@ -4,12 +4,26 @@ import {sendStatus} from "../repositories/status-collection";
 import {blogsCommandsRepository} from "../repositories/blogs-repositories/blogs-commands-repository";
 import {usersCollection} from "../repositories/users-repository";
 import {ObjectId} from "mongodb";
+import {blogsCollection} from "../repositories/db";
 
 
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     const findUser = await usersCollection.findOne({loginPass: req.headers.authorization})
     if (!findUser) {
         return res.sendStatus(sendStatus.UNAUTHORIZED_401)
+    }
+    next()
+}
+export const blogIdQueryMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+    let blogId: ObjectId;
+    try {
+        blogId = new ObjectId(req.params.id)
+    } catch (e) {
+        return res.sendStatus(sendStatus.NOT_FOUND_404)
+    }
+    const findBlog = await blogsCommandsRepository.findBlogById(blogId)
+    if (!findBlog) {
+        return res.sendStatus(sendStatus.NOT_FOUND_404)
     }
     next()
 }
@@ -35,21 +49,6 @@ export const inputPostsValidation = {
         .isString().trim().withMessage('Must be a string')
         .isLength({min: 1, max: 1000}).withMessage('Length must be from 1 to 1000 symbols'),
     blogId: body('blogId')
-        .custom(async value => {
-            let blogId: ObjectId;
-            try {
-                blogId = new ObjectId(value)
-            } catch (e) {
-                throw new Error('Blog is not found');
-            }
-            const result = await blogsCommandsRepository.findBlogById(blogId)
-            if (!result) {
-                throw new Error('Blog is not found');
-            } else {
-                return true;
-            }
-        }),
-    blogIdQuery: param('id')
         .custom(async value => {
             let blogId: ObjectId;
             try {
