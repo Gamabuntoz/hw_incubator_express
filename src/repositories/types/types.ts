@@ -30,9 +30,22 @@ export type usersType = {
     createdAt: string
 }
 
+export type commentsType = {
+    id?: string
+    _id?: ObjectId
+    postId?: string
+    content: string
+    commentatorInfo: {
+        userId: string | ObjectId | undefined
+        userLogin: string
+    }
+    createdAt: string
+}
+
 export type blogsArrayType = Array<blogsType>
 export type postsArrayType = Array<postsType>
 export type usersArrayType = Array<usersType>
+export type commentsArrayType = Array<commentsType>
 
 export type findBlogsType = {
     pagesCount: number
@@ -56,6 +69,14 @@ export type findUsersType = {
     pageSize: number
     totalCount: number
     items: usersArrayType
+}
+
+export type findCommentsType = {
+    pagesCount: number
+    page: number
+    pageSize: number
+    totalCount: number
+    items: commentsArrayType
 }
 
 

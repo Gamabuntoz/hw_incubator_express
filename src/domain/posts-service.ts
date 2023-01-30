@@ -1,8 +1,8 @@
-import {postsCommandsRepository} from "../repositories/posts-repositories/posts-commands-repository";
+import {postsCommandsRepository} from "../repositories/posts/posts-commands-repository";
 import {ObjectId} from "mongodb";
-import {postsType} from "../repositories/types/types";
+import {commentsType, postsType, usersType} from "../repositories/types/types";
 import {blogsService} from "./blogs-service";
-
+import {commentsRepository} from "../repositories/comments/comments-repository";
 
 export const postsService = {
     async createPost(title: string, shortDescription: string, content: string, blogId: string): Promise<postsType | boolean> {
@@ -24,6 +24,24 @@ export const postsService = {
             content: result.content,
             blogId: result.blogId,
             blogName: result.blogName,
+            createdAt: result.createdAt,
+        }
+    },
+    async createCommentById(content: string, user: usersType | null, postId: string): Promise<commentsType> {
+        const newComment: commentsType = {
+            postId: postId,
+            content: content,
+            commentatorInfo: {
+                userId: user!._id,
+                userLogin: user!.login
+            },
+            createdAt: new Date().toISOString()
+        }
+        const result = await commentsRepository.createComment(newComment)
+        return {
+            id: result._id!.toString(),
+            content: result.content,
+            commentatorInfo: result.commentatorInfo,
             createdAt: result.createdAt,
         }
     },

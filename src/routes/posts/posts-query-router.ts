@@ -1,8 +1,11 @@
 import {Request, Response, Router} from "express";
-import {findPostsType, postsType} from "../../repositories/types/types";
+import {blogsType, findCommentsType, findPostsType, postsType} from "../../repositories/types/types";
 import {sendStatus} from "../../repositories/status-collection";
-import {postsQueryRepository} from "../../repositories/posts-repositories/posts-query-repository";
+import {postsQueryRepository} from "../../repositories/posts/posts-query-repository";
 import {ObjectId} from "mongodb";
+import {blogsQueryRepository} from "../../repositories/blogs/blogs-query-repository";
+import {blogsQueryRouter} from "../blogs/blogs-query-router";
+import {blogIdQueryMiddleware, postIdQueryMiddleware} from "../../middlewares/input-validation-middleware";
 
 export const postsQueryRouter = Router()
 
@@ -29,3 +32,16 @@ postsQueryRouter.get('/:id', async (req: Request, res: Response) => {
     }
     res.status(sendStatus.OK_200).send(foundPost)
 })
+postsQueryRouter.get('/:id/comments',
+    postIdQueryMiddleware,
+    async (req: Request, res: Response) => {
+        const sortBy = req.query.sortBy
+        const sortDirection = req.query.sortDirection
+        const pageNumber = +(req.query.pageNumber ?? 1)
+        const pageSize = +(req.query.pageSize ?? 10)
+        const postId = req.params.id
+        const allCommentsByPostId: findCommentsType | null = await postsQueryRepository
+            .findAllCommentsByPostId(sortBy as string, sortDirection as string, pageNumber, pageSize, postId)
+
+        res.status(sendStatus.OK_200).send(allCommentsByPostId)
+    })
