@@ -33,7 +33,7 @@ usersRouter.post('/',
         const email = req.body.email
         const newUser: usersType | boolean | null = await usersService.createUser(login, password, email)
         res.status(sendStatus.CREATED_201).send(newUser)
-    })
+    }),
 usersRouter.delete('/:id',
     authMiddleware,
     async (req: Request, res: Response) => {
