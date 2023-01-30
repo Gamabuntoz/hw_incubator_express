@@ -1,14 +1,16 @@
 import {Request, Response, Router} from "express";
 import {usersService} from "../domain/users-service";
 import {
-        inputUsersValidation,
-        inputValidationErrors
+    authMiddleware,
+    inputUsersValidation,
+    inputValidationErrors
 } from "../middlewares/input-validation-middleware";
 import {sendStatus} from "../repositories/status-collection";
 
 export const authRouter = Router({})
 
 authRouter.post("/login",
+    authMiddleware,
     inputUsersValidation.loginOrEmail,
     inputUsersValidation.password,
     inputValidationErrors,
