@@ -8,7 +8,7 @@ export type blogsType = {
     id?: string
     _id?: ObjectId
 }
-export type blogsArrayType = Array<blogsType>
+
 
 export type postsType = {
     id?: string
@@ -20,7 +20,19 @@ export type postsType = {
     blogName: string
     createdAt: string
 }
+
+export type usersType = {
+    id?: string
+    _id?: ObjectId
+    passwordHash?: string
+    login: string
+    email: string
+    createdAt: string
+}
+
+export type blogsArrayType = Array<blogsType>
 export type postsArrayType = Array<postsType>
+export type usersArrayType = Array<usersType>
 
 export type findBlogsType = {
     pagesCount: number
@@ -37,3 +49,14 @@ export type findPostsType = {
     totalCount: number
     items: postsArrayType
 }
+
+export type findUsersType = {
+    pagesCount: number
+    page: number
+    pageSize: number
+    totalCount: number
+    items: usersArrayType
+}
+
+
+
