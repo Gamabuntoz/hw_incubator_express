@@ -1,6 +1,6 @@
 import {ObjectId} from "mongodb";
-import {findPostsType, postsType} from "../types/types";
-import {postsCollection} from "../db";
+import {findCommentsType, findPostsType, postsType} from "../types/types";
+import {commentsCollection, postsCollection} from "../db";
 
 export const postsQueryRepository = {
     async findAllPosts(sortBy: string, sortDirection: string, pageNumber: number, pageSize: number): Promise<findPostsType> {
@@ -48,4 +48,30 @@ export const postsQueryRepository = {
             createdAt: result.createdAt
         }
     },
+    async findAllCommentsByPostId(sortBy: string | undefined, sortDirection: string | undefined, pageNumber: number, pageSize: number, postId: string): Promise<null | findCommentsType> {
+        let sort = "createdAt"
+        if (sortBy) {
+            sort = sortBy
+        }
+        const totalCount = await commentsCollection.countDocuments({postId: postId})
+        const findAll = await commentsCollection
+            .find({postId: postId})
+            .sort({[sort]: sortDirection === "asc" ? 1 : -1})
+            .skip((pageNumber - 1) * pageSize)
+            .limit(pageSize)
+            .toArray()
+        return {
+            pagesCount: Math.ceil(totalCount / pageSize),
+            page: pageNumber,
+            pageSize: pageSize,
+            totalCount: totalCount,
+            items: findAll.map(c => ({
+                    id: c._id!.toString(),
+                    content: c.content,
+                    commentatorInfo: c.commentatorInfo,
+                    createdAt: c.createdAt
+                })
+            )
+        }
+    }
 }

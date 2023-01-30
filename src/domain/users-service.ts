@@ -5,6 +5,18 @@ import bcrypt from "bcrypt"
 import {usersCollection} from "../repositories/db";
 
 export const usersService ={
+    async findUserById(userId: ObjectId): Promise<usersType | null> {
+        const result = await usersCollection.findOne({_id: userId})
+        if (!result) {
+            return null
+        }
+        return {
+            id: result._id!.toString(),
+            login: result.login,
+            email: result.email,
+            createdAt: result.createdAt
+        }
+    },
     async findAllUsers(sortBy: string | undefined, sortDirection: string | undefined, pageNumber: number, pageSize: number, searchLoginTerm: string, searchEmailTerm: string): Promise<findUsersType> {
         let filter = {}
         if (searchLoginTerm || searchEmailTerm) {

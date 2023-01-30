@@ -2,7 +2,7 @@ import {Request, Response, Router} from "express";
 import {findUsersType, usersType} from "../../repositories/types/types";
 import {sendStatus} from "../../repositories/status-collection";
 import {
-    authMiddleware,
+    authMiddlewareBasic,
     inputUsersValidation,
     inputValidationErrors
 } from "../../middlewares/input-validation-middleware";
@@ -22,7 +22,7 @@ usersRouter.get('/', async (req: Request, res: Response) => {
     res.status(sendStatus.OK_200).send(allUsers)
 })
 usersRouter.post('/',
-    authMiddleware,
+    authMiddlewareBasic,
     inputUsersValidation.login,
     inputUsersValidation.password,
     inputUsersValidation.email,
@@ -35,7 +35,7 @@ usersRouter.post('/',
         res.status(sendStatus.CREATED_201).send(newUser)
     }),
 usersRouter.delete('/:id',
-    authMiddleware,
+    authMiddlewareBasic,
     async (req: Request, res: Response) => {
         const foundUser = await usersService.deleteUser(req.params.id)
         if (!foundUser) {

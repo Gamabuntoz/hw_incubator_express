@@ -2,7 +2,8 @@ import {Request, Response, Router} from "express";
 import {blogsType, findBlogsType, findPostsType} from "../../repositories/types/types";
 import {sendStatus} from "../../repositories/status-collection";
 import {ObjectId} from "mongodb";
-import {blogsQueryRepository} from "../../repositories/blogs-repositories/blogs-query-repository";
+import {blogsQueryRepository} from "../../repositories/blogs/blogs-query-repository";
+import {blogIdQueryMiddleware} from "../../middlewares/input-validation-middleware";
 
 export const blogsQueryRouter = Router()
 
@@ -36,27 +37,18 @@ blogsQueryRouter.get('/:id', async (req: Request, res: Response) => {
 
 })
 
-blogsQueryRouter.get('/:id/posts', async (req: Request, res: Response) => {
-    const sortBy = req.query.sortBy
-    const sortDirection = req.query.sortDirection
-    const pageNumber = +(req.query.pageNumber ?? 1)
-    const pageSize = +(req.query.pageSize ?? 10)
-    let blogId: string;
-    try {
-        blogId = new ObjectId(req.params.id).toString()
-    } catch (e) {
-        res.sendStatus(sendStatus.NOT_FOUND_404)
-        return false
-    }
-    const foundBlogById: blogsType | null = await blogsQueryRepository.findBlogById(new ObjectId(blogId))
-    if (!foundBlogById) {
-        res.sendStatus(sendStatus.NOT_FOUND_404)
-        return
-    }
-    const allPostsByBlogId: findPostsType | null = await blogsQueryRepository
-        .findAllPostsByBlogId(sortBy as string, sortDirection as string, pageNumber, pageSize, blogId)
+blogsQueryRouter.get('/:id/posts',
+    blogIdQueryMiddleware,
+    async (req: Request, res: Response) => {
+        const sortBy = req.query.sortBy
+        const sortDirection = req.query.sortDirection
+        const pageNumber = +(req.query.pageNumber ?? 1)
+        const pageSize = +(req.query.pageSize ?? 10)
+        const blogId = req.body.id
+        const allPostsByBlogId: findPostsType | null = await blogsQueryRepository
+            .findAllPostsByBlogId(sortBy as string, sortDirection as string, pageNumber, pageSize, blogId)
 
-    res.status(sendStatus.OK_200).send(allPostsByBlogId)
-})
+        res.status(sendStatus.OK_200).send(allPostsByBlogId)
+    })
 
 

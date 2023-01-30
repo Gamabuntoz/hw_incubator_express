@@ -1,16 +1,32 @@
 import {NextFunction, Request, Response} from "express";
 import {body, ValidationError, validationResult} from "express-validator";
 import {sendStatus} from "../repositories/status-collection";
-import {blogsCommandsRepository} from "../repositories/blogs-repositories/blogs-commands-repository";
+import {blogsCommandsRepository} from "../repositories/blogs/blogs-commands-repository";
 import {adminCollection} from "../repositories/db";
 import {ObjectId} from "mongodb";
+import {jwtService} from "../application/jwt-service";
+import {usersService} from "../domain/users-service";
+import {postsCommandsRepository} from "../repositories/posts/posts-commands-repository";
 
 
-export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+export const authMiddlewareBasic = async (req: Request, res: Response, next: NextFunction) => {
     const findUser = await adminCollection.findOne({loginPass: req.headers.authorization})
     if (!findUser) {
         return res.sendStatus(sendStatus.UNAUTHORIZED_401)
     }
+    next()
+}
+export const authMiddlewareBearer = async (req: Request, res: Response, next: NextFunction) => {
+    const authHeader = req.headers.authorization
+    if (!authHeader) {
+        return res.sendStatus(sendStatus.UNAUTHORIZED_401)
+    }
+    const token = authHeader.split(" ")[1]
+    const userId = await jwtService.getUserIdByToken(token)
+    if (!userId) {
+        return res.sendStatus(sendStatus.UNAUTHORIZED_401)
+    }
+    req.user = await usersService.findUserById(userId)
     next()
 }
 export const blogIdQueryMiddleware = async (req: Request, res: Response, next: NextFunction) => {
@@ -26,6 +42,20 @@ export const blogIdQueryMiddleware = async (req: Request, res: Response, next: N
     }
     next()
 }
+export const postIdQueryMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+    let postId: ObjectId;
+    try {
+        postId = new ObjectId(req.params.id)
+    } catch (e) {
+        return res.sendStatus(sendStatus.NOT_FOUND_404)
+    }
+    const findBlog = await postsCommandsRepository.findPostById(req.params.id)
+    if (!findBlog) {
+        return res.sendStatus(sendStatus.NOT_FOUND_404)
+    }
+    next()
+}
+
 
 export const inputBlogsValidation = {
     name: body('name')
@@ -77,6 +107,11 @@ export const inputUsersValidation = {
         .exists().withMessage('Can not be empty')
         .isString().trim().withMessage('Must be a string')
 }
+export const inputCommentsValidation = {
+    content: body('content')
+        .isString().trim().withMessage('Must be a string')
+        .isLength({min: 20, max: 300}).withMessage('Length must be from 1 to 15 symbols'),
+    }
 export const inputValidationErrors = (req: Request, res: Response, next: NextFunction) => {
     const errorFormat = ({msg, param}: ValidationError) => {
         return {message: msg, field: param}

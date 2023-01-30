@@ -1,18 +1,23 @@
 import {MongoClient} from 'mongodb'
 import * as dotenv from 'dotenv'
-import {blogsType, postsType, usersType} from "./types/types";
+import {blogsType, commentsType, postsType, usersType} from "./types/types";
 
 dotenv.config()
 
-const mongoUri = process.env.MONGO_URI || "mongodb://0.0.0.0:27017";
-if (!mongoUri) {
+export const settings = {
+    MONGO_URI: process.env.MONGO_URI || "mongodb://0.0.0.0:27017",
+    JWT_SECRET: process.env.JWT_SECRET || "123"
+}
+
+if (!settings.MONGO_URI) {
     throw new Error("URL doesn't found")
 }
-export const client = new MongoClient(mongoUri);
+export const client = new MongoClient(settings.MONGO_URI);
 export const postsCollection = client.db().collection<postsType>("posts")
 export const blogsCollection = client.db().collection<blogsType>("blogs")
 export const usersCollection = client.db().collection<usersType>("users")
 export const adminCollection = client.db().collection("admin")
+export const commentsCollection = client.db().collection<commentsType>("comments")
 
 export async function runDb() {
     try {

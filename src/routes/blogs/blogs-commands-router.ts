@@ -2,7 +2,7 @@ import {Request, Response, Router} from "express";
 import {blogsType, postsType} from "../../repositories/types/types";
 import {sendStatus} from "../../repositories/status-collection";
 import {
-    authMiddleware, blogIdQueryMiddleware,
+    authMiddlewareBasic, blogIdQueryMiddleware,
     inputBlogsValidation,
     inputPostsValidation,
     inputValidationErrors,
@@ -12,7 +12,7 @@ import {blogsService} from "../../domain/blogs-service";
 export const blogsCommandsRouter = Router()
 
 blogsCommandsRouter.post('/',
-    authMiddleware,
+    authMiddlewareBasic,
     inputBlogsValidation.name,
     inputBlogsValidation.description,
     inputBlogsValidation.websiteUrl,
@@ -25,7 +25,7 @@ blogsCommandsRouter.post('/',
         res.status(sendStatus.CREATED_201).send(newBlogCreate)
     })
 blogsCommandsRouter.post('/:id/posts',
-    authMiddleware,
+    authMiddlewareBasic,
     blogIdQueryMiddleware,
     inputPostsValidation.title,
     inputPostsValidation.shortDescription,
@@ -40,7 +40,7 @@ blogsCommandsRouter.post('/:id/posts',
         res.status(sendStatus.CREATED_201).send(newPost)
     })
 blogsCommandsRouter.put('/:id',
-    authMiddleware,
+    authMiddlewareBasic,
     inputBlogsValidation.name,
     inputBlogsValidation.description,
     inputBlogsValidation.websiteUrl,
@@ -57,7 +57,7 @@ blogsCommandsRouter.put('/:id',
         res.sendStatus(sendStatus.NO_CONTENT_204)
     })
 blogsCommandsRouter.delete('/:id',
-    authMiddleware,
+    authMiddlewareBasic,
     async (req: Request, res: Response) => {
         const foundBlog = await blogsService.deleteBlog(req.params.id)
         if (!foundBlog) {

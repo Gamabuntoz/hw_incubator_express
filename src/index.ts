@@ -1,13 +1,13 @@
 import express from 'express'
 import bodyParser from 'body-parser'
 import {runDb} from "./repositories/db";
-import {blogsCommandsRouter} from "./routes/blogs-routes/blogs-commands-router";
-import {postsCommandRouter} from "./routes/posts-routes/posts-command-router";
-import {testingRouter} from "./routes/testing-router";
-import {blogsQueryRouter} from "./routes/blogs-routes/blogs-query-router";
-import {postsQueryRouter} from "./routes/posts-routes/posts-query-router";
-import {usersRouter} from "./routes/users-router/users-router";
-import {authRouter} from "./routes/auth-router";
+import {blogsCommandsRouter} from "./routes/blogs/blogs-commands-router";
+import {postsCommandRouter} from "./routes/posts/posts-command-router";
+import {testingRouter} from "./routes/DELETE-ALL-DATA/testing-router";
+import {blogsQueryRouter} from "./routes/blogs/blogs-query-router";
+import {postsQueryRouter} from "./routes/posts/posts-query-router";
+import {usersRouter} from "./routes/users/users-router";
+import {authRouter} from "./routes/auth/auth-router";
 
 export const app = express()
 const port = process.env.PORT || 5000
