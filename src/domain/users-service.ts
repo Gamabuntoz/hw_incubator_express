@@ -69,7 +69,7 @@ export const usersService ={
     async checkCredentials(loginOrEmail: string, password: string): Promise<boolean> {
         const user = await usersRepository.findByLoginOrEmail(loginOrEmail)
         if (!user) return false
-        const passwordHash = await this._generateHash(password, user.passwordHash!.slice(7, 29))
+        const passwordHash = await this._generateHash(password, user.passwordHash!.slice(0, 29))
         if (user.passwordHash !== passwordHash) {
             return false
         }
