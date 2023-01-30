@@ -46,7 +46,13 @@ export const usersService ={
             passwordHash: passwordHash,
             createdAt: new Date().toISOString(),
         }
-        return usersRepository.createUser(newUser)
+        const result = await usersRepository.createUser(newUser)
+        return {
+            id: result._id!.toString(),
+            login: result.login,
+            email: result.email,
+            createdAt: result.createdAt
+        }
     },
     async deleteUser(id: string): Promise<boolean> {
         let userId: ObjectId;
