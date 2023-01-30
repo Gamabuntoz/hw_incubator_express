@@ -1,15 +1,14 @@
 import {usersRepository} from "../repositories/users-repository";
-import {Filter, ObjectId} from "mongodb";
+import {ObjectId} from "mongodb";
 import {findUsersType, usersType} from "../repositories/types/types";
 import bcrypt from "bcrypt"
 import {usersCollection} from "../repositories/db";
 
 export const usersService ={
     async findAllUsers(sortBy: string | undefined, sortDirection: string | undefined, pageNumber: number, pageSize: number, searchLoginTerm: string, searchEmailTerm: string): Promise<findUsersType> {
-        const filter: Filter<usersType> = {}
+        let filter = {}
         if (searchLoginTerm || searchEmailTerm) {
-            filter.login = {$regex: searchLoginTerm, $options: "$i"}
-            filter.email = {$regex: searchEmailTerm, $options: "$i"}
+            filter = {$or: [{login: {$regex: searchLoginTerm, $options: "$i"}}, {email: {$regex: searchEmailTerm, $options: "$i"}}]}
         }
         let sort = "createdAt"
         if (sortBy) {
