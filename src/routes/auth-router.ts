@@ -10,7 +10,6 @@ import {sendStatus} from "../repositories/status-collection";
 export const authRouter = Router({})
 
 authRouter.post("/login",
-    authMiddleware,
     inputUsersValidation.loginOrEmail,
     inputUsersValidation.password,
     inputValidationErrors,
