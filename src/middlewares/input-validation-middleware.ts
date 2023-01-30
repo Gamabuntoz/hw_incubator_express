@@ -1,14 +1,13 @@
 import {NextFunction, Request, Response} from "express";
-import {body, oneOf, param, ValidationError, validationResult} from "express-validator";
+import {body, ValidationError, validationResult} from "express-validator";
 import {sendStatus} from "../repositories/status-collection";
 import {blogsCommandsRepository} from "../repositories/blogs-repositories/blogs-commands-repository";
-import {usersCollection} from "../repositories/db";
+import {adminCollection} from "../repositories/db";
 import {ObjectId} from "mongodb";
-import {blogsCollection} from "../repositories/db";
 
 
 export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-    const findUser = await usersCollection.findOne({loginPass: req.headers.authorization})
+    const findUser = await adminCollection.findOne({loginPass: req.headers.authorization})
     if (!findUser) {
         return res.sendStatus(sendStatus.UNAUTHORIZED_401)
     }
