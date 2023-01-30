@@ -1,9 +1,9 @@
-import {blogsCollection, usersCollection} from "./db";
-import {usersArrayType, usersType} from "./types/types";
+import {usersCollection} from "./db";
+import {usersType} from "./types/types";
 import {ObjectId} from "mongodb";
 
 export const usersRepository = {
-    async createUser(user: usersType): Promise<usersType | null> {
+    async createUser(user: usersType): Promise<usersType> {
         let newUser = await usersCollection.insertOne(user)
         return user
     },
