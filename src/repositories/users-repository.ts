@@ -8,7 +8,7 @@ export const usersRepository = {
         return user
     },
     async findByLoginOrEmail(loginOrEmail: string) {
-        const foundUser = await usersCollection.findOne({ $or: [{login : loginOrEmail }, { email: loginOrEmail }]})
+        const foundUser = await usersCollection.findOne({$or: [{login: loginOrEmail}, {email: loginOrEmail}]})
         return foundUser
     },
     async deleteUser(userId: ObjectId): Promise<boolean> {

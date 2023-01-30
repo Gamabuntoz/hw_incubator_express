@@ -2,7 +2,8 @@ import {Request, Response, Router} from "express";
 import {blogsType, postsType} from "../../repositories/types/types";
 import {sendStatus} from "../../repositories/status-collection";
 import {
-    authMiddlewareBasic, blogIdQueryMiddleware,
+    authMiddlewareBasic,
+    blogIdQueryMiddleware,
     inputBlogsValidation,
     inputPostsValidation,
     inputValidationErrors,

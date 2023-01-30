@@ -1,11 +1,9 @@
 import {Request, Response, Router} from "express";
-import {blogsType, findCommentsType, findPostsType, postsType} from "../../repositories/types/types";
+import {findCommentsType, findPostsType, postsType} from "../../repositories/types/types";
 import {sendStatus} from "../../repositories/status-collection";
 import {postsQueryRepository} from "../../repositories/posts/posts-query-repository";
 import {ObjectId} from "mongodb";
-import {blogsQueryRepository} from "../../repositories/blogs/blogs-query-repository";
-import {blogsQueryRouter} from "../blogs/blogs-query-router";
-import {blogIdQueryMiddleware, postIdQueryMiddleware} from "../../middlewares/input-validation-middleware";
+import {postIdQueryMiddleware} from "../../middlewares/input-validation-middleware";
 
 export const postsQueryRouter = Router()
 

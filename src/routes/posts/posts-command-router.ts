@@ -2,9 +2,12 @@ import {Request, Response, Router} from "express";
 import {commentsType, postsType} from "../../repositories/types/types";
 import {sendStatus} from "../../repositories/status-collection";
 import {
-    authMiddlewareBasic, authMiddlewareBearer, inputCommentsValidation,
+    authMiddlewareBasic,
+    authMiddlewareBearer,
+    inputCommentsValidation,
     inputPostsValidation,
-    inputValidationErrors, postIdQueryMiddleware
+    inputValidationErrors,
+    postIdQueryMiddleware
 } from "../../middlewares/input-validation-middleware";
 import {postsService} from "../../domain/posts-service";
 
@@ -32,7 +35,7 @@ postsCommandRouter.post("/:id/comments",
     inputCommentsValidation.content,
     inputValidationErrors,
     async (req: Request, res: Response) => {
-    const postId = req.params.id
+        const postId = req.params.id
         const content = req.body.content
         const newComment: commentsType = await postsService.createCommentById(content, req.user, postId)
         res.status(sendStatus.CREATED_201).send({
