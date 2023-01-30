@@ -1,6 +1,5 @@
 import {Request, Response, Router} from "express";
-import {commentsType, usersType} from "../../repositories/types/types";
-import {usersService} from "../../domain/users-service";
+import {commentsType} from "../../repositories/types/types";
 import {sendStatus} from "../../repositories/status-collection";
 import {
     authMiddlewareBearer,
@@ -33,7 +32,7 @@ commentsRouter.put('/:id',
     inputCommentsValidation.content,
     inputValidationErrors,
     async (req: Request, res: Response) => {
-    const commentId = req.params.id
+        const commentId = req.params.id
         const content = req.body.content
         const updateComment: commentsType | boolean = await commentsService.updateComment(content, commentId)
         if (!updateComment) {

@@ -8,6 +8,7 @@ import {blogsQueryRouter} from "./routes/blogs/blogs-query-router";
 import {postsQueryRouter} from "./routes/posts/posts-query-router";
 import {usersRouter} from "./routes/users/users-router";
 import {authRouter} from "./routes/auth/auth-router";
+import {commentsRouter} from "./routes/comments/comments-router";
 
 export const app = express()
 const port = process.env.PORT || 5000
@@ -21,6 +22,7 @@ app.use('/posts', postsQueryRouter)
 app.use('/testing', testingRouter)
 app.use('/users', usersRouter)
 app.use('/auth', authRouter)
+app.use("/comments", commentsRouter)
 
 const startApp = async () => {
     await runDb()
