@@ -2,7 +2,7 @@ import {NextFunction, Request, Response} from "express";
 import {body, oneOf, param, ValidationError, validationResult} from "express-validator";
 import {sendStatus} from "../repositories/status-collection";
 import {blogsCommandsRepository} from "../repositories/blogs-repositories/blogs-commands-repository";
-import {usersCollection} from "../repositories/users-repository";
+import {usersCollection} from "../repositories/db";
 import {ObjectId} from "mongodb";
 import {blogsCollection} from "../repositories/db";
 
@@ -63,6 +63,20 @@ export const inputPostsValidation = {
                 return true;
             }
         })
+}
+export const inputUsersValidation = {
+    login: body('login')
+        .isString().trim().withMessage('Must be a string')
+        .isLength({min: 3, max: 10}).withMessage('Length must be from 3 to 10 symbols')
+        .matches(/^[a-zA-Z0-9_-]*$/).withMessage('Incorrect symbols'),
+    password: body('password')
+        .isString().trim().withMessage('Must be a string')
+        .isLength({min: 6, max: 20}).withMessage('Length must be from 6 to 20 symbols'),
+    email: body('email')
+        .isEmail().withMessage('Incorrect email'),
+    loginOrEmail: body('loginOrEmail')
+        .exists().withMessage('Can not be empty')
+        .isString().trim().withMessage('Must be a string')
 }
 export const inputValidationErrors = (req: Request, res: Response, next: NextFunction) => {
     const errorFormat = ({msg, param}: ValidationError) => {

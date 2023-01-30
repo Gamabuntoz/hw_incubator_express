@@ -11,6 +11,7 @@ if (!mongoUri) {
 export const client = new MongoClient(mongoUri);
 export const postsCollection = client.db().collection<postsType>("posts")
 export const blogsCollection = client.db().collection<blogsType>("blogs")
+export const usersCollection = client.db().collection("users")
 
 export async function runDb() {
     try {

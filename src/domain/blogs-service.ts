@@ -58,14 +58,14 @@ export const blogsService = {
         }
     },
     async deleteBlog(id: string): Promise<boolean> {
-        let postId: ObjectId;
+        let blogId: ObjectId;
         try {
-            postId = new ObjectId(id)
+            blogId = new ObjectId(id)
         } catch (e) {
             console.log(e)
             return false
         }
-        return blogsCommandsRepository.deleteBlog(postId)
+        return blogsCommandsRepository.deleteBlog(blogId)
     },
     async deleteAllBlogs(): Promise<boolean> {
         return blogsCommandsRepository.deleteAllBlogs()

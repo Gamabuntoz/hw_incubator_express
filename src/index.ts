@@ -6,6 +6,7 @@ import {postsCommandRouter} from "./routes/posts-routes/posts-command-router";
 import {testingRouter} from "./routes/testing-router";
 import {blogsQueryRouter} from "./routes/blogs-routes/blogs-query-router";
 import {postsQueryRouter} from "./routes/posts-routes/posts-query-router";
+import {usersRouter} from "./routes/users-router/users-router";
 
 export const app = express()
 const port = process.env.PORT || 5000
@@ -17,6 +18,7 @@ app.use('/blogs', blogsQueryRouter)
 app.use('/posts', postsCommandRouter)
 app.use('/posts', postsQueryRouter)
 app.use('/testing', testingRouter)
+app.use('/users', usersRouter)
 
 const startApp = async () => {
     await runDb()
