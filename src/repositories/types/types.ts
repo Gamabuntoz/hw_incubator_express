@@ -29,16 +29,16 @@ export type usersType = {
     email: string
     createdAt: string
 }
-
+type commentatorInfoType = {
+    userId: string | ObjectId | undefined
+    userLogin: string
+}
 export type commentsType = {
     id?: string
     _id?: ObjectId
     postId?: string
     content: string
-    commentatorInfo: {
-        userId: string | ObjectId | undefined
-        userLogin: string
-    }
+    commentatorInfo: commentatorInfoType
     createdAt: string
 }
 
