@@ -44,7 +44,7 @@ blogsQueryRouter.get('/:id/posts',
         const sortDirection = req.query.sortDirection
         const pageNumber = +(req.query.pageNumber ?? 1)
         const pageSize = +(req.query.pageSize ?? 10)
-        const blogId = req.body.id
+        const blogId = req.params.id
         const allPostsByBlogId: findPostsType | null = await blogsQueryRepository
             .findAllPostsByBlogId(blogId, sortBy as string, sortDirection as string, pageNumber, pageSize)
 
