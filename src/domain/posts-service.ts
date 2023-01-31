@@ -27,7 +27,7 @@ export const postsService = {
             createdAt: result.createdAt,
         }
     },
-    async createCommentById(content: string, user: usersType | null, postId: string): Promise<commentsType> {
+    async createCommentByPostId(content: string, user: usersType | null, postId: string): Promise<commentsType> {
         const newComment: commentsType = {
             postId: postId,
             content: content,
@@ -39,10 +39,10 @@ export const postsService = {
         }
         const result = await commentsRepository.createComment(newComment)
         return {
-            id: result._id!.toString(),
-            content: result.content,
-            commentatorInfo: result.commentatorInfo,
-            createdAt: result.createdAt,
+            id: newComment._id!.toString(),
+            content: newComment.content,
+            commentatorInfo: newComment.commentatorInfo,
+            createdAt: newComment.createdAt
         }
     },
     async updatePost(id: string, title: string, shortDescription: string, content: string, blogId: string): Promise<boolean> {
