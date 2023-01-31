@@ -37,13 +37,8 @@ postsCommandRouter.post("/:id/comments",
     async (req: Request, res: Response) => {
         const postId = req.params.id
         const content = req.body.content
-        const newComment: commentsType = await postsService.createCommentById(content, req.user, postId)
-        res.status(sendStatus.CREATED_201).send({
-            id: newComment._id,
-            content: newComment.content,
-            commentatorInfo: newComment.commentatorInfo,
-            createdAt: newComment.createdAt
-        })
+        const newComment: commentsType = await postsService.createCommentByPostId(content, req.user, postId)
+        res.status(sendStatus.CREATED_201).send(newComment)
     })
 postsCommandRouter.put('/:id',
     authMiddlewareBasic,
