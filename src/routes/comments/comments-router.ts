@@ -44,7 +44,9 @@ commentsRouter.put('/:id',
         if (!findComment) {
             return res.sendStatus(sendStatus.NOT_FOUND_404)
         }
-        if (req.user?.id !== findComment?.commentatorInfo.userId) return sendStatus.FORBIDDEN_403
+        if (req.user!.id !== findComment.commentatorInfo.userId) {
+            return res.sendStatus(sendStatus.FORBIDDEN_403)
+        }
         const content = req.body.content
         const updateComment: commentsType | boolean = await commentsService.updateComment(content, commentId.toString())
         if (!updateComment) {
