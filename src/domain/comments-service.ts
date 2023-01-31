@@ -13,10 +13,7 @@ export const commentsService ={
         return {
             id: result._id.toString(),
             content: result.content,
-            commentatorInfo: {
-                userId: "string",
-                userLogin: "string"
-            },
+            commentatorInfo: result.commentatorInfo,
             createdAt: result.createdAt
         }
     },
