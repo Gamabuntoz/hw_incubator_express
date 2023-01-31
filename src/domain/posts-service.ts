@@ -41,7 +41,10 @@ export const postsService = {
         return {
             id: newComment._id!.toString(),
             content: newComment.content,
-            commentatorInfo: newComment.commentatorInfo,
+            commentatorInfo: {
+                userId: user!.id,
+                userLogin: user!.login
+            },
             createdAt: newComment.createdAt
         }
     },
