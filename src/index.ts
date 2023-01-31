@@ -1,18 +1,28 @@
 import express from 'express'
 import bodyParser from 'body-parser'
 import {runDb} from "./repositories/db";
-import {blogsRouter} from "./routes/blogs-router";
-import {postsRouter} from "./routes/posts-router";
-import {testingRouter} from "./routes/testing-router";
+import {blogsCommandsRouter} from "./routes/blogs/blogs-commands-router";
+import {postsCommandRouter} from "./routes/posts/posts-command-router";
+import {testingRouter} from "./routes/DELETE-ALL-DATA/testing-router";
+import {blogsQueryRouter} from "./routes/blogs/blogs-query-router";
+import {postsQueryRouter} from "./routes/posts/posts-query-router";
+import {usersRouter} from "./routes/users/users-router";
+import {authRouter} from "./routes/auth/auth-router";
+import {commentsRouter} from "./routes/comments/comments-router";
 
 export const app = express()
 const port = process.env.PORT || 5000
 const parserMiddleware = bodyParser({})
 app.use(parserMiddleware)
 
-app.use('/blogs', blogsRouter)
-app.use('/posts', postsRouter)
+app.use('/blogs', blogsCommandsRouter)
+app.use('/blogs', blogsQueryRouter)
+app.use('/posts', postsCommandRouter)
+app.use('/posts', postsQueryRouter)
 app.use('/testing', testingRouter)
+app.use('/users', usersRouter)
+app.use('/auth', authRouter)
+app.use("/comments", commentsRouter)
 
 const startApp = async () => {
     await runDb()
