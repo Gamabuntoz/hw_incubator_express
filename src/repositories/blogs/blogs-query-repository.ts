@@ -37,8 +37,8 @@ export const blogsQueryRepository = {
         }
     },
 
-    async findBlogById(postId: ObjectId): Promise<null | blogsType> {
-        const result = await blogsCollection.findOne({_id: postId})
+    async findBlogById(blogId: ObjectId): Promise<null | blogsType> {
+        const result = await blogsCollection.findOne({_id: blogId})
         if (!result) {
             return null
         }
@@ -51,7 +51,7 @@ export const blogsQueryRepository = {
         }
     },
 
-    async findAllPostsByBlogId(sortBy: string | undefined, sortDirection: string | undefined, pageNumber: number, pageSize: number, blogId: string): Promise<null | findPostsType> {
+    async findAllPostsByBlogId(blogId: string, sortBy: string | undefined, sortDirection: string | undefined, pageNumber: number, pageSize: number): Promise<null | findPostsType> {
         let sort = "createdAt"
         if (sortBy) {
             sort = sortBy
