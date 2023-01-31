@@ -46,7 +46,7 @@ blogsQueryRouter.get('/:id/posts',
         const pageSize = +(req.query.pageSize ?? 10)
         const blogId = req.body.id
         const allPostsByBlogId: findPostsType | null = await blogsQueryRepository
-            .findAllPostsByBlogId(sortBy as string, sortDirection as string, pageNumber, pageSize, blogId)
+            .findAllPostsByBlogId(blogId, sortBy as string, sortDirection as string, pageNumber, pageSize)
 
         res.status(sendStatus.OK_200).send(allPostsByBlogId)
     })

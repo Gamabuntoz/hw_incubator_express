@@ -78,14 +78,14 @@ export const usersService ={
     async deleteAllUsers(): Promise<boolean> {
         return usersRepository.deleteAllUsers()
     },
-    async checkCredentials(loginOrEmail: string, password: string): Promise<boolean> {
+    async checkCredentials(loginOrEmail: string, password: string): Promise<usersType | boolean> {
         const user = await usersRepository.findByLoginOrEmail(loginOrEmail)
         if (!user) return false
         const passwordHash = await this._generateHash(password, user.passwordHash!.slice(0, 29))
         if (user.passwordHash !== passwordHash) {
             return false
         }
-        return true
+        return user
     },
     async _generateHash(password: string, salt: string) {
         const hash = await bcrypt.hash(password, salt)
