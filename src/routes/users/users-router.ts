@@ -4,7 +4,7 @@ import {sendStatus} from "../../repositories/status-collection";
 import {
     authMiddlewareBasic,
     inputUsersValidation,
-    inputValidationErrors
+    inputValidationErrors,
 } from "../../middlewares/input-validation-middleware";
 import {usersService} from "../../domain/users-service";
 
