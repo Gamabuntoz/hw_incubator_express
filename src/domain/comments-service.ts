@@ -27,15 +27,8 @@ export const commentsService ={
         }
         return commentsRepository.updateComment(content, commentId)
     },
-    async deleteComment(id: string): Promise<boolean> {
-        let comentId: ObjectId;
-        try {
-            comentId = new ObjectId(id)
-        } catch (e) {
-            console.log(e)
-            return false
-        }
-        return commentsRepository.deleteComment(comentId)
+    async deleteComment(id: ObjectId): Promise<boolean> {
+        return commentsRepository.deleteComment(id)
     },
     async deleteAllComments(): Promise<boolean> {
         return commentsRepository.deleteAllComments()

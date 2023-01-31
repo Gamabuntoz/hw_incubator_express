@@ -57,7 +57,21 @@ commentsRouter.put('/:id',
 commentsRouter.delete('/:id',
     authMiddlewareBearer,
     async (req: Request, res: Response) => {
-        const foundComment = await commentsService.deleteComment(req.params.id)
+        let commentId: ObjectId;
+        try {
+            commentId = new ObjectId(req.params.id)
+        } catch (e) {
+            res.sendStatus(sendStatus.NOT_FOUND_404)
+            return false
+        }
+        const findComment: commentsType | null = await commentsRepository.findComment(commentId)
+        if (!findComment) {
+            return res.sendStatus(sendStatus.NOT_FOUND_404)
+        }
+        if (req.user!.id !== findComment.commentatorInfo.userId) {
+            return res.sendStatus(sendStatus.FORBIDDEN_403)
+        }
+        const foundComment = await commentsService.deleteComment(commentId)
         if (!foundComment) {
             return res.sendStatus(sendStatus.NOT_FOUND_404)
         }
