@@ -6,7 +6,7 @@ import {
     inputValidationErrors
 } from "../../middlewares/input-validation-middleware";
 import {sendStatus} from "../../repositories/status-collection";
-import {jwtService} from "../../application/jwt-service";
+import {jwtService} from "../../application/jwt-service"
 
 export const authRouter = Router({})
 
