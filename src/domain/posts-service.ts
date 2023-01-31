@@ -32,7 +32,7 @@ export const postsService = {
             postId: postId,
             content: content,
             commentatorInfo: {
-                userId: user!._id,
+                userId: user!.id,
                 userLogin: user!.login
             },
             createdAt: new Date().toISOString()

@@ -8,6 +8,7 @@ import {
 } from "../../middlewares/input-validation-middleware";
 import {ObjectId} from "mongodb";
 import {commentsService} from "../../domain/comments-service";
+import {commentsRepository} from "../../repositories/comments/comments-repository";
 
 export const commentsRouter = Router()
 
@@ -32,9 +33,17 @@ commentsRouter.put('/:id',
     inputCommentsValidation.content,
     inputValidationErrors,
     async (req: Request, res: Response) => {
-        const commentId = req.params.id
+        let commentId: ObjectId;
+        try {
+            commentId = new ObjectId(req.params.id)
+        } catch (e) {
+            res.sendStatus(sendStatus.NOT_FOUND_404)
+            return false
+        }
+        const findComment: commentsType | null = await commentsRepository.findComment(commentId)
+        if (req.user?.id !== findComment?.commentatorInfo.userId) return sendStatus.FORBIDDEN_403
         const content = req.body.content
-        const updateComment: commentsType | boolean = await commentsService.updateComment(content, commentId)
+        const updateComment: commentsType | boolean = await commentsService.updateComment(content, commentId.toString())
         if (!updateComment) {
             return res.sendStatus(sendStatus.NOT_FOUND_404)
         }
