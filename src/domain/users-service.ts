@@ -2,7 +2,7 @@ import {usersRepository} from "../repositories/users-repository";
 import {ObjectId} from "mongodb";
 import {findUsersType, usersType} from "../repositories/types/types";
 import bcrypt from "bcrypt"
-import {usersCollection} from "../repositories/db";
+import {usersCollection} from "../repositories/db"
 
 export const usersService ={
     async findUserById(userId: ObjectId): Promise<usersType | null> {
@@ -88,7 +88,6 @@ export const usersService ={
         return user
     },
     async _generateHash(password: string, salt: string) {
-        const hash = await bcrypt.hash(password, salt)
-        return hash
+        return await bcrypt.hash(password, salt)
     }
 }

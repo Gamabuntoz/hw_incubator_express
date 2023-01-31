@@ -33,13 +33,13 @@ usersRouter.post('/',
         const email = req.body.email
         const newUser: usersType | boolean | null = await usersService.createUser(login, password, email)
         res.status(sendStatus.CREATED_201).send(newUser)
-    }),
-    usersRouter.delete('/:id',
-        authMiddlewareBasic,
-        async (req: Request, res: Response) => {
-            const foundUser = await usersService.deleteUser(req.params.id)
-            if (!foundUser) {
-                return res.sendStatus(sendStatus.NOT_FOUND_404)
-            }
-            res.sendStatus(sendStatus.NO_CONTENT_204)
-        })
+    })
+usersRouter.delete('/:id',
+    authMiddlewareBasic,
+    async (req: Request, res: Response) => {
+        const foundUser = await usersService.deleteUser(req.params.id)
+        if (!foundUser) {
+            return res.sendStatus(sendStatus.NOT_FOUND_404)
+        }
+        res.sendStatus(sendStatus.NO_CONTENT_204)
+    })
