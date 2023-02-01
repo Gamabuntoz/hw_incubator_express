@@ -1,18 +1,18 @@
 import {Request, Response, Router} from "express";
-import {commentsType} from "../../repositories/types/types";
-import {sendStatus} from "../../repositories/status-collection";
+import {commentsType} from "../db/types";
+import {sendStatus} from "../db/status-collection";
 import {
     authMiddlewareBearer,
     inputCommentsValidation,
     inputValidationErrors
-} from "../../middlewares/input-validation-middleware";
+} from "../middlewares/input-validation-middleware";
 import {ObjectId} from "mongodb";
-import {commentsService} from "../../domain/comments-service";
-import {commentsRepository} from "../../repositories/comments/comments-repository";
+import {commentsService} from "./comments-service";
+import {commentsRepository} from "./comments-repository";
 
 export const commentsRouter = Router()
 
-commentsRouter.get('/:id', async (req: Request, res: Response) => {
+commentsRouter.get("/:id", async (req: Request, res: Response) => {
     let commentId: ObjectId;
     try {
         commentId = new ObjectId(req.params.id)
@@ -28,7 +28,7 @@ commentsRouter.get('/:id', async (req: Request, res: Response) => {
     }
     res.status(sendStatus.OK_200).send(findCommentById)
 })
-commentsRouter.put('/:id',
+commentsRouter.put("/:id",
     authMiddlewareBearer,
     inputCommentsValidation.content,
     inputValidationErrors,
@@ -54,7 +54,7 @@ commentsRouter.put('/:id',
         }
         res.sendStatus(sendStatus.NO_CONTENT_204)
     })
-commentsRouter.delete('/:id',
+commentsRouter.delete("/:id",
     authMiddlewareBearer,
     async (req: Request, res: Response) => {
         let commentId: ObjectId;

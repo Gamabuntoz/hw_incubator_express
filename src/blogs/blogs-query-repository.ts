@@ -1,6 +1,6 @@
 import {Filter, ObjectId} from "mongodb";
-import {blogsType, findBlogsType, findPostsType} from "../types/types";
-import {blogsCollection, postsCollection} from "../db";
+import {blogsType, findBlogsType, findPostsType} from "../db/types";
+import {blogsCollection, postsCollection} from "../db/db";
 
 
 export const blogsQueryRepository = {

@@ -1,13 +1,13 @@
 import {Request, Response, Router} from "express";
-import {blogsType, findBlogsType, findPostsType} from "../../repositories/types/types";
-import {sendStatus} from "../../repositories/status-collection";
+import {blogsType, findBlogsType, findPostsType} from "../db/types";
+import {sendStatus} from "../db/status-collection";
 import {ObjectId} from "mongodb";
-import {blogsQueryRepository} from "../../repositories/blogs/blogs-query-repository";
-import {blogIdQueryMiddleware} from "../../middlewares/input-validation-middleware";
+import {blogsQueryRepository} from "./blogs-query-repository";
+import {blogIdQueryMiddleware} from "../middlewares/input-validation-middleware";
 
 export const blogsQueryRouter = Router()
 
-blogsQueryRouter.get('/', async (req: Request, res: Response) => {
+blogsQueryRouter.get("/", async (req: Request, res: Response) => {
     const searchNameTerm = req.query.searchNameTerm
     const sortBy = req.query.sortBy
     const sortDirection = req.query.sortDirection
@@ -18,7 +18,7 @@ blogsQueryRouter.get('/', async (req: Request, res: Response) => {
     res.status(sendStatus.OK_200).send(allBlogs)
 })
 
-blogsQueryRouter.get('/:id', async (req: Request, res: Response) => {
+blogsQueryRouter.get("/:id", async (req: Request, res: Response) => {
     let blogId: ObjectId;
     try {
         blogId = new ObjectId(req.params.id)
@@ -37,7 +37,7 @@ blogsQueryRouter.get('/:id', async (req: Request, res: Response) => {
 
 })
 
-blogsQueryRouter.get('/:id/posts',
+blogsQueryRouter.get("/:id/posts",
     blogIdQueryMiddleware,
     async (req: Request, res: Response) => {
         const sortBy = req.query.sortBy
