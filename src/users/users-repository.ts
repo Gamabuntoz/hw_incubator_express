@@ -1,5 +1,5 @@
-import {usersCollection} from "./db";
-import {usersType} from "./types/types";
+import {usersCollection} from "../db/db";
+import {usersType} from "../db/types";
 import {ObjectId} from "mongodb";
 
 export const usersRepository = {

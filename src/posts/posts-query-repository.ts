@@ -1,6 +1,6 @@
 import {ObjectId} from "mongodb";
-import {findCommentsType, findPostsType, postsType} from "../types/types";
-import {commentsCollection, postsCollection} from "../db";
+import {findCommentsType, findPostsType, postsType} from "../db/types";
+import {commentsCollection, postsCollection} from "../db/db";
 
 export const postsQueryRepository = {
     async findAllPosts(sortBy: string, sortDirection: string, pageNumber: number, pageSize: number): Promise<findPostsType> {

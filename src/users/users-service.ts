@@ -1,8 +1,8 @@
-import {usersRepository} from "../repositories/users-repository";
+import {usersRepository} from "./users-repository";
 import {ObjectId} from "mongodb";
-import {findUsersType, usersType} from "../repositories/types/types";
+import {findUsersType, usersType} from "../db/types";
 import bcrypt from "bcrypt"
-import {usersCollection} from "../repositories/db"
+import {usersCollection} from "../db/db"
 
 export const usersService ={
     async findUserById(userId: ObjectId): Promise<usersType | null> {

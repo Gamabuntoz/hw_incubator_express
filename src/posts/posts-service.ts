@@ -1,8 +1,8 @@
-import {postsCommandsRepository} from "../repositories/posts/posts-commands-repository";
+import {postsCommandsRepository} from "./posts-commands-repository";
 import {ObjectId} from "mongodb";
-import {commentsType, postsType, usersType} from "../repositories/types/types";
-import {blogsService} from "./blogs-service";
-import {commentsRepository} from "../repositories/comments/comments-repository";
+import {commentsType, postsType, usersType} from "../db/types";
+import {blogsService} from "../blogs/blogs-service";
+import {commentsRepository} from "../comments/comments-repository";
 
 export const postsService = {
     async createPost(title: string, shortDescription: string, content: string, blogId: string): Promise<postsType | boolean> {

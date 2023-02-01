@@ -1,6 +1,6 @@
-import {MongoClient} from 'mongodb'
-import * as dotenv from 'dotenv'
-import {blogsType, commentsType, postsType, usersType} from "./types/types";
+import {MongoClient} from "mongodb"
+import * as dotenv from "dotenv"
+import {blogsType, commentsType, postsType, usersType} from "./types";
 
 dotenv.config()
 

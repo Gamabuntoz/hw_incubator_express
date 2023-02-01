@@ -1,16 +1,16 @@
 import {Request, Response, Router} from "express";
-import {findUsersType, usersType} from "../../repositories/types/types";
-import {sendStatus} from "../../repositories/status-collection";
+import {findUsersType, usersType} from "../db/types";
+import {sendStatus} from "../db/status-collection";
 import {
     authMiddlewareBasic,
     inputUsersValidation,
     inputValidationErrors,
-} from "../../middlewares/input-validation-middleware";
-import {usersService} from "../../domain/users-service";
+} from "../middlewares/input-validation-middleware";
+import {usersService} from "./users-service";
 
 export const usersRouter = Router()
 
-usersRouter.get('/', async (req: Request, res: Response) => {
+usersRouter.get("/", async (req: Request, res: Response) => {
     const sortBy = req.query.sortBy
     const sortDirection = req.query.sortDirection
     const pageNumber = +(req.query.pageNumber ?? 1)
@@ -21,7 +21,7 @@ usersRouter.get('/', async (req: Request, res: Response) => {
         .findAllUsers(sortBy as string, sortDirection as string, pageNumber, pageSize, searchLoginTerm as string, searchEmailTerm as string)
     res.status(sendStatus.OK_200).send(allUsers)
 })
-usersRouter.post('/',
+usersRouter.post("/",
     authMiddlewareBasic,
     inputUsersValidation.login,
     inputUsersValidation.password,
@@ -34,7 +34,7 @@ usersRouter.post('/',
         const newUser: usersType | boolean | null = await usersService.createUser(login, password, email)
         res.status(sendStatus.CREATED_201).send(newUser)
     })
-usersRouter.delete('/:id',
+usersRouter.delete("/:id",
     authMiddlewareBasic,
     async (req: Request, res: Response) => {
         const foundUser = await usersService.deleteUser(req.params.id)

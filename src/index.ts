@@ -1,14 +1,14 @@
-import express from 'express'
-import bodyParser from 'body-parser'
-import {runDb} from "./repositories/db";
-import {blogsCommandsRouter} from "./routes/blogs/blogs-commands-router";
-import {postsCommandRouter} from "./routes/posts/posts-command-router";
-import {testingRouter} from "./routes/DELETE-ALL-DATA/testing-router";
-import {blogsQueryRouter} from "./routes/blogs/blogs-query-router";
-import {postsQueryRouter} from "./routes/posts/posts-query-router";
-import {usersRouter} from "./routes/users/users-router";
-import {authRouter} from "./routes/auth/auth-router";
-import {commentsRouter} from "./routes/comments/comments-router";
+import express from "express"
+import bodyParser from "body-parser"
+import {runDb} from "./db/db";
+import {blogsCommandsRouter} from "./blogs/blogs-commands-router";
+import {postsCommandRouter} from "./posts/posts-command-router";
+import {testingRouter} from "./DELETE-ALL-DATA/testing-router";
+import {blogsQueryRouter} from "./blogs/blogs-query-router";
+import {postsQueryRouter} from "./posts/posts-query-router";
+import {usersRouter} from "./users/users-router";
+import {authRouter} from "./auth/auth-router";
+import {commentsRouter} from "./comments/comments-router";
 import cors from "cors"
 
 export const app = express()

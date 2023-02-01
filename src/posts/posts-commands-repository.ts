@@ -1,6 +1,6 @@
-import {postsCollection} from "../db";
+import {postsCollection} from "../db/db";
 import {ObjectId} from "mongodb";
-import {postsArrayType, postsType} from "../types/types";
+import {postsArrayType, postsType} from "../db/types";
 
 export const postsCommandsRepository = {
     async findAllPosts(): Promise<postsArrayType> {

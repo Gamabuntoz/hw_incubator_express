@@ -1,7 +1,7 @@
 import {ObjectId} from "mongodb";
-import {commentsType} from "../repositories/types/types";
-import {commentsCollection} from "../repositories/db";
-import {commentsRepository} from "../repositories/comments/comments-repository";
+import {commentsType} from "../db/types";
+import {commentsCollection} from "../db/db";
+import {commentsRepository} from "./comments-repository";
 
 export const commentsService = {
     async findCommentById(commentId: ObjectId): Promise<commentsType | boolean | null> {

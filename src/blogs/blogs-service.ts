@@ -1,8 +1,8 @@
-import {blogsCommandsRepository} from "../repositories/blogs/blogs-commands-repository";
+import {blogsCommandsRepository} from "./blogs-commands-repository";
 import {ObjectId} from "mongodb";
-import {blogsType, postsType} from "../repositories/types/types";
-import {blogsCollection} from "../repositories/db";
-import {postsCommandsRepository} from "../repositories/posts/posts-commands-repository";
+import {blogsType, postsType} from "../db/types";
+import {blogsCollection} from "../db/db";
+import {postsCommandsRepository} from "../posts/posts-commands-repository";
 
 
 export const blogsService = {

@@ -1,12 +1,12 @@
 import {Request, Response, Router} from "express";
-import {usersService} from "../../domain/users-service";
+import {usersService} from "../users/users-service";
 import {
     authMiddlewareBearer,
     inputUsersValidation,
     inputValidationErrors
-} from "../../middlewares/input-validation-middleware";
-import {sendStatus} from "../../repositories/status-collection";
-import {jwtService} from "../../application/jwt-service"
+} from "../middlewares/input-validation-middleware";
+import {sendStatus} from "../db/status-collection";
+import {jwtService} from "../application/jwt-service"
 
 export const authRouter = Router({})
 
