@@ -2,7 +2,7 @@ import {blogsCommandsRepository} from "../repositories/blogs/blogs-commands-repo
 import {ObjectId} from "mongodb";
 import {blogsType, postsType} from "../repositories/types/types";
 import {blogsCollection} from "../repositories/db";
-import {postsCommandsRepository} from "../repositories/posts/posts-commands-repository";
+import {postsCommandsRepository} from "../repositories/posts/posts-commands-repository"
 
 
 export const blogsService = {
