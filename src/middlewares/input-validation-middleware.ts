@@ -66,6 +66,7 @@ export const inputBlogsValidation = {
         .isLength({min: 1, max: 500}).withMessage("Length must be from 1 to 500 symbols"),
     websiteUrl: body("websiteUrl")
         .isURL().withMessage("Must be URL")
+        .isLength({min: 1, max: 100}).withMessage("Length must be from 1 to 500 symbols")
 }
 export const inputPostsValidation = {
     title: body("title")
