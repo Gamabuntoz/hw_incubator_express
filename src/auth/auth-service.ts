@@ -31,7 +31,7 @@ export const authService = {
         await emailAdapter.sendEmail(newUser)
         return newUser
     },
-    async resendEmail (email: string): Promise<boolean | string> {
+    async resendEmail(email: string): Promise<boolean | string> {
         let user = await usersRepository.findUserByLoginOrEmail(email)
         if (!user) return "User dont exist"
         if (user.emailConfirmation.isConfirmed) return "Email already confirmed"
@@ -39,7 +39,7 @@ export const authService = {
         await emailAdapter.sendEmail(user)
         return true
     },
-    async confirmEmail (code: string): Promise<boolean | string> {
+    async confirmEmail(code: string): Promise<boolean | string> {
         let user = await usersRepository.findUserByConfirmationCode(code)
         if (!user) return "User dont exist"
         if (user.emailConfirmation.confirmationCode !== code) return "Wrong confirmation code"
@@ -51,7 +51,7 @@ export const authService = {
     async checkCredentials(loginOrEmail: string, password: string): Promise<userType | boolean> {
         const user = await usersRepository.findUserByLoginOrEmail(loginOrEmail)
         if (!user) return false
-        if(!user.emailConfirmation.isConfirmed) {
+        if (!user.emailConfirmation.isConfirmed) {
             return false
         }
         const passwordHash = await this._generateHash(password, user.accountData.passwordHash!.slice(0, 29))
