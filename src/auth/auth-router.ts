@@ -1,5 +1,4 @@
 import {Request, Response, Router} from "express";
-import {usersService} from "../users/users-service";
 import {
     authCheckLoginOrEmail,
     authMiddlewareBearer,
@@ -8,9 +7,8 @@ import {
 } from "../middlewares/input-validation-middleware";
 import {sendStatus} from "../db/status-collection";
 import {jwtService} from "../application/jwt-service"
-import {usersType, userType} from "../db/types";
+import {userType} from "../db/types";
 import {authService} from "./auth-service";
-import {usersRepository} from "../users/users-repository";
 
 export const authRouter = Router({})
 
