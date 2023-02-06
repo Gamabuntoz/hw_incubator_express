@@ -65,7 +65,7 @@ export const authService = {
         if (user.emailConfirmation.isConfirmed) return "Email already confirmed"
         await usersRepository.resendConfirmation(user._id)
         user = await usersRepository.findUserByLoginOrEmail(email)
-        if(user)await emailAdapter.sendEmail(user)
+        if (user) await emailAdapter.sendEmail(user)
         return true
     },
     async confirmEmail(code: string): Promise<boolean | string> {
