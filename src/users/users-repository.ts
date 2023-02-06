@@ -10,12 +10,10 @@ export const usersRepository = {
         return user
     },
     async findUserByLoginOrEmail(loginOrEmail: string) {
-        const foundUser = await usersCollection.findOne({$or: [{"accountData.login": loginOrEmail}, {"accountData.email": loginOrEmail}]})
-        return foundUser
+        return usersCollection.findOne({$or: [{"accountData.login": loginOrEmail}, {"accountData.email": loginOrEmail}]})
     },
     async findUserByConfirmationCode(code: string) {
-        const foundUser = await usersCollection.findOne({"emailConfirmation.confirmationCode": code})
-        return foundUser
+        return usersCollection.findOne({"emailConfirmation.confirmationCode": code})
     },
     async deleteUser(userId: ObjectId): Promise<boolean> {
         const result = await usersCollection.deleteOne({_id: userId})
