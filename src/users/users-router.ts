@@ -1,5 +1,5 @@
 import {Request, Response, Router} from "express";
-import {findUsersType, usersType} from "../db/types";
+import {findUsersType, findUserType} from "../db/types";
 import {sendStatus} from "../db/status-collection";
 import {
     authMiddlewareBasic,
@@ -7,6 +7,7 @@ import {
     inputValidationErrors,
 } from "../middlewares/input-validation-middleware";
 import {usersService} from "./users-service";
+import {authService} from "../auth/auth-service";
 
 export const usersRouter = Router()
 
@@ -33,7 +34,7 @@ usersRouter.post("/",
         const login = req.body.login
         const password = req.body.password
         const email = req.body.email
-        const newUser: usersType | boolean | null = await usersService.createUser(login, password, email)
+        const newUser: findUserType | null = await authService.createUserByAdmin(login, password, email)
         res.status(sendStatus.CREATED_201).send(newUser)
     })
 usersRouter.delete("/:id",
