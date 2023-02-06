@@ -1,20 +1,22 @@
 import {usersRepository} from "./users-repository";
 import {ObjectId} from "mongodb";
-import {findUsersType, usersType} from "../db/types";
+import {findUsersType, findUserType, userType} from "../db/types";
 import bcrypt from "bcrypt"
 import {usersCollection} from "../db/db"
+import {v4 as uuidv4} from "uuid";
+import add from "date-fns/add";
 
 export const usersService ={
-    async findUserById(userId: ObjectId): Promise<usersType | null> {
+    async findUserById(userId: ObjectId): Promise<findUserType | null> {
         const result = await usersCollection.findOne({_id: userId})
         if (!result) {
             return null
         }
         return {
             id: result._id!.toString(),
-            login: result.login,
-            email: result.email,
-            createdAt: result.createdAt
+            login: result.accountData.login,
+            email: result.accountData.email,
+            createdAt: result.accountData.createdAt
         }
     },
     async findAllUsers(sortBy: string | undefined, sortDirection: string | undefined, pageNumber: number, pageSize: number, searchLoginTerm: string, searchEmailTerm: string): Promise<findUsersType> {
@@ -40,29 +42,39 @@ export const usersService ={
             totalCount: totalCount,
             items: findAll.map(u => ({
                     id: u._id!.toString(),
-                    login: u.login,
-                    email: u.email,
-                    createdAt: u.createdAt
+                    login: u.accountData.login,
+                    email: u.accountData.email,
+                    createdAt: u.accountData.createdAt
                 })
             )
         }
     },
-    async createUser(login: string, password: string, email: string): Promise<usersType | null> {
+    async createUser(login: string, password: string, email: string): Promise<findUserType | null> {
         const passwordSalt = await bcrypt.genSalt(10)
         const passwordHash = await this._generateHash(password, passwordSalt)
-        const newUser: usersType = {
+        const newUser: userType = {
             _id: new ObjectId(),
-            login: login,
-            email: email,
-            passwordHash: passwordHash,
-            createdAt: new Date().toISOString(),
+            accountData: {
+                login: login,
+                email: email,
+                passwordHash: passwordHash,
+                createdAt: new Date().toISOString()
+            },
+            emailConfirmation: {
+                confirmationCode: uuidv4(),
+                isConfirmed: false,
+                expirationDate: add(new Date(), {
+                    hours: 1,
+                    minutes: 1
+                }),
+            }
         }
         const result = await usersRepository.createUser(newUser)
         return {
             id: result._id!.toString(),
-            login: result.login,
-            email: result.email,
-            createdAt: result.createdAt
+            login: result.accountData.login,
+            email: result.accountData.email,
+            createdAt: result.accountData.createdAt
         }
     },
     async deleteUser(id: string): Promise<boolean> {
@@ -78,11 +90,11 @@ export const usersService ={
     async deleteAllUsers(): Promise<boolean> {
         return usersRepository.deleteAllUsers()
     },
-    async checkCredentials(loginOrEmail: string, password: string): Promise<usersType | boolean> {
-        const user = await usersRepository.findByLoginOrEmail(loginOrEmail)
+    async checkCredentials(loginOrEmail: string, password: string): Promise<userType | boolean> {
+        const user = await usersRepository.findUserByLoginOrEmail(loginOrEmail)
         if (!user) return false
-        const passwordHash = await this._generateHash(password, user.passwordHash!.slice(0, 29))
-        if (user.passwordHash !== passwordHash) {
+        const passwordHash = await this._generateHash(password, user.accountData.passwordHash!.slice(0, 29))
+        if (user.accountData.passwordHash !== passwordHash) {
             return false
         }
         return user
