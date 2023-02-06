@@ -7,12 +7,33 @@ import {ObjectId} from "mongodb";
 import {jwtService} from "../application/jwt-service";
 import {usersService} from "../users/users-service";
 import {postsCommandsRepository} from "../posts/posts-commands-repository";
-import {userType} from "../db/types";
 
 export const authCheckLoginOrEmail = async (req: Request, res: Response, next: NextFunction) => {
-    const findUser = await usersCollection.findOne({$or: [{"accountData.login": req.body.login}, {"accountData.email": req.body.login}]})
-    if (findUser) {
-        throw new Error("Blog is not found");
+    const findUserByEmail = await usersCollection.findOne({"accountData.email": req.body.email})
+    const findUserByLogin = await usersCollection.findOne({"accountData.login": req.body.login})
+    if (findUserByEmail) {
+        return res.status(sendStatus.BAD_REQUEST_400).send(
+        {
+            errorsMessages: [
+                {
+                    message: "Email already exist",
+                    field: "email"
+                }
+            ]
+        }
+        )
+    }
+    if (findUserByLogin) {
+        return res.status(sendStatus.BAD_REQUEST_400).send(
+            {
+                errorsMessages: [
+                    {
+                        message: "Login already exist",
+                        field: "login"
+                    }
+                ]
+            }
+        )
     }
     next()
 }
