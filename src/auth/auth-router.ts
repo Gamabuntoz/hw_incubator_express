@@ -38,8 +38,8 @@ authRouter.post("/registration-confirmation",
                     }
                 ]
             })
-            res.sendStatus(sendStatus.NO_CONTENT_204)
         }
+        res.sendStatus(sendStatus.NO_CONTENT_204)
     })
 
 authRouter.post("/registration-email-resending",
