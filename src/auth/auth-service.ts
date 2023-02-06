@@ -1,6 +1,6 @@
 import {usersRepository} from "../users/users-repository";
 import {ObjectId} from "mongodb";
-import {userType} from "../db/types";
+import {findUserType, userType} from "../db/types";
 import bcrypt from "bcrypt"
 import {v4 as uuidv4} from "uuid"
 import add from "date-fns/add"
@@ -30,6 +30,34 @@ export const authService = {
         const result = await usersRepository.createUser(newUser)
         await emailAdapter.sendEmail(newUser)
         return newUser
+    },
+    async createUserByAdmin(login: string, password: string, email: string): Promise<findUserType | null> {
+        const passwordSalt = await bcrypt.genSalt(10)
+        const passwordHash = await this._generateHash(password, passwordSalt)
+        const newUser: userType = {
+            _id: new ObjectId(),
+            accountData: {
+                login: login,
+                email: email,
+                passwordHash: passwordHash,
+                createdAt: new Date().toISOString()
+            },
+            emailConfirmation: {
+                confirmationCode: uuidv4(),
+                isConfirmed: true,
+                expirationDate: add(new Date(), {
+                    hours: 1,
+                    minutes: 1
+                }),
+            }
+        }
+        const result = await usersRepository.createUser(newUser)
+        return {
+            id: result._id!.toString(),
+            login: result.accountData.login,
+            email: result.accountData.email,
+            createdAt: result.accountData.createdAt
+        }
     },
     async resendEmail(email: string): Promise<boolean | string> {
         let user = await usersRepository.findUserByLoginOrEmail(email)
