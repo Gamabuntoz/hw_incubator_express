@@ -30,7 +30,7 @@ authRouter.post("/registration-confirmation",
         const code = req.body.code
         const result = await authService.confirmEmail(code)
         if (typeof result === "string") {
-            res.status(sendStatus.BAD_REQUEST_400).send({
+            return res.status(sendStatus.BAD_REQUEST_400).send({
                 errorsMessages: [
                     {
                         message: result,
@@ -49,11 +49,11 @@ authRouter.post("/registration-email-resending",
         const email = req.body.email
         const result = await authService.resendEmail(email)
         if (typeof result === "string") {
-            res.status(sendStatus.BAD_REQUEST_400).send({
+            return res.status(sendStatus.BAD_REQUEST_400).send({
                 errorsMessages: [
                     {
                         message: result,
-                        field: "code"
+                        field: "email"
                     }
                 ]
             })
