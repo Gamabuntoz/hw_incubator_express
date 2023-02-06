@@ -43,7 +43,6 @@ authRouter.post("/registration-confirmation",
     })
 
 authRouter.post("/registration-email-resending",
-    authCheckLoginOrEmail,
     inputUsersValidation.email,
     inputValidationErrors,
     async (req: Request, res: Response) => {
