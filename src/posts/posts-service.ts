@@ -1,6 +1,6 @@
 import {postsCommandsRepository} from "./posts-commands-repository";
 import {ObjectId} from "mongodb";
-import {commentsType, postsType, usersType} from "../db/types";
+import {commentsType, findUserType, postsType, userType} from "../db/types";
 import {blogsService} from "../blogs/blogs-service";
 import {commentsRepository} from "../comments/comments-repository";
 
@@ -27,7 +27,7 @@ export const postsService = {
             createdAt: result.createdAt,
         }
     },
-    async createCommentByPostId(content: string, user: usersType | null, postId: string): Promise<commentsType> {
+    async createCommentByPostId(content: string, user: findUserType | null, postId: string): Promise<commentsType> {
         const newComment: commentsType = {
             postId: postId,
             content: content,
