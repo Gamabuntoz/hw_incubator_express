@@ -10,7 +10,9 @@ import {usersService} from "./users-service";
 
 export const usersRouter = Router()
 
-usersRouter.get("/", async (req: Request, res: Response) => {
+usersRouter.get("/",
+    authMiddlewareBasic,
+    async (req: Request, res: Response) => {
     const sortBy = req.query.sortBy
     const sortDirection = req.query.sortDirection
     const pageNumber = +(req.query.pageNumber ?? 1)

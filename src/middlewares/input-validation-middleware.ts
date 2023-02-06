@@ -2,13 +2,20 @@ import {NextFunction, Request, Response} from "express";
 import {body, ValidationError, validationResult} from "express-validator";
 import {sendStatus} from "../db/status-collection";
 import {blogsCommandsRepository} from "../blogs/blogs-commands-repository";
-import {adminCollection} from "../db/db";
+import {adminCollection, usersCollection} from "../db/db";
 import {ObjectId} from "mongodb";
 import {jwtService} from "../application/jwt-service";
 import {usersService} from "../users/users-service";
 import {postsCommandsRepository} from "../posts/posts-commands-repository";
+import {userType} from "../db/types";
 
-
+export const authCheckLoginOrEmail = async (req: Request, res: Response, next: NextFunction) => {
+    const findUser = await usersCollection.findOne({$or: [{"accountData.login": req.body.login}, {"accountData.email": req.body.login}]})
+    if (findUser) {
+        throw new Error("Blog is not found");
+    }
+    next()
+}
 export const authMiddlewareBasic = async (req: Request, res: Response, next: NextFunction) => {
     const findUser = await adminCollection.findOne({loginPass: req.headers.authorization})
     if (!findUser) {
