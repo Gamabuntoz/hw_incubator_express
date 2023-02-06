@@ -64,7 +64,8 @@ export const authService = {
         if (!user) return "User dont exist"
         if (user.emailConfirmation.isConfirmed) return "Email already confirmed"
         await usersRepository.resendConfirmation(user._id)
-        await emailAdapter.sendEmail(user)
+        user = await usersRepository.findUserByLoginOrEmail(email)
+        if(user)await emailAdapter.sendEmail(user)
         return true
     },
     async confirmEmail(code: string): Promise<boolean | string> {
