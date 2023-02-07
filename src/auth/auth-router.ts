@@ -9,6 +9,7 @@ import {sendStatus} from "../db/status-collection";
 import {jwtService} from "../application/jwt-service"
 import {userType} from "../db/types";
 import {authService} from "./auth-service";
+import {usersRepository} from "../users/users-repository";
 
 export const authRouter = Router({})
 
@@ -60,7 +61,42 @@ authRouter.post("/registration-email-resending",
         }
         res.sendStatus(sendStatus.NO_CONTENT_204)
     })
-
+authRouter.post("/refresh-token",
+    async (req: Request, res: Response) => {
+        let oldRefreshToken
+        try {
+            oldRefreshToken = req.cookies.refreshToken
+        } catch (e) {
+            return res.sendStatus(sendStatus.UNAUTHORIZED_401)
+        }
+        const userIDbyRefreshToken = await jwtService.checkRefreshToken(oldRefreshToken)
+        await jwtService.blockOldRefreshToken(oldRefreshToken)
+        if (!userIDbyRefreshToken) {
+            return res.sendStatus(sendStatus.UNAUTHORIZED_401)
+        }
+        const user = await usersRepository.findUserById(userIDbyRefreshToken)
+        const accessToken = await jwtService.createAccessJWT(user!)
+        const refreshToken = await jwtService.createRefreshJWT(user!)
+        res.status(sendStatus.OK_200).cookie("refreshToken", refreshToken, {
+            secure: true,
+            httpOnly: true
+        }).send({accessToken: accessToken})
+    })
+authRouter.post("/logout",
+    async (req: Request, res: Response) => {
+        let oldRefreshToken
+        try {
+            oldRefreshToken = req.cookies.refreshToken
+        } catch (e) {
+            return res.sendStatus(sendStatus.UNAUTHORIZED_401)
+        }
+        const userIDbyRefreshToken = await jwtService.checkRefreshToken(oldRefreshToken)
+        await jwtService.blockOldRefreshToken(oldRefreshToken)
+        if (!userIDbyRefreshToken) {
+            return res.sendStatus(sendStatus.UNAUTHORIZED_401)
+        }
+        res.sendStatus(sendStatus.OK_200)
+    })
 authRouter.post("/login",
     inputUsersValidation.loginOrEmail,
     inputUsersValidation.password,
@@ -73,8 +109,12 @@ authRouter.post("/login",
             res.sendStatus(sendStatus.UNAUTHORIZED_401)
             return
         }
-        const token = await jwtService.createJWT(checkUser)
-        res.status(sendStatus.OK_200).send({accessToken: token})
+        const accessToken = await jwtService.createAccessJWT(checkUser)
+        const refreshToken = await jwtService.createRefreshJWT(checkUser)
+        res.status(sendStatus.OK_200).cookie("refreshToken", refreshToken, {
+            secure: true,
+            httpOnly: true
+        }).send({accessToken: accessToken})
     })
 authRouter.get("/me",
     authMiddlewareBearer,
