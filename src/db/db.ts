@@ -17,6 +17,7 @@ export const postsCollection = client.db().collection<postsType>("posts")
 export const blogsCollection = client.db().collection<blogsType>("blogs")
 export const usersCollection = client.db().collection<userType>("users")
 export const adminCollection = client.db().collection("admin")
+export const blockedTokensCollection = client.db().collection("blockedTokens")
 export const commentsCollection = client.db().collection<commentsType>("comments")
 
 export async function runDb() {

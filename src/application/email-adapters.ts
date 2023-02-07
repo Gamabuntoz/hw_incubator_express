@@ -11,7 +11,7 @@ export const emailAdapter = {
             },
         });
         let result = await transporter.sendMail({
-            from: "bonypiper@gmail.com",
+            from: "SAMURAI, <bonypiper@gmail.com>",
             to: user.accountData.email,
             subject: "Registration",
             html: `<h1>Thank for your registration</h1>
