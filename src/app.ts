@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser"
 import {blogsCommandsRouter} from "./blogs/blogs-commands-router";
 import {blogsQueryRouter} from "./blogs/blogs-query-router";
 import {postsCommandRouter} from "./posts/posts-command-router";
@@ -14,6 +15,7 @@ const parserMiddleware = express.json()
 
 app.use(cors({}))
 app.use(parserMiddleware)
+app.use(cookieParser())
 app.use("/blogs", blogsCommandsRouter)
 app.use("/blogs", blogsQueryRouter)
 app.use("/posts", postsCommandRouter)
