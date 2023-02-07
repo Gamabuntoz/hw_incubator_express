@@ -95,7 +95,7 @@ authRouter.post("/logout",
         if (!userIDbyRefreshToken) {
             return res.sendStatus(sendStatus.UNAUTHORIZED_401)
         }
-        res.sendStatus(sendStatus.OK_200)
+        res.sendStatus(sendStatus.OK_200);
     })
 authRouter.post("/login",
     inputUsersValidation.loginOrEmail,
