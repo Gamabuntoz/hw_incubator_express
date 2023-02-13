@@ -14,15 +14,15 @@ devicesRouter.get("/devices",
         } catch (e) {
             return res.sendStatus(sendStatus.UNAUTHORIZED_401)
         }
-        const userIDbyRefreshToken = await jwtService.checkRefreshToken(refreshToken)
-        if (!userIDbyRefreshToken) {
+        const currentSessionInfo = await jwtService.checkRefreshToken(refreshToken)
+        if (!currentSessionInfo) {
             return res.sendStatus(sendStatus.UNAUTHORIZED_401)
         }
         const checkSession = await jwtService.findAuthSession(refreshToken)
         if (!checkSession) {
             return res.sendStatus(sendStatus.UNAUTHORIZED_401)
         }
-        const allSessions = await jwtService.findAllUserSessions(userIDbyRefreshToken.toString())
+        const allSessions = await jwtService.findAllUserSessions(currentSessionInfo.userId.toString())
         res.status(sendStatus.OK_200).send(allSessions.map(c => ({
                 ip: c.ipAddress,
                 title: c.deviceName,
@@ -39,8 +39,8 @@ devicesRouter.delete("/devices",
         } catch (e) {
             return res.sendStatus(sendStatus.UNAUTHORIZED_401)
         }
-        const userIDbyRefreshToken = await jwtService.checkRefreshToken(refreshToken)
-        if (!userIDbyRefreshToken) {
+        const currentSessionInfo = await jwtService.checkRefreshToken(refreshToken)
+        if (!currentSessionInfo) {
             return res.sendStatus(sendStatus.UNAUTHORIZED_401)
         }
         const checkSession = await jwtService.findAuthSession(refreshToken)
@@ -65,8 +65,8 @@ devicesRouter.delete("/devices/:id",
         } catch (e) {
             return res.sendStatus(sendStatus.UNAUTHORIZED_401)
         }
-        const userIDbyRefreshToken = await jwtService.checkRefreshToken(refreshToken)
-        if (!userIDbyRefreshToken) {
+        const currentSessionInfo = await jwtService.checkRefreshToken(refreshToken)
+        if (!currentSessionInfo) {
             return res.sendStatus(sendStatus.UNAUTHORIZED_401)
         }
         const checkSession = await jwtService.findAuthSession(refreshToken)
@@ -75,7 +75,7 @@ devicesRouter.delete("/devices/:id",
         }
         const findSessionById = await jwtService.findAuthSessionByDeviceId(deviceId)
         if (!findSessionById) return res.sendStatus(sendStatus.NOT_FOUND_404)
-        if (findSessionById.userId !== userIDbyRefreshToken) return res.sendStatus(sendStatus.FORBIDDEN_403)
+        if (findSessionById.userId !== currentSessionInfo.userId.toString()) return res.sendStatus(sendStatus.FORBIDDEN_403)
         const deleteAllSessions = await jwtService.deleteAuthSessionByDeviceId(deviceId)
         res.sendStatus(sendStatus.NO_CONTENT_204)
     })
