@@ -2,12 +2,12 @@ import {Request, Response, Router} from "express";
 import {findUsersType, findUserType} from "../db/types";
 import {sendStatus} from "../db/status-collection";
 import {
-    authMiddlewareBasic,
     inputUsersValidation,
     inputValidationErrors,
 } from "../middlewares/input-validation-middleware";
 import {usersService} from "./users-service";
 import {authService} from "../auth/auth-service";
+import {authMiddlewareBasic} from "../middlewares/authorization-middleware";
 
 export const usersRouter = Router()
 

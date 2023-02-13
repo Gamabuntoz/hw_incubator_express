@@ -2,13 +2,13 @@ import {Request, Response, Router} from "express";
 import {commentsType} from "../db/types";
 import {sendStatus} from "../db/status-collection";
 import {
-    authMiddlewareBearer,
     inputCommentsValidation,
     inputValidationErrors
 } from "../middlewares/input-validation-middleware";
 import {ObjectId} from "mongodb";
 import {commentsService} from "./comments-service";
 import {commentsRepository} from "./comments-repository";
+import {authMiddlewareBearer} from "../middlewares/authorization-middleware";
 
 export const commentsRouter = Router()
 
