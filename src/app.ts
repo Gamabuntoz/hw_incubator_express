@@ -25,6 +25,6 @@ app.use("/testing", testingRouter)
 app.use("/users", usersRouter)
 app.use("/auth", authRouter)
 app.use("/comments", commentsRouter)
-app.use("/security/devices", devicesRouter)
+app.use("/security", devicesRouter)
 
 export default app
