@@ -2,13 +2,13 @@ import {Request, Response, Router} from "express";
 import {blogsType, postsType} from "../db/types";
 import {sendStatus} from "../db/status-collection";
 import {
-    authMiddlewareBasic,
     blogIdQueryMiddleware,
     inputBlogsValidation,
     inputPostsValidation,
     inputValidationErrors,
 } from "../middlewares/input-validation-middleware";
 import {blogsService} from "./blogs-service";
+import {authMiddlewareBasic} from "../middlewares/authorization-middleware";
 
 export const blogsCommandsRouter = Router()
 

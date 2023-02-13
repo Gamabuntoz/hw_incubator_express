@@ -2,23 +2,17 @@ import jwt from "jsonwebtoken"
 import {deviceAuthSessionsType, userType} from "../db/types";
 import {authSessionsCollection, settings} from "../db/db";
 import {ObjectId} from "mongodb";
+import {v4 as uuidv4} from "uuid"
 
 export const jwtService = {
     async createAccessJWT(user: userType) {
         return jwt.sign({userId: user._id}, settings.JWT_SECRET, {expiresIn: 10})
     },
-    async createRefreshJWT(user: userType) {
-        return jwt.sign({userId: user._id}, settings.JWT_SECRET, {expiresIn: 20})
+    async createRefreshJWT(user: userType, deviceId: string) {
+        return jwt.sign({userId: user._id, deviceId: deviceId}, settings.JWT_SECRET, {expiresIn: 20})
     },
-    async getUserIdByToken(token: string) {
-        try {
-            const result: any = jwt.verify(token, settings.JWT_SECRET)
-            return new ObjectId((result.userId))
-        } catch (error) {
-            return null
-        }
-    },
-    async authSessionInfo(refreshToken: string, userId: string, userIpAddress: string, deviceName: string) {
+
+    async authSessionInfo(refreshToken: string, userId: string, userIpAddress: string, deviceName: string, deviceId: string) {
         let decodeToken: any
         try {
             decodeToken = jwt.verify(refreshToken, settings.JWT_SECRET)
@@ -27,9 +21,11 @@ export const jwtService = {
         }
         const sessionInfo: deviceAuthSessionsType = {
             issueAt: decodeToken.iat.toString(),
+            expiryAt: decodeToken.exp.toString(),
             ipAddress: userIpAddress,
             deviceName: deviceName,
-            userId: userId
+            userId: userId,
+            deviceId: deviceId
         }
         return await authSessionsCollection.insertOne(sessionInfo)
     },
@@ -76,13 +72,12 @@ export const jwtService = {
         return result.deletedCount === 1
     },
     async checkRefreshToken(token: string) {
-        const checkToken = await authSessionsCollection.findOne({value: token})
-        if (checkToken) {
-            return null
-        }
         try {
             const result: any = jwt.verify(token, settings.JWT_SECRET)
-            return new ObjectId((result.userId))
+            return {
+                userId: new ObjectId((result.userId)),
+                deviceId: result.deviceId
+            }
         } catch (error) {
             return null
         }

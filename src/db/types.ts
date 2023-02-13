@@ -58,9 +58,11 @@ export type commentsType = {
 
 export type deviceAuthSessionsType = {
     issueAt: string
+    expiryAt: string
     ipAddress: string
     deviceName: string
     userId: string
+    deviceId: string
 }
 
 export type blogsArrayType = Array<blogsType>

@@ -1,7 +1,5 @@
 import {Request, Response, Router} from "express";
 import {
-    authCheckLoginOrEmail,
-    authMiddlewareBearer,
     inputUsersValidation,
     inputValidationErrors
 } from "../middlewares/input-validation-middleware";
@@ -10,6 +8,8 @@ import {jwtService} from "../application/jwt-service"
 import {userType} from "../db/types";
 import {authService} from "./auth-service";
 import {usersRepository} from "../users/users-repository";
+import {v4 as uuidv4} from "uuid"
+import {authCheckLoginOrEmail, authMiddlewareBearer} from "../middlewares/authorization-middleware";
 
 export const authRouter = Router({})
 
@@ -69,8 +69,8 @@ authRouter.post("/refresh-token",
         } catch (e) {
             return res.sendStatus(sendStatus.UNAUTHORIZED_401)
         }
-        const userIDbyRefreshToken = await jwtService.checkRefreshToken(oldRefreshToken)
-        if (!userIDbyRefreshToken) {
+        const currentSessionInfo = await jwtService.checkRefreshToken(oldRefreshToken)
+        if (!currentSessionInfo) {
             return res.sendStatus(sendStatus.UNAUTHORIZED_401)
         }
         const deleteOldSession = await jwtService.deleteAuthSession(oldRefreshToken)
@@ -79,10 +79,10 @@ authRouter.post("/refresh-token",
         }
         const userIpAddress = req.headers['x-forwarded-for']
         const userDeviceName = req.headers['user-agent']
-        const user = await usersRepository.findUserById(userIDbyRefreshToken)
+        const user = await usersRepository.findUserById(currentSessionInfo.userId)
         const accessToken = await jwtService.createAccessJWT(user!)
-        const refreshToken = await jwtService.createRefreshJWT(user!)
-        const sessionInfo = await jwtService.authSessionInfo(refreshToken, user!._id.toString(), userIpAddress as string, userDeviceName as string)
+        const refreshToken = await jwtService.createRefreshJWT(user!, currentSessionInfo.deviceId)
+        const sessionInfo = await jwtService.authSessionInfo(refreshToken, user!._id.toString(), userIpAddress as string, userDeviceName as string, currentSessionInfo.deviceId)
         res.status(sendStatus.OK_200).cookie("refreshToken", refreshToken, {
             secure: true,
             httpOnly: true
@@ -120,9 +120,10 @@ authRouter.post("/login",
         }
         const userIpAddress = req.headers['x-forwarded-for']
         const userDeviceName = req.headers['user-agent']
+        const deviceId = uuidv4()
         const accessToken = await jwtService.createAccessJWT(checkUser)
-        const refreshToken = await jwtService.createRefreshJWT(checkUser)
-        const sessionInfo = await jwtService.authSessionInfo(refreshToken, checkUser._id.toString(), userIpAddress as string, userDeviceName as string)
+        const refreshToken = await jwtService.createRefreshJWT(checkUser, deviceId)
+        const sessionInfo = await jwtService.authSessionInfo(refreshToken, checkUser._id.toString(), userIpAddress as string, userDeviceName as string, deviceId)
         res.status(sendStatus.OK_200).cookie("refreshToken", refreshToken, {
             secure: true,
             httpOnly: true

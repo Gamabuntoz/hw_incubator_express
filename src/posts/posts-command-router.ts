@@ -2,14 +2,13 @@ import {Request, Response, Router} from "express";
 import {commentsType, postsType} from "../db/types";
 import {sendStatus} from "../db/status-collection";
 import {
-    authMiddlewareBasic,
-    authMiddlewareBearer,
     inputCommentsValidation,
     inputPostsValidation,
     inputValidationErrors,
     postIdQueryMiddleware
 } from "../middlewares/input-validation-middleware";
 import {postsService} from "./posts-service";
+import {authMiddlewareBasic, authMiddlewareBearer} from "../middlewares/authorization-middleware";
 
 export const postsCommandRouter = Router()
 
