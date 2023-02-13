@@ -1,9 +1,5 @@
 import {Request, Response, Router} from "express";
-import {authMiddlewareBasic} from "../middlewares/input-validation-middleware";
-import {findUsersType} from "../db/types";
-import {usersService} from "../users/users-service";
 import {sendStatus} from "../db/status-collection";
-import {usersRouter} from "../users/users-router";
 import {jwtService} from "../application/jwt-service";
 import {ObjectId} from "mongodb";
 
