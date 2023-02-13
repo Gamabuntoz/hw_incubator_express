@@ -133,8 +133,8 @@ export const inputUsersValidation = {
     email: body("email")
         .isEmail().withMessage("Incorrect email"),
     loginOrEmail: body("loginOrEmail")
-        .exists().withMessage("Can not be empty")
         .isString().trim().withMessage("Must be a string")
+        .isLength({min: 3, max: 30}).withMessage("Length must be from 3 to 10 symbols")
 }
 export const inputCommentsValidation = {
     content: body("content")
