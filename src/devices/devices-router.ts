@@ -6,7 +6,7 @@ import {ObjectId} from "mongodb";
 
 export const devicesRouter = Router()
 
-devicesRouter.get("/",
+devicesRouter.get("/devices",
     async (req: Request, res: Response) => {
         let refreshToken
         try {
@@ -31,7 +31,7 @@ devicesRouter.get("/",
             })
         ))
     })
-devicesRouter.delete("/",
+devicesRouter.delete("/devices",
     async (req: Request, res: Response) => {
         let refreshToken
         try {
@@ -50,7 +50,7 @@ devicesRouter.delete("/",
         const deleteAllSessions = await jwtService.deleteAllAuthSession(refreshToken)
         res.sendStatus(sendStatus.NO_CONTENT_204)
     })
-devicesRouter.delete("/:id",
+devicesRouter.delete("/devices/:id",
     async (req: Request, res: Response) => {
         let deviceId: ObjectId;
         try {
