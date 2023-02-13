@@ -1,8 +1,8 @@
-import jwt from "jsonwebtoken"
-import {userType} from "../db/types";
-import {blockedTokensCollection, settings} from "../db/db";
+import jwt, {JwtPayload} from "jsonwebtoken"
+import {deviceAuthSessionsType, userType} from "../db/types";
+import {authSessionsCollection, settings} from "../db/db";
 import {ObjectId} from "mongodb";
-import {tr} from "date-fns/locale";
+import {v4 as uuidv4} from "uuid"
 
 export const jwtService = {
     async createAccessJWT(user: userType) {
@@ -19,14 +19,65 @@ export const jwtService = {
             return null
         }
     },
-    async blockOldRefreshToken(refreshToken: string) {
-        const blockedToken = {
-            value: refreshToken
+    async authSessionInfo(refreshToken: string, userId: string, userIpAddress: string, deviceName: string) {
+        let decodeToken: any
+        try {
+            decodeToken = jwt.verify(refreshToken, settings.JWT_SECRET)
+        } catch (e) {
+            return null
         }
-        return await blockedTokensCollection.insertOne(blockedToken)
+        const sessionInfo: deviceAuthSessionsType = {
+            issueAt: decodeToken.iat.toString(),
+            ipAddress: userIpAddress,
+            deviceName: deviceName,
+            userId: userId
+        }
+        return await authSessionsCollection.insertOne(sessionInfo)
+    },
+    async findAuthSession(refreshToken: string) {
+        let decodeToken: any
+        try {
+            decodeToken = jwt.verify(refreshToken, settings.JWT_SECRET)
+        } catch (e) {
+            return null
+        }
+        const issueAt = decodeToken.iat.toString()
+        return await authSessionsCollection.findOne({issueAt: issueAt})
+    },
+    async findAuthSessionByDeviceId(deviceId: ObjectId) {
+        return await authSessionsCollection.findOne({_id: deviceId})
+    },
+    async findAllUserSessions(userId: string) {
+        return authSessionsCollection.find({userId: userId})
+    },
+    async deleteAuthSession(refreshToken: string) {
+        let decodeToken: any
+        try {
+            decodeToken = jwt.verify(refreshToken, settings.JWT_SECRET)
+        } catch (e) {
+            return null
+        }
+        const issueAt = decodeToken.iat.toString()
+        const result = await authSessionsCollection.deleteOne({issueAt: issueAt})
+        return result.deletedCount === 1
+    },
+    async deleteAuthSessionByDeviceId(deviceId: ObjectId) {
+        const result = await authSessionsCollection.deleteOne({_id: deviceId})
+        return result.deletedCount === 1
+    },
+    async deleteAllAuthSession(refreshToken: string) {
+        let decodeToken: any
+        try {
+            decodeToken = jwt.verify(refreshToken, settings.JWT_SECRET)
+        } catch (e) {
+            return null
+        }
+        const issueAt = decodeToken.iat.toString()
+        const result = await authSessionsCollection.deleteMany({issueAt: {$ne: issueAt}})
+        return result.deletedCount === 1
     },
     async checkRefreshToken(token: string) {
-        const checkToken = await blockedTokensCollection.findOne({value: token})
+        const checkToken = await authSessionsCollection.findOne({value: token})
         if (checkToken) {
             return null
         }

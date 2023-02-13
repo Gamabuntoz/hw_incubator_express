@@ -70,13 +70,19 @@ authRouter.post("/refresh-token",
             return res.sendStatus(sendStatus.UNAUTHORIZED_401)
         }
         const userIDbyRefreshToken = await jwtService.checkRefreshToken(oldRefreshToken)
-        await jwtService.blockOldRefreshToken(oldRefreshToken)
         if (!userIDbyRefreshToken) {
             return res.sendStatus(sendStatus.UNAUTHORIZED_401)
         }
+        const deleteOldSession = await jwtService.deleteAuthSession(oldRefreshToken)
+        if (!deleteOldSession) {
+            return res.sendStatus(sendStatus.UNAUTHORIZED_401)
+        }
+        const userIpAddress = req.headers['x-forwarded-for']
+        const userDeviceName = req.headers['user-agent']
         const user = await usersRepository.findUserById(userIDbyRefreshToken)
         const accessToken = await jwtService.createAccessJWT(user!)
         const refreshToken = await jwtService.createRefreshJWT(user!)
+        const sessionInfo = await jwtService.authSessionInfo(refreshToken, user!._id.toString(), userIpAddress as string, userDeviceName as string)
         res.status(sendStatus.OK_200).cookie("refreshToken", refreshToken, {
             secure: true,
             httpOnly: true
@@ -91,7 +97,10 @@ authRouter.post("/logout",
             return res.sendStatus(sendStatus.UNAUTHORIZED_401)
         }
         const userIDbyRefreshToken = await jwtService.checkRefreshToken(oldRefreshToken)
-        await jwtService.blockOldRefreshToken(oldRefreshToken)
+        const result = await jwtService.deleteAuthSession(oldRefreshToken)
+        if (!result) {
+            return res.sendStatus(sendStatus.UNAUTHORIZED_401)
+        }
         if (!userIDbyRefreshToken) {
             return res.sendStatus(sendStatus.UNAUTHORIZED_401)
         }
@@ -109,8 +118,11 @@ authRouter.post("/login",
             res.sendStatus(sendStatus.UNAUTHORIZED_401)
             return
         }
+        const userIpAddress = req.headers['x-forwarded-for']
+        const userDeviceName = req.headers['user-agent']
         const accessToken = await jwtService.createAccessJWT(checkUser)
         const refreshToken = await jwtService.createRefreshJWT(checkUser)
+        const sessionInfo = await jwtService.authSessionInfo(refreshToken, checkUser._id.toString(), userIpAddress as string, userDeviceName as string)
         res.status(sendStatus.OK_200).cookie("refreshToken", refreshToken, {
             secure: true,
             httpOnly: true

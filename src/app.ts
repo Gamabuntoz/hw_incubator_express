@@ -9,10 +9,11 @@ import {testingRouter} from "./DELETE-ALL-DATA/testing-router";
 import {usersRouter} from "./users/users-router";
 import {authRouter} from "./auth/auth-router";
 import {commentsRouter} from "./comments/comments-router";
+import {devicesRouter} from "./devices/devices-router";
 
 const app = express()
 const parserMiddleware = express.json()
-
+app.set('trust proxy', true)
 app.use(cors({}))
 app.use(parserMiddleware)
 app.use(cookieParser())
@@ -24,5 +25,6 @@ app.use("/testing", testingRouter)
 app.use("/users", usersRouter)
 app.use("/auth", authRouter)
 app.use("/comments", commentsRouter)
+app.use("/security/devices", devicesRouter)
 
 export default app
