@@ -53,3 +53,20 @@ export const authMiddlewareBearer = async (req: Request, res: Response, next: Ne
     req.user = await usersService.findUserById(userId.userId)
     next()
 }
+export const authRefreshTokenMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+    let oldRefreshToken
+    try {
+        oldRefreshToken = req.cookies.refreshToken
+    } catch (e) {
+        return res.sendStatus(sendStatus.UNAUTHORIZED_401)
+    }
+    const checkUserToken = await jwtService.checkRefreshToken(oldRefreshToken)
+    if (!checkUserToken) {
+        return res.sendStatus(sendStatus.UNAUTHORIZED_401)
+    }
+    const findDevice = jwtService.findDeviceByDate(checkUserToken.issueAt)
+    if (!findDevice) {
+        return res.sendStatus(sendStatus.UNAUTHORIZED_401)
+    }
+    next()
+}

@@ -1,6 +1,6 @@
 import {postsCommandsRepository} from "./posts-commands-repository";
 import {ObjectId} from "mongodb";
-import {commentsType, findUserType, postsType, userType} from "../db/types";
+import {commentsType, findUserType, postsType} from "../db/types";
 import {blogsService} from "../blogs/blogs-service";
 import {commentsRepository} from "../comments/comments-repository";
 
@@ -37,7 +37,7 @@ export const postsService = {
             },
             createdAt: new Date().toISOString()
         }
-        const result = await commentsRepository.createComment(newComment)
+        await commentsRepository.createComment(newComment)
         return {
             id: newComment._id!.toString(),
             content: newComment.content,

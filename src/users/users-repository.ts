@@ -6,7 +6,7 @@ import add from "date-fns/add";
 
 export const usersRepository = {
     async createUser(user: userType): Promise<userType> {
-        let newUser = await usersCollection.insertOne(user)
+        await usersCollection.insertOne(user)
         return user
     },
     async findUserByLoginOrEmail(loginOrEmail: string) {

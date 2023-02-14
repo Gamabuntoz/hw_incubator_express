@@ -7,75 +7,45 @@ export const jwtService = {
     async createAccessJWT(user: userType) {
         return jwt.sign({userId: user._id}, settings.JWT_SECRET, {expiresIn: "1h"})
     },
-    async createRefreshJWT(user: userType, deviceId: string) {
-        return jwt.sign({userId: user._id, deviceId: deviceId}, settings.JWT_SECRET, {expiresIn: "1h"})
+    async createRefreshJWT(user: userType, deviceId: string, issueAt: number) {
+        return jwt.sign({userId: user._id, deviceId: deviceId, issueAt: issueAt}, settings.JWT_SECRET, {expiresIn: settings.EXPIRATION_JWT_REFRESH_TOKEN})
     },
 
-    async authSessionInfo(refreshToken: string, userId: string, userIpAddress: string, deviceName: string, deviceId: string) {
-        let decodeToken: any
-        try {
-            decodeToken = jwt.verify(refreshToken, settings.JWT_SECRET)
-        } catch (e) {
-            return null
-        }
-        const sessionInfo: deviceAuthSessionsType = {
-            issueAt: decodeToken.iat.toString(),
-            expiryAt: decodeToken.exp.toString(),
-            ipAddress: userIpAddress,
-            deviceName: deviceName,
-            userId: userId,
-            deviceId: deviceId
-        }
-        return await authSessionsCollection.insertOne(sessionInfo)
+    async insertDeviceInfo(device: deviceAuthSessionsType) {
+        return await authSessionsCollection.insertOne(device)
     },
-    async findAuthSession(refreshToken: string) {
-        let decodeToken: any
-        try {
-            decodeToken = jwt.verify(refreshToken, settings.JWT_SECRET)
-        } catch (e) {
-            return null
-        }
-        const issueAt = decodeToken.iat.toString()
+    async updateDeviceInfo(oldIssueAt: number, newIssueAt: number) {
+        const result = await authSessionsCollection.updateOne({issueAt: oldIssueAt}, {issueAt: newIssueAt})
+        return result.modifiedCount === 1
+    },
+    async findDeviceByDate(issueAt: number) {
         return await authSessionsCollection.findOne({issueAt: issueAt})
     },
-    async findAuthSessionByDeviceId(deviceId: ObjectId) {
-        return await authSessionsCollection.findOne({_id: deviceId})
+    async findDeviceByDeviceId(deviceId: string) {
+        return await authSessionsCollection.findOne({deviceId: deviceId})
     },
     async findAllUserSessions(userId: string) {
         return authSessionsCollection.find({userId: userId}).toArray()
     },
-    async deleteAuthSession(refreshToken: string) {
-        let decodeToken: any
-        try {
-            decodeToken = jwt.verify(refreshToken, settings.JWT_SECRET)
-        } catch (e) {
-            return null
-        }
-        const issueAt = decodeToken.iat.toString()
+    async deleteDevice(issueAt: number) {
         const result = await authSessionsCollection.deleteOne({issueAt: issueAt})
         return result.deletedCount === 1
     },
-    async deleteAuthSessionByDeviceId(deviceId: ObjectId) {
-        const result = await authSessionsCollection.deleteOne({_id: deviceId})
+    async deleteAuthSessionByDeviceId(deviceId: string) {
+        const result = await authSessionsCollection.deleteOne({deviceId: deviceId})
         return result.deletedCount === 1
     },
-    async deleteAllAuthSession(refreshToken: string) {
-        let decodeToken: any
-        try {
-            decodeToken = jwt.verify(refreshToken, settings.JWT_SECRET)
-        } catch (e) {
-            return null
-        }
-        const issueAt = decodeToken.iat.toString()
-        const result = await authSessionsCollection.deleteMany({issueAt: {$ne: issueAt}})
+    async deleteAllUserDeviceExceptCurrent(issueAt: number, userId: ObjectId) {
+        const result = await authSessionsCollection.deleteMany({issueAt: {$ne: issueAt}, userId: userId})
         return result.deletedCount === 1
     },
     async checkRefreshToken(token: string) {
         try {
             const result: any = jwt.verify(token, settings.JWT_SECRET)
             return {
-                userId: new ObjectId(result.userId),
-                deviceId: result.deviceId
+                userId: result.userId,
+                deviceId: result.deviceId,
+                issueAt: result.issueAt
             }
         } catch (error) {
             return null
