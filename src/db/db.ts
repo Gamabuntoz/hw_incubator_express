@@ -7,7 +7,7 @@ dotenv.config()
 export const settings = {
     MONGO_URI: process.env.MONGO_URI || "mongodb://0.0.0.0:27017",
     JWT_SECRET: process.env.JWT_SECRET || "123",
-    EXPIRATION_JWT_REFRESH_TOKEN: 20000
+    EXPIRATION_JWT_REFRESH_TOKEN: 2000000
 }
 
 if (!settings.MONGO_URI) {
