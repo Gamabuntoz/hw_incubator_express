@@ -77,7 +77,7 @@ authRouter.post("/refresh-token",
         if (!deleteOldSession) {
             return res.sendStatus(sendStatus.UNAUTHORIZED_401)
         }
-        const userIpAddress = req.headers['x-forwarded-for']
+        const userIpAddress = req.headers['x-forwarded-for'] || req.socket.remoteAddress
         const userDeviceName = req.headers['user-agent']
         const user = await usersRepository.findUserById(currentSessionInfo.userId)
         const accessToken = await jwtService.createAccessJWT(user!)

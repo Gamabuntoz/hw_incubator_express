@@ -2,14 +2,13 @@ import jwt from "jsonwebtoken"
 import {deviceAuthSessionsType, userType} from "../db/types";
 import {authSessionsCollection, settings} from "../db/db";
 import {ObjectId} from "mongodb";
-import {v4 as uuidv4} from "uuid"
 
 export const jwtService = {
     async createAccessJWT(user: userType) {
-        return jwt.sign({userId: user._id}, settings.JWT_SECRET, {expiresIn: 10})
+        return jwt.sign({userId: user._id}, settings.JWT_SECRET, {expiresIn: "1h"})
     },
     async createRefreshJWT(user: userType, deviceId: string) {
-        return jwt.sign({userId: user._id, deviceId: deviceId}, settings.JWT_SECRET, {expiresIn: 20})
+        return jwt.sign({userId: user._id, deviceId: deviceId}, settings.JWT_SECRET, {expiresIn: "1h"})
     },
 
     async authSessionInfo(refreshToken: string, userId: string, userIpAddress: string, deviceName: string, deviceId: string) {
@@ -43,7 +42,7 @@ export const jwtService = {
         return await authSessionsCollection.findOne({_id: deviceId})
     },
     async findAllUserSessions(userId: string) {
-        return authSessionsCollection.find({userId: userId})
+        return authSessionsCollection.find({userId: userId}).toArray()
     },
     async deleteAuthSession(refreshToken: string) {
         let decodeToken: any
@@ -75,11 +74,15 @@ export const jwtService = {
         try {
             const result: any = jwt.verify(token, settings.JWT_SECRET)
             return {
-                userId: new ObjectId((result.userId)),
+                userId: new ObjectId(result.userId),
                 deviceId: result.deviceId
             }
         } catch (error) {
             return null
         }
-    }
+    },
+    async deleteAllAuthSessionAllUsers() {
+        const result = await authSessionsCollection.deleteMany({})
+        return result.deletedCount === 1
+    },
 }
