@@ -57,8 +57,8 @@ export type commentsType = {
 }
 
 export type deviceAuthSessionsType = {
-    issueAt: string
-    expiryAt: string
+    issueAt: number
+    expiresAt: number
     ipAddress: string
     deviceName: string
     userId: string
