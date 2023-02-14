@@ -64,7 +64,7 @@ export const authRefreshTokenMiddleware = async (req: Request, res: Response, ne
     if (!checkUserToken) {
         return res.sendStatus(sendStatus.UNAUTHORIZED_401)
     }
-    const findDevice = jwtService.findDeviceByDate(checkUserToken.issueAt)
+    const findDevice = await jwtService.findDeviceByDate(checkUserToken.issueAt)
     if (!findDevice) {
         return res.sendStatus(sendStatus.UNAUTHORIZED_401)
     }

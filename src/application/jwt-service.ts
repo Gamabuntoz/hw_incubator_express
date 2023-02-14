@@ -5,7 +5,7 @@ import {ObjectId} from "mongodb";
 
 export const jwtService = {
     async createAccessJWT(user: userType) {
-        return jwt.sign({userId: user._id}, settings.JWT_SECRET, {expiresIn: 10})
+        return jwt.sign({userId: user._id}, settings.JWT_SECRET, {expiresIn: "1h"})
     },
     async createRefreshJWT(user: userType, deviceId: string, issueAt: number) {
         return jwt.sign({userId: user._id, deviceId: deviceId, issueAt: issueAt}, settings.JWT_SECRET, {expiresIn: settings.EXPIRATION_JWT_REFRESH_TOKEN})
@@ -15,8 +15,7 @@ export const jwtService = {
         return await authDeviceCollection.insertOne(device)
     },
     async updateDeviceInfo(oldIssueAt: number, newIssueAt: number) {
-        const result = await authDeviceCollection.updateOne({issueAt: oldIssueAt}, {issueAt: newIssueAt})
-        return result.modifiedCount === 1
+        return await authDeviceCollection.updateOne({issueAt: oldIssueAt}, {$set: {issueAt: newIssueAt}})
     },
     async findDeviceByDate(issueAt: number) {
         return await authDeviceCollection.findOne({issueAt: issueAt})
@@ -25,7 +24,7 @@ export const jwtService = {
         return await authDeviceCollection.findOne({deviceId: deviceId})
     },
     async findAllUserDevices(userId: string) {
-        return authDeviceCollection.find({userId: userId}).toArray()
+        return await authDeviceCollection.find({userId: userId}).toArray()
     },
     async deleteDevice(issueAt: number) {
         const result = await authDeviceCollection.deleteOne({issueAt: issueAt})
