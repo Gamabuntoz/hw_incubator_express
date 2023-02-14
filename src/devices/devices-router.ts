@@ -11,12 +11,12 @@ devicesRouter.get("/devices",
     async (req: Request, res: Response) => {
         const refreshToken = req.cookies.refreshToken
         const checkUserToken = await jwtService.checkRefreshToken(refreshToken)
-        const allSessions = await jwtService.findAllUserSessions(checkUserToken!.userId.toString())
-        res.status(sendStatus.OK_200).send(allSessions.map(c => ({
+        const allUserDevices = await jwtService.findAllUserDevices(checkUserToken!.userId)
+        res.status(sendStatus.OK_200).send(allUserDevices.map(c => ({
                 ip: c.ipAddress,
                 title: c.deviceName,
-                lastActiveDate: c.issueAt.toISOString(),
-                deviceId: c._id.toString()
+                lastActiveDate: new Date(c.issueAt).toISOString(),
+                deviceId: c.deviceId
             })
         ))
     })
