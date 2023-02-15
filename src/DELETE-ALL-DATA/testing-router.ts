@@ -5,6 +5,7 @@ import {usersService} from "../users/users-service";
 import {commentsService} from "../comments/comments-service";
 import {jwtService} from "../application/jwt-service";
 import {authAttemptsCollection} from "../db/db";
+import {deleteAttemptsDB} from "../middlewares/authorization-middleware";
 
 export const testingRouter = Router()
 
@@ -14,6 +15,6 @@ testingRouter.delete("/all-data", async (req: Request, res: Response) => {
     await usersService.deleteAllUsers()
     await commentsService.deleteAllComments()
     await jwtService.deleteAllAuthSessionAllUsers()
-    await authAttemptsCollection.drop()
+    await deleteAttemptsDB.deleteAllAuthSessionAllUsers()
     res.sendStatus(204)
 })
