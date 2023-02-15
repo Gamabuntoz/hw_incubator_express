@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response} from "express";
-import {adminCollection, usersCollection} from "../db/db";
+import {adminCollection, authAttemptsCollection, usersCollection} from "../db/db";
 import {sendStatus} from "../db/status-collection";
 import {jwtService} from "../application/jwt-service";
 import {usersService} from "../users/users-service";
@@ -69,4 +69,18 @@ export const authRefreshTokenMiddleware = async (req: Request, res: Response, ne
         return res.sendStatus(sendStatus.UNAUTHORIZED_401)
     }
     next()
+}
+export const authAttemptsChecker = async (req: Request, res: Response, next: NextFunction) => {
+    const interval = 10 * 1000
+    const ip = req.ip
+    const currentTime = new Date()
+    const url = req.url
+    const attemptTime = new Date(currentTime.getTime() - interval)
+    const attemptCount = await authAttemptsCollection.countDocuments({ip, url, time: {$gt: attemptTime}})
+    await authAttemptsCollection.insertOne({ip, url, time: currentTime})
+    if(attemptCount < 5) {
+        next()
+    } else {
+        res.sendStatus(sendStatus.TOO_MANY_REQUESTS_429)
+    }
 }

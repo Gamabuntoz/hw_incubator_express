@@ -20,6 +20,7 @@ export const usersCollection = client.db().collection<userType>("users")
 export const adminCollection = client.db().collection("admin")
 export const authDeviceCollection = client.db().collection("authSessions")
 export const commentsCollection = client.db().collection<commentsType>("comments")
+export const authAttemptsCollection = client.db().collection("authAttempts")
 
 export async function runDb() {
     try {
