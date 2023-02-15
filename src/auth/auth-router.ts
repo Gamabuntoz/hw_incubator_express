@@ -13,7 +13,7 @@ import {
     authRefreshTokenMiddleware
 } from "../middlewares/authorization-middleware";
 import {settings} from "../db/db";
-import {ObjectId} from "mongodb";
+import {ObjectId} from "mongodb"
 
 export const authRouter = Router({})
 
