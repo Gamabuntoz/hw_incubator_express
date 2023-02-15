@@ -7,6 +7,7 @@ import {authService} from "./auth-service";
 import {usersRepository} from "../users/users-repository";
 import {v4 as uuidv4} from "uuid"
 import {
+    authAttemptsChecker,
     authCheckLoginOrEmail,
     authMiddlewareBearer,
     authRefreshTokenMiddleware
@@ -21,6 +22,7 @@ authRouter.post("/registration",
     inputUsersValidation.login,
     inputUsersValidation.password,
     inputUsersValidation.email,
+    authAttemptsChecker,
     inputValidationErrors,
     async (req: Request, res: Response) => {
         const login = req.body.login
@@ -30,6 +32,7 @@ authRouter.post("/registration",
         res.sendStatus(sendStatus.NO_CONTENT_204)
     })
 authRouter.post("/registration-confirmation",
+    authAttemptsChecker,
     async (req: Request, res: Response) => {
         const code = req.body.code
         const result = await authService.confirmEmail(code)
@@ -48,6 +51,7 @@ authRouter.post("/registration-confirmation",
 
 authRouter.post("/registration-email-resending",
     inputUsersValidation.email,
+    authAttemptsChecker,
     inputValidationErrors,
     async (req: Request, res: Response) => {
         const email = req.body.email
@@ -82,6 +86,7 @@ authRouter.post("/refresh-token",
 authRouter.post("/login",
     inputUsersValidation.loginOrEmail,
     inputUsersValidation.password,
+    authAttemptsChecker,
     inputValidationErrors,
     async (req: Request, res: Response) => {
         const loginOrEmail = req.body.loginOrEmail
@@ -104,10 +109,11 @@ authRouter.post("/login",
         const accessToken = await jwtService.createAccessJWT(checkUserToken)
         const refreshToken = await jwtService.createRefreshJWT(checkUserToken, device.deviceId, device.issueAt)
         await jwtService.insertDeviceInfo(device as deviceAuthSessionsType)
-        res.status(sendStatus.OK_200).cookie("refreshToken", refreshToken, {
+        res.cookie("refreshToken", refreshToken, {
             secure: true,
             httpOnly: true
-        }).send({accessToken: accessToken})
+        })
+        res.status(sendStatus.OK_200).send({accessToken: accessToken})
     })
 authRouter.post("/logout",
     authRefreshTokenMiddleware,
