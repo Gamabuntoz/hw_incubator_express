@@ -147,7 +147,7 @@ authRouter.post("/password-recovery",
         return
     })
 authRouter.post("/new-password",
-    inputUsersValidation.password,
+    inputUsersValidation.newPassword,
     authAttemptsChecker,
     inputValidationErrors,
     async (req: Request, res: Response) => {
