@@ -14,7 +14,7 @@ import {
 } from "../middlewares/authorization-middleware";
 import {settings} from "../db/db";
 import {ObjectId} from "mongodb"
-import {devicesRepository} from "../devices/devices-repository";
+import {devicesRepository} from "../devices/devices-repository"
 
 export const authRouter = Router({})
 
