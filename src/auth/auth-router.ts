@@ -156,6 +156,7 @@ authRouter.post("/new-password",
         const result = await authService.changePasswordAttempt(newPassword, recoveryCode)
         if (!result) {
             res.sendStatus(sendStatus.BAD_REQUEST_400)
+            return
         }
         res.sendStatus(sendStatus.NO_CONTENT_204)
         return
