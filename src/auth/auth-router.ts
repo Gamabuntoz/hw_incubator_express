@@ -154,9 +154,15 @@ authRouter.post("/new-password",
         const newPassword = req.body.newPassword
         const recoveryCode = req.body.recoveryCode
         const result = await authService.changePasswordAttempt(newPassword, recoveryCode)
-        if (!result) {
-            res.sendStatus(sendStatus.BAD_REQUEST_400)
-            return
+        if (typeof result === "string") {
+            return res.status(sendStatus.BAD_REQUEST_400).send({
+                errorsMessages: [
+                    {
+                        message: result,
+                        field: "recoveryCode"
+                    }
+                ]
+            })
         }
         res.sendStatus(sendStatus.NO_CONTENT_204)
         return
