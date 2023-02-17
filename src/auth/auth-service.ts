@@ -98,7 +98,7 @@ export const authService = {
     },
     async changePasswordAttempt(newPassword: string, recoveryCode: string) {
         let user = await usersRepository.findUserByRecoveryCode(recoveryCode)
-        if (!user) return false
+        if (!user) return "Invalid code"
         if (user.passwordRecovery!.expirationDate < new Date()) return false
         const passwordSalt = await bcrypt.genSalt(10)
         const passwordHash = await this._generateHash(newPassword, passwordSalt)
