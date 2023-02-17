@@ -14,6 +14,7 @@ import {
 } from "../middlewares/authorization-middleware";
 import {settings} from "../db/db";
 import {ObjectId} from "mongodb"
+import {devicesRepository} from "../devices/devices-repository";
 
 export const authRouter = Router({})
 
@@ -77,7 +78,7 @@ authRouter.post("/refresh-token",
         const user = await usersRepository.findUserById(new ObjectId(checkUserToken!.userId))
         const accessToken = await jwtService.createAccessJWT(user!)
         const refreshToken = await jwtService.createRefreshJWT(user!, checkUserToken!.deviceId, issueAt)
-        await jwtService.updateDeviceInfo(checkUserToken!.issueAt, issueAt)
+        await devicesRepository.updateDeviceInfo(checkUserToken!.issueAt, issueAt)
         res.status(sendStatus.OK_200).cookie("refreshToken", refreshToken, {
             secure: true,
             httpOnly: true
@@ -96,7 +97,7 @@ authRouter.post("/login",
             res.sendStatus(sendStatus.UNAUTHORIZED_401)
             return
         }
-        const userIpAddress = req.headers['x-forwarded-for']
+        const userIpAddress = req.ip
         const userDeviceName = req.headers['user-agent']
         const device = {
             ipAddress: userIpAddress,
@@ -108,7 +109,7 @@ authRouter.post("/login",
         }
         const accessToken = await jwtService.createAccessJWT(checkUserToken)
         const refreshToken = await jwtService.createRefreshJWT(checkUserToken, device.deviceId, device.issueAt)
-        await jwtService.insertDeviceInfo(device as deviceAuthSessionsType)
+        await devicesRepository.insertDeviceInfo(device as deviceAuthSessionsType)
         res.cookie("refreshToken", refreshToken, {
             secure: true,
             httpOnly: true
@@ -120,7 +121,7 @@ authRouter.post("/logout",
     async (req: Request, res: Response) => {
         const oldRefreshToken = req.cookies.refreshToken
         const checkUserToken = await jwtService.checkRefreshToken(oldRefreshToken)
-        await jwtService.deleteDevice(checkUserToken!.issueAt)
+        await devicesRepository.deleteDevice(checkUserToken!.issueAt)
         res.sendStatus(sendStatus.NO_CONTENT_204)
     })
 authRouter.get("/me",
@@ -134,6 +135,32 @@ authRouter.get("/me",
             login: req.user.login,
             userId: req.user.id,
         })
-    }
-)
+    })
+authRouter.post("/password-recovery",
+    inputUsersValidation.email,
+    authAttemptsChecker,
+    inputValidationErrors,
+    async (req: Request, res: Response) => {
+        const email = req.body.email
+        await authService.passwordRecovery(email)
+        res.sendStatus(sendStatus.NO_CONTENT_204)
+        return
+    })
+authRouter.post("/new-password",
+    inputUsersValidation.password,
+    authAttemptsChecker,
+    inputValidationErrors,
+    async (req: Request, res: Response) => {
+        const newPassword = req.body.newPassword
+        const recoveryCode = req.body.recoveryCode
+        const result = await authService.changePasswordAttempt(newPassword, recoveryCode)
+        if (!result) {
+            res.sendStatus(sendStatus.BAD_REQUEST_400)
+        }
+        res.sendStatus(sendStatus.NO_CONTENT_204)
+        return
+    })
+
+
+
 

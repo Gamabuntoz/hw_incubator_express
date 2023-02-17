@@ -64,14 +64,13 @@ export const authService = {
         if (!user) return "User dont exist"
         if (user.emailConfirmation.isConfirmed) return "Email already confirmed"
         await usersRepository.resendConfirmation(user._id)
-        user = await usersRepository.findUserByLoginOrEmail(email)
-        if (user) await emailAdapter.sendEmail(user)
+        await usersRepository.findUserByLoginOrEmail(email)
+        await emailAdapter.sendEmail(user)
         return true
     },
     async confirmEmail(code: string): Promise<boolean | string> {
         let user = await usersRepository.findUserByConfirmationCode(code)
         if (!user) return "User dont exist"
-        if (user.emailConfirmation.confirmationCode !== code) return "Wrong confirmation code"
         if (user.emailConfirmation.expirationDate < new Date()) return "Confirmation code was expired"
         if (user.emailConfirmation.isConfirmed) return "Email already confirmed"
         let result = await usersRepository.updateConfirmation(user._id)
@@ -88,6 +87,23 @@ export const authService = {
             return false
         }
         return user
+    },
+    async passwordRecovery(email: string): Promise<boolean | string> {
+        let user = await usersRepository.findUserByLoginOrEmail(email)
+        if (!user) return false
+        await usersRepository.createPasswordRecoveryCode(user._id)
+        user = await usersRepository.findUserByLoginOrEmail(email)
+        await emailAdapter.sendEmailForPasswordRecovery(user!)
+        return true
+    },
+    async changePasswordAttempt(newPassword: string, recoveryCode: string) {
+        let user = await usersRepository.findUserByRecoveryCode(recoveryCode)
+        if (!user) return false
+        if (user.passwordRecovery!.expirationDate < new Date()) return false
+        const passwordSalt = await bcrypt.genSalt(10)
+        const passwordHash = await this._generateHash(newPassword, passwordSalt)
+        await usersRepository.updatePassword(user._id, passwordHash)
+        return true
     },
     async _generateHash(password: string, salt: string) {
         return await bcrypt.hash(password, salt)
