@@ -39,7 +39,12 @@ export const usersRepository = {
             hours: 1,
             minutes: 1
         })
-        let result = await usersCollection.updateOne({_id: id}, {$set: {"emailConfirmation.confirmationCode": newCode, "emailConfirmation.expirationDate": newDate}})
+        let result = await usersCollection.updateOne({_id: id}, {
+            $set: {
+                "emailConfirmation.confirmationCode": newCode,
+                "emailConfirmation.expirationDate": newDate
+            }
+        })
         return result.modifiedCount === 1
     },
     async createPasswordRecoveryCode(id: ObjectId): Promise<boolean> {
@@ -48,7 +53,12 @@ export const usersRepository = {
             hours: 1,
             minutes: 1
         })
-        let result = await usersCollection.updateOne({_id: id}, {$set: {"passwordRecovery.code": code, "passwordRecovery.expirationDate": date}})
+        let result = await usersCollection.updateOne({_id: id}, {
+            $set: {
+                "passwordRecovery.code": code,
+                "passwordRecovery.expirationDate": date
+            }
+        })
         return result.modifiedCount === 1
     },
     async updatePassword(id: ObjectId, passwordHash: string): Promise<boolean> {
