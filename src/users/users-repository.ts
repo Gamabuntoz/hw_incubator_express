@@ -19,7 +19,8 @@ export const usersRepository = {
         return usersCollection.findOne({"emailConfirmation.confirmationCode": code})
     },
     async findUserByRecoveryCode(code: string) {
-        return usersCollection.findOne({"passwordRecovery.code": code})
+        await usersCollection.findOne({"passwordRecovery.code": code})
+        return
     },
     async deleteUser(userId: ObjectId): Promise<boolean> {
         const result = await usersCollection.deleteOne({_id: userId})

@@ -83,6 +83,7 @@ export const authAttemptsChecker = async (req: Request, res: Response, next: Nex
         next()
     } else {
         res.sendStatus(sendStatus.TOO_MANY_REQUESTS_429)
+        return
     }
 }
 export const deleteAttemptsDB = {
