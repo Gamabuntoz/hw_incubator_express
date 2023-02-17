@@ -3,6 +3,7 @@ import {adminCollection, authAttemptsCollection, usersCollection} from "../db/db
 import {sendStatus} from "../db/status-collection";
 import {jwtService} from "../application/jwt-service";
 import {usersService} from "../users/users-service";
+import {devicesRepository} from "../devices/devices-repository";
 
 export const authCheckLoginOrEmail = async (req: Request, res: Response, next: NextFunction) => {
     const findUserByEmail = await usersCollection.findOne({"accountData.email": req.body.email})
@@ -64,7 +65,7 @@ export const authRefreshTokenMiddleware = async (req: Request, res: Response, ne
     if (!checkUserToken) {
         return res.sendStatus(sendStatus.UNAUTHORIZED_401)
     }
-    const findDevice = await jwtService.findDeviceByDate(checkUserToken.issueAt)
+    const findDevice = await devicesRepository.findDeviceByDate(checkUserToken.issueAt)
     if (!findDevice) {
         return res.sendStatus(sendStatus.UNAUTHORIZED_401)
     }

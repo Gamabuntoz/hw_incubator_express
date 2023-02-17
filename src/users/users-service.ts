@@ -6,7 +6,7 @@ import {usersCollection} from "../db/db"
 import {v4 as uuidv4} from "uuid";
 import add from "date-fns/add";
 
-export const usersService ={
+export const usersService = {
     async findUserById(userId: ObjectId): Promise<findUserType | null> {
         const result = await usersCollection.findOne({_id: userId})
         if (!result) {
@@ -22,7 +22,14 @@ export const usersService ={
     async findAllUsers(sortBy: string | undefined, sortDirection: string | undefined, pageNumber: number, pageSize: number, searchLoginTerm: string, searchEmailTerm: string): Promise<findUsersType> {
         let filter = {}
         if (searchLoginTerm || searchEmailTerm) {
-            filter = {$or: [{login: {$regex: searchLoginTerm, $options: "$i"}}, {email: {$regex: searchEmailTerm, $options: "$i"}}]}
+            filter = {
+                $or: [{login: {$regex: searchLoginTerm, $options: "$i"}}, {
+                    email: {
+                        $regex: searchEmailTerm,
+                        $options: "$i"
+                    }
+                }]
+            }
         }
         let sort = "createdAt"
         if (sortBy) {
