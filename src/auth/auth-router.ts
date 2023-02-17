@@ -19,11 +19,11 @@ import {devicesRepository} from "../devices/devices-repository"
 export const authRouter = Router({})
 
 authRouter.post("/registration",
+    authAttemptsChecker,
     authCheckLoginOrEmail,
     inputUsersValidation.login,
     inputUsersValidation.password,
     inputUsersValidation.email,
-    authAttemptsChecker,
     inputValidationErrors,
     async (req: Request, res: Response) => {
         const login = req.body.login
@@ -51,8 +51,8 @@ authRouter.post("/registration-confirmation",
     })
 
 authRouter.post("/registration-email-resending",
-    inputUsersValidation.email,
     authAttemptsChecker,
+    inputUsersValidation.email,
     inputValidationErrors,
     async (req: Request, res: Response) => {
         const email = req.body.email
@@ -85,9 +85,9 @@ authRouter.post("/refresh-token",
         }).send({accessToken: accessToken})
     })
 authRouter.post("/login",
+    authAttemptsChecker,
     inputUsersValidation.loginOrEmail,
     inputUsersValidation.password,
-    authAttemptsChecker,
     inputValidationErrors,
     async (req: Request, res: Response) => {
         const loginOrEmail = req.body.loginOrEmail
@@ -137,8 +137,8 @@ authRouter.get("/me",
         })
     })
 authRouter.post("/password-recovery",
-    inputUsersValidation.email,
     authAttemptsChecker,
+    inputUsersValidation.email,
     inputValidationErrors,
     async (req: Request, res: Response) => {
         const email = req.body.email
@@ -147,8 +147,8 @@ authRouter.post("/password-recovery",
         return
     })
 authRouter.post("/new-password",
-    inputUsersValidation.newPassword,
     authAttemptsChecker,
+    inputUsersValidation.newPassword,
     inputValidationErrors,
     async (req: Request, res: Response) => {
         const newPassword = req.body.newPassword
