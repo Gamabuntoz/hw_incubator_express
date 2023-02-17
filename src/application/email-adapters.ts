@@ -1,17 +1,19 @@
 import nodemailer from "nodemailer";
 import {userType} from "../db/types";
 
+const senderData = {
+    service: "gmail",
+    auth: {
+        user: "bonypiper@gmail.com",
+        pass: "zfzmivezoxwgectq",
+    }
+}
+
 export const emailAdapter = {
     async sendEmail(user: userType) {
-        let transporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: {
-                user: "bonypiper@gmail.com",
-                pass: "zfzmivezoxwgectq",
-            },
-        });
+        let transporter = nodemailer.createTransport(senderData);
         let result = await transporter.sendMail({
-            from: "SAMURAI, <bonypiper@gmail.com>",
+            from: "SAMURAIS-API, <bonypiper@gmail.com>",
             to: user.accountData.email,
             subject: "Registration",
             html: `<h1>Thank for your registration</h1>
@@ -20,5 +22,17 @@ export const emailAdapter = {
             </p>`,
         });
         return result
-    }
-}
+    },
+    async sendEmailForPasswordRecovery(user: userType) {
+        let transporter = nodemailer.createTransport(senderData);
+        let result = await transporter.sendMail({
+            from: "SAMURAIS-API, <bonypiper@gmail.com>",
+            to: user.accountData.email,
+            subject: "Password Recovery",
+            html: `<h1>Password recovery</h1>
+                        <p>To finish password recovery please follow the link below:
+                           <a href='https://incubator-hw.vercel.app/password-recovery?recoveryCode=${user.passwordRecovery?.code}'>recovery password</a>
+                        </p>`,
+        });
+        return result
+}}

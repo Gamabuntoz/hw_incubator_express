@@ -2,6 +2,7 @@ import {Request, Response, Router} from "express";
 import {sendStatus} from "../db/status-collection";
 import {jwtService} from "../application/jwt-service";
 import {authRefreshTokenMiddleware} from "../middlewares/authorization-middleware";
+import {devicesRepository} from "./devices-repository";
 
 
 export const devicesRouter = Router()
@@ -11,7 +12,7 @@ devicesRouter.get("/devices",
     async (req: Request, res: Response) => {
         const refreshToken = req.cookies.refreshToken
         const checkUserToken = await jwtService.checkRefreshToken(refreshToken)
-        const allUserDevices = await jwtService.findAllUserDevices(checkUserToken!.userId)
+        const allUserDevices = await devicesRepository.findAllUserDevices(checkUserToken!.userId)
         res.status(sendStatus.OK_200).send(allUserDevices.map(c => ({
                 ip: c.ipAddress,
                 title: c.deviceName,
@@ -25,7 +26,7 @@ devicesRouter.delete("/devices",
     async (req: Request, res: Response) => {
         const refreshToken = req.cookies.refreshToken
         const checkUserToken = await jwtService.checkRefreshToken(refreshToken)
-        await jwtService.deleteAllUserDeviceExceptCurrent(checkUserToken!.issueAt, checkUserToken!.userId)
+        await devicesRepository.deleteAllUserDeviceExceptCurrent(checkUserToken!.issueAt, checkUserToken!.userId)
         res.sendStatus(sendStatus.NO_CONTENT_204)
     })
 devicesRouter.delete("/devices/:id",
@@ -34,13 +35,13 @@ devicesRouter.delete("/devices/:id",
         const deviceId = req.params.id
         const refreshToken = req.cookies.refreshToken
         const checkUserToken = await jwtService.checkRefreshToken(refreshToken)
-        const findDevice = await jwtService.findDeviceByDeviceId(deviceId)
+        const findDevice = await devicesRepository.findDeviceByDeviceId(deviceId)
         if (!findDevice) {
             return res.sendStatus(sendStatus.NOT_FOUND_404)
         }
         if (findDevice.userId !== checkUserToken!.userId) {
             return res.sendStatus(sendStatus.FORBIDDEN_403)
         }
-        await jwtService.deleteAuthSessionByDeviceId(deviceId)
+        await devicesRepository.deleteAuthSessionByDeviceId(deviceId)
         res.sendStatus(sendStatus.NO_CONTENT_204)
     })

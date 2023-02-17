@@ -18,6 +18,9 @@ export const usersRepository = {
     async findUserByConfirmationCode(code: string) {
         return usersCollection.findOne({"emailConfirmation.confirmationCode": code})
     },
+    async findUserByRecoveryCode(code: string) {
+        return usersCollection.findOne({"passwordRecovery.code": code})
+    },
     async deleteUser(userId: ObjectId): Promise<boolean> {
         const result = await usersCollection.deleteOne({_id: userId})
         return result.deletedCount === 1
@@ -38,5 +41,18 @@ export const usersRepository = {
         })
         let result = await usersCollection.updateOne({_id: id}, {$set: {"emailConfirmation.confirmationCode": newCode, "emailConfirmation.expirationDate": newDate}})
         return result.modifiedCount === 1
-    }
+    },
+    async createPasswordRecoveryCode(id: ObjectId): Promise<boolean> {
+        const code = uuidv4()
+        const date = add(new Date(), {
+            hours: 1,
+            minutes: 1
+        })
+        let result = await usersCollection.updateOne({_id: id}, {$set: {"passwordRecovery.code": code, "passwordRecovery.expirationDate": date}})
+        return result.modifiedCount === 1
+    },
+    async updatePassword(id: ObjectId, passwordHash: string): Promise<boolean> {
+        let result = await usersCollection.updateOne({_id: id}, {$set: {"accountData.passwordHash": passwordHash}})
+        return result.modifiedCount === 1
+    },
 }

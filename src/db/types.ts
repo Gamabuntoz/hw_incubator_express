@@ -41,6 +41,10 @@ export type userType = {
         isConfirmed: boolean
         expirationDate: Date
     },
+    passwordRecovery?: {
+        code: string
+        expirationDate: Date
+    }
 }
 
 type commentatorInfoType = {
