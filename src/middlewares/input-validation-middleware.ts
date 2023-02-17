@@ -82,7 +82,10 @@ export const inputUsersValidation = {
         .isEmail().withMessage("Incorrect email"),
     loginOrEmail: body("loginOrEmail")
         .isString().trim().withMessage("Must be a string")
-        .isLength({min: 3, max: 30}).withMessage("Length must be from 3 to 10 symbols")
+        .isLength({min: 3, max: 30}).withMessage("Length must be from 3 to 10 symbols"),
+    newPassword: body("newPassword")
+        .isString().trim().withMessage("Must be a string")
+        .isLength({min: 6, max: 20}).withMessage("Length must be from 6 to 20 symbols")
 }
 export const inputCommentsValidation = {
     content: body("content")
