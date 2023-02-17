@@ -12,7 +12,7 @@ import {
     authMiddlewareBearer,
     authRefreshTokenMiddleware
 } from "../middlewares/authorization-middleware";
-import {settings} from "../db/db";
+import {settings} from "../db/db"
 import {ObjectId} from "mongodb"
 import {devicesRepository} from "../devices/devices-repository"
 
