@@ -4,7 +4,7 @@ import {blogsService} from "../blogs/blogs-service";
 import {usersService} from "../users/users-service";
 import {commentsService} from "../comments/comments-service";
 import {deleteAttemptsDB} from "../middlewares/authorization-middleware";
-import {devicesRepository} from "../devices/devices-repository";
+import {devicesRepository} from "../devices/devices-repository"
 
 export const testingRouter = Router()
 
