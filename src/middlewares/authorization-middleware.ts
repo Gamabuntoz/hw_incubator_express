@@ -4,6 +4,7 @@ import {sendStatus} from "../db/status-collection";
 import {jwtService} from "../application/jwt-service";
 import {usersService} from "../users/users-service";
 import {devicesRepository} from "../devices/devices-repository";
+import {ObjectId} from "mongodb";
 
 export const authCheckLoginOrEmail = async (req: Request, res: Response, next: NextFunction) => {
     const findUserByEmail = await usersCollection.findOne({"accountData.email": req.body.email})
@@ -47,11 +48,11 @@ export const authMiddlewareBearer = async (req: Request, res: Response, next: Ne
         return res.sendStatus(sendStatus.UNAUTHORIZED_401)
     }
     const token = authHeader.split(" ")[1]
-    const userId = await jwtService.checkRefreshToken(token)
-    if (!userId) {
+    const userInfo = await jwtService.checkRefreshToken(token)
+    if (!userInfo) {
         return res.sendStatus(sendStatus.UNAUTHORIZED_401)
     }
-    req.user = await usersService.findUserById(userId.userId)
+    req.user = await usersService.findUserById(new ObjectId(userInfo.userId))
     next()
 }
 export const authRefreshTokenMiddleware = async (req: Request, res: Response, next: NextFunction) => {

@@ -51,12 +51,12 @@ export const authService = {
                 }),
             }
         }
-        const result = await usersRepository.createUser(newUser)
+        await usersRepository.createUser(newUser)
         return {
-            id: result._id!.toString(),
-            login: result.accountData.login,
-            email: result.accountData.email,
-            createdAt: result.accountData.createdAt
+            id: newUser._id!.toString(),
+            login: newUser.accountData.login,
+            email: newUser.accountData.email,
+            createdAt: newUser.accountData.createdAt
         }
     },
     async resendEmail(email: string): Promise<boolean | string> {
