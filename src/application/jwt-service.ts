@@ -1,7 +1,6 @@
 import jwt from "jsonwebtoken"
-import {deviceAuthSessionsType, userType} from "../db/types";
-import {authDeviceCollection, settings} from "../db/db";
-import {ObjectId} from "mongodb";
+import {userType} from "../db/types";
+import {settings} from "../db/db";
 
 export const jwtService = {
     async createAccessJWT(user: userType) {
