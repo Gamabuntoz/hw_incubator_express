@@ -1,5 +1,5 @@
 import {Request, Response, Router} from "express";
-import {blogsType, findBlogsType, findPostsType} from "../db/types";
+import {, , } from "../db/DB-types";
 import {sendStatus} from "../db/status-collection";
 import {ObjectId} from "mongodb";
 import {blogsQueryRepository} from "./blogs-query-repository";

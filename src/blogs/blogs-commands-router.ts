@@ -1,5 +1,5 @@
 import {Request, Response, Router} from "express";
-import {blogsType, postsType} from "../db/types";
+import {blogDBType, postDBType} from "../db/DB-types";
 import {sendStatus} from "../db/status-collection";
 import {
     blogIdQueryMiddleware,
@@ -9,6 +9,7 @@ import {
 } from "../middlewares/input-validation-middleware";
 import {blogsService} from "./blogs-service";
 import {authMiddlewareBasic} from "../middlewares/authorization-middleware";
+import {blogUIType} from "../db/UI-types";
 
 export const blogsCommandsRouter = Router()
 
@@ -22,7 +23,7 @@ blogsCommandsRouter.post("/",
         const name = req.body.name
         const description = req.body.description
         const website = req.body.websiteUrl
-        const newBlogCreate: blogsType = await blogsService.createBlog(name, description, website)
+        const newBlogCreate: blogUIType = await blogsService.createBlog(name, description, website)
         res.status(sendStatus.CREATED_201).send(newBlogCreate)
     })
 blogsCommandsRouter.post("/:id/posts",
@@ -37,7 +38,7 @@ blogsCommandsRouter.post("/:id/posts",
         const shortDescription = req.body.shortDescription
         const content = req.body.content
         const blogId = req.params.id
-        const newPost: postsType | boolean = await blogsService.createPostById(title, shortDescription, content, blogId)
+        const newPost: postDBType | boolean = await blogsService.createPostById(title, shortDescription, content, blogId)
         res.status(sendStatus.CREATED_201).send(newPost)
     })
 blogsCommandsRouter.put("/:id",

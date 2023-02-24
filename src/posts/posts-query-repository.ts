@@ -1,6 +1,6 @@
 import {ObjectId} from "mongodb";
-import {findCommentsType, findPostsType, postsType} from "../db/types";
-import {commentsCollection, postsCollection} from "../db/db";
+import {findCommentsType, findPostsType, postsType} from "../db/DB-types";
+import {CommentModel, PostModel} from "../db/db";
 
 export const postsQueryRepository = {
     async findAllPosts(sortBy: string, sortDirection: string, pageNumber: number, pageSize: number): Promise<findPostsType> {
@@ -8,13 +8,13 @@ export const postsQueryRepository = {
         if (sortBy) {
             sort = sortBy
         }
-        const totalCount = await postsCollection.countDocuments({})
-        const findAll = await postsCollection
+        const totalCount = await PostModel.countDocuments({})
+        const findAll = await PostModel
             .find({})
             .sort({[sort]: sortDirection === "asc" ? 1 : -1})
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
-            .toArray()
+            .lean()
 
         return {
             pagesCount: Math.ceil(totalCount / pageSize),
@@ -34,7 +34,7 @@ export const postsQueryRepository = {
         }
     },
     async findPostById(postId: ObjectId): Promise<postsType | null | boolean> {
-        const result = await postsCollection.findOne({_id: postId})
+        const result = await PostModel.findOne({_id: postId})
         if (!result) {
             return false
         }
@@ -53,8 +53,8 @@ export const postsQueryRepository = {
         if (sortBy) {
             sort = sortBy
         }
-        const totalCount = await commentsCollection.countDocuments({postId: postId})
-        const findAll = await commentsCollection
+        const totalCount = await CommentModel.countDocuments({postId: postId})
+        const findAll = await CommentModel
             .find({postId: postId})
             .sort({[sort]: sortDirection === "asc" ? 1 : -1})
             .skip((pageNumber - 1) * pageSize)

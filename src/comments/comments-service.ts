@@ -1,5 +1,5 @@
 import {ObjectId} from "mongodb";
-import {commentsType} from "../db/types";
+import {commentsType} from "../db/DB-types";
 import {commentsCollection} from "../db/db";
 import {commentsRepository} from "./comments-repository";
 

@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import {userType} from "../db/types";
+import {userType} from "../db/DB-types";
 
 const senderData = {
     service: "gmail",

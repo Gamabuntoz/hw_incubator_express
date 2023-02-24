@@ -1,70 +1,68 @@
 import {blogsCommandsRepository} from "./blogs-commands-repository";
 import {ObjectId} from "mongodb";
-import {blogsType, postsType} from "../db/types";
-import {blogsCollection} from "../db/db";
+import {blogDBType, postDBType} from "../db/DB-types";
+import {BlogModel} from "../db/db";
 import {postsCommandsRepository} from "../posts/posts-commands-repository";
+import {blogUIType, postUIType} from "../db/UI-types";
+import {tryObjectId} from "../middlewares/input-validation-middleware";
 
 
 export const blogsService = {
-    async findBlogById(blogId: ObjectId): Promise<null | blogsType> {
-        return blogsCollection.findOne({_id: blogId})
+    async findBlogById(blogId: ObjectId): Promise<null | blogDBType> {
+        return BlogModel.findOne({_id: blogId})
     },
-    async createBlog(name: string, description: string, website: string): Promise<blogsType> {
-        const newBlog: blogsType = {
+    async createBlog(name: string, description: string, website: string): Promise<blogUIType> {
+        const newBlog: blogDBType = {
+            _id: new ObjectId(),
             createdAt: new Date().toISOString(),
             name: name,
             description: description,
             websiteUrl: website,
+            isMembership: false
         }
-        const result = await blogsCommandsRepository.createBlog(newBlog)
+        await blogsCommandsRepository.createBlog(newBlog)
         return {
-            id: result._id!.toString(),
-            name: result.name,
-            description: result.description,
-            websiteUrl: result.websiteUrl,
-            createdAt: result.createdAt,
+            id: newBlog._id!.toString(),
+            name: newBlog.name,
+            description: newBlog.description,
+            websiteUrl: newBlog.websiteUrl,
+            createdAt: newBlog.createdAt,
+            isMembership: newBlog.isMembership
         }
     },
     async updateBlog(id: string, name: string, description: string, website: string): Promise<boolean> {
-        let postId: ObjectId;
-        try {
-            postId = new ObjectId(id)
-        } catch (e) {
-            console.log(e)
-            return false
-        }
+        const postId = tryObjectId(id)
+        if (!postId) return false
         return blogsCommandsRepository.updateBlog(postId, name, description, website)
     },
-    async createPostById(title: string, shortDescription: string, content: string, blogId: string): Promise<postsType | boolean> {
-        const blogById = await blogsService.findBlogById(new ObjectId(blogId))
+    async createPostById(title: string, shortDescription: string, content: string, id: string): Promise<postUIType | boolean> {
+        const blogId = tryObjectId(id)
+        if (!blogId) return false
+        const blogById = await blogsService.findBlogById(blogId)
         if (!blogById) return false
-        const newPost: postsType = {
+        const newPost: postDBType = {
+            _id: new ObjectId(),
             title: title,
             shortDescription: shortDescription,
             content: content,
-            blogId: blogId,
+            blogId: blogId.toString(),
             blogName: blogById.name,
             createdAt: new Date().toISOString()
         }
-        const result = await postsCommandsRepository.createPost(newPost)
+        await postsCommandsRepository.createPost(newPost)
         return {
-            id: result._id!.toString(),
-            title: result.title,
-            shortDescription: result.shortDescription,
-            content: result.content,
-            blogId: result.blogId,
-            blogName: result.blogName,
-            createdAt: result.createdAt,
+            id: newPost._id!.toString(),
+            title: newPost.title,
+            shortDescription: newPost.shortDescription,
+            content: newPost.content,
+            blogId: newPost.blogId,
+            blogName: newPost.blogName,
+            createdAt: newPost.createdAt,
         }
     },
     async deleteBlog(id: string): Promise<boolean> {
-        let blogId: ObjectId;
-        try {
-            blogId = new ObjectId(id)
-        } catch (e) {
-            console.log(e)
-            return false
-        }
+        const blogId = tryObjectId(id)
+        if (!blogId) return false
         return blogsCommandsRepository.deleteBlog(blogId)
     },
     async deleteAllBlogs(): Promise<boolean> {

@@ -31,6 +31,16 @@ export const postIdQueryMiddleware = async (req: Request, res: Response, next: N
     }
     next()
 }
+export const tryObjectId = (id: string) => {
+    let newObjectId: ObjectId;
+    try {
+        newObjectId = new ObjectId(id)
+        return newObjectId
+    } catch (e) {
+        console.log(e)
+        return false
+    }
+}
 
 
 export const inputBlogsValidation = {

@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken"
-import {userType} from "../db/types";
+import {userType} from "../db/DB-types";
 import {settings} from "../db/db";
 
 export const jwtService = {

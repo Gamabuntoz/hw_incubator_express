@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response} from "express";
-import {adminCollection, authAttemptsCollection, usersCollection} from "../db/db";
+import {AdminModel, AuthAttemptModel, UserModel} from "../db/db";
 import {sendStatus} from "../db/status-collection";
 import {jwtService} from "../application/jwt-service";
 import {usersService} from "../users/users-service";
@@ -7,8 +7,8 @@ import {devicesRepository} from "../devices/devices-repository";
 import {ObjectId} from "mongodb";
 
 export const authCheckLoginOrEmail = async (req: Request, res: Response, next: NextFunction) => {
-    const findUserByEmail = await usersCollection.findOne({"accountData.email": req.body.email})
-    const findUserByLogin = await usersCollection.findOne({"accountData.login": req.body.login})
+    const findUserByEmail = await UserModel.findOne({"accountData.email": req.body.email})
+    const findUserByLogin = await UserModel.findOne({"accountData.login": req.body.login})
     if (findUserByEmail) {
         return res.status(sendStatus.BAD_REQUEST_400).send(
             {
@@ -36,7 +36,7 @@ export const authCheckLoginOrEmail = async (req: Request, res: Response, next: N
     next()
 }
 export const authMiddlewareBasic = async (req: Request, res: Response, next: NextFunction) => {
-    const findUser = await adminCollection.findOne({loginPass: req.headers.authorization})
+    const findUser = await AdminModel.findOne({loginPass: req.headers.authorization})
     if (!findUser) {
         return res.sendStatus(sendStatus.UNAUTHORIZED_401)
     }
@@ -78,8 +78,8 @@ export const authAttemptsChecker = async (req: Request, res: Response, next: Nex
     const currentTime = new Date()
     const url = req.url
     const attemptTime = new Date(currentTime.getTime() - interval)
-    const attemptCount = await authAttemptsCollection.countDocuments({ip, url, time: {$gt: attemptTime}})
-    await authAttemptsCollection.insertOne({ip, url, time: currentTime})
+    const attemptCount = await AuthAttemptModel.countDocuments({ip, url, time: {$gt: attemptTime}})
+    await AuthAttemptModel.create({ip, url, time: currentTime})
     if (attemptCount < 5) {
         next()
     } else {
@@ -89,7 +89,7 @@ export const authAttemptsChecker = async (req: Request, res: Response, next: Nex
 }
 export const deleteAttemptsDB = {
     async deleteAllAuthSessionAllUsers() {
-        const result = await authAttemptsCollection.deleteMany({})
+        const result = await AuthAttemptModel.deleteMany({})
         return result.deletedCount === 1
     }
 }

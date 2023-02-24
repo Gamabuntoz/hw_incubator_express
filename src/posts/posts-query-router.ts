@@ -1,5 +1,5 @@
 import {Request, Response, Router} from "express";
-import {findCommentsType, findPostsType, postsType} from "../db/types";
+import {findCommentsType, findPostsType, postsType} from "../db/DB-types";
 import {sendStatus} from "../db/status-collection";
 import {postsQueryRepository} from "./posts-query-repository";
 import {ObjectId} from "mongodb";

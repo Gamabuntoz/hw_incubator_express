@@ -1,6 +1,8 @@
-import {MongoClient} from "mongodb"
+import {MongoClient, ObjectId} from "mongodb"
 import * as dotenv from "dotenv"
-import {blogsType, commentsType, postsType, userType} from "./types";
+import {blogsType, commentsType, postsType, userType} from "./DB-types";
+import mongoose from "mongoose";
+import {postSchema, blogSchema, attemptSchema, commentSchema, deviceSchema, userSchema, adminSchema} from "./schems";
 
 dotenv.config()
 
@@ -13,22 +15,19 @@ export const settings = {
 if (!settings.MONGO_URI) {
     throw new Error("URL doesn't found")
 }
-export const client = new MongoClient(settings.MONGO_URI);
-export const postsCollection = client.db().collection<postsType>("posts")
-export const blogsCollection = client.db().collection<blogsType>("blogs")
-export const usersCollection = client.db().collection<userType>("users")
-export const adminCollection = client.db().collection("admin")
-export const authDeviceCollection = client.db().collection("authSessions")
-export const commentsCollection = client.db().collection<commentsType>("comments")
-export const authAttemptsCollection = client.db().collection("authAttempts")
+
+export const PostModel = mongoose.model("posts", postSchema)
+export const BlogModel = mongoose.model("blogs", blogSchema)
+export const UserModel = mongoose.model("users", userSchema)
+export const AdminModel = mongoose.model("admin", adminSchema)
+export const DeviceModel = mongoose.model("devices", deviceSchema)
+export const CommentModel = mongoose.model("comments", commentSchema)
+export const AuthAttemptModel = mongoose.model("authAttempts", attemptSchema)
 
 export async function runDb() {
     try {
-        await client.connect();
-        await client.db().command({ping: 1});
-        console.log("Connected successfully to mongo server");
+        await mongoose.connect(settings.MONGO_URI);
     } catch {
-        console.log("Can't connect to db");
-        await client.close();
+        await mongoose.disconnect();
     }
 }

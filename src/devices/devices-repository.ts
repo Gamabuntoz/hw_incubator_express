@@ -1,37 +1,37 @@
-import {deviceAuthSessionsType} from "../db/types";
-import {authDeviceCollection} from "../db/db";
+import {authDeviceDBType} from "../db/DB-types";
+import {DeviceModel} from "../db/db";
 import {ObjectId} from "mongodb";
 
 export const devicesRepository = {
-    async insertDeviceInfo(device: deviceAuthSessionsType) {
-        return await authDeviceCollection.insertOne(device)
+    async insertDeviceInfo(device: authDeviceDBType): Promise<authDeviceDBType> {
+        return DeviceModel.create(device)
     },
-    async updateDeviceInfo(oldIssueAt: number, newIssueAt: number) {
-        return await authDeviceCollection.updateOne({issueAt: oldIssueAt}, {$set: {issueAt: newIssueAt}})
+    async updateDeviceInfo(oldIssueAt: number, newIssueAt: number): Promise<boolean> {
+        const result = await DeviceModel.updateOne({issueAt: oldIssueAt}, {$set: {issueAt: newIssueAt}})
+        return result.matchedCount === 1
     },
-    async findDeviceByDate(issueAt: number) {
-        return await authDeviceCollection.findOne({issueAt: issueAt})
+    async findDeviceByDate(issueAt: number): Promise<authDeviceDBType | null> {
+        return DeviceModel.findOne({issueAt: issueAt})
     },
-    async findDeviceByDeviceId(deviceId: string) {
-        return await authDeviceCollection.findOne({deviceId: deviceId})
+    async findDeviceByDeviceId(deviceId: string): Promise<authDeviceDBType | null> {
+        return DeviceModel.findOne({deviceId: deviceId})
     },
-    async findAllUserDevices(userId: string) {
-        return await authDeviceCollection.find({userId: userId}).toArray()
+    async findAllUserDevices(userId: string): Promise<authDeviceDBType[] | null> {
+        return DeviceModel.find({userId: userId}).lean()
     },
-    async deleteDevice(issueAt: number) {
-        const result = await authDeviceCollection.deleteOne({issueAt: issueAt})
+    async deleteDevice(issueAt: number): Promise<boolean> {
+        const result = await DeviceModel.deleteOne({issueAt: issueAt})
         return result.deletedCount === 1
     },
-    async deleteAuthSessionByDeviceId(deviceId: string) {
-        const result = await authDeviceCollection.deleteOne({deviceId: deviceId})
+    async deleteAuthSessionByDeviceId(deviceId: string): Promise<boolean> {
+        const result = await DeviceModel.deleteOne({deviceId: deviceId})
         return result.deletedCount === 1
     },
-    async deleteAllUserDeviceExceptCurrent(issueAt: number, userId: ObjectId) {
-        const result = await authDeviceCollection.deleteMany({issueAt: {$ne: issueAt}, userId: userId})
+    async deleteAllUserDeviceExceptCurrent(issueAt: number, userId: ObjectId): Promise<boolean> {
+        const result = await DeviceModel.deleteMany({issueAt: {$ne: issueAt}, userId: userId})
         return result.deletedCount === 1
     },
     async deleteAllAuthSessionAllUsers() {
-        const result = await authDeviceCollection.deleteMany({})
-        return result.deletedCount === 1
+        return DeviceModel.deleteMany({})
     }
 }

@@ -1,36 +1,36 @@
-import {usersCollection} from "../db/db";
-import {userType} from "../db/types";
+import {UserModel} from "../db/db";
+import {userType} from "../db/DB-types";
 import {ObjectId} from "mongodb";
 import {v4 as uuidv4} from "uuid"
 import add from "date-fns/add";
 
 export const usersRepository = {
     async createUser(user: userType): Promise<userType> {
-        await usersCollection.insertOne(user)
+        await UserModel.create(user)
         return user
     },
     async findUserByLoginOrEmail(loginOrEmail: string) {
-        return usersCollection.findOne({$or: [{"accountData.login": loginOrEmail}, {"accountData.email": loginOrEmail}]})
+        return UserModel.findOne({$or: [{"accountData.login": loginOrEmail}, {"accountData.email": loginOrEmail}]})
     },
     async findUserById(id: ObjectId) {
-        return usersCollection.findOne({_id: id})
+        return UserModel.findOne({_id: id})
     },
     async findUserByConfirmationCode(code: string) {
-        return usersCollection.findOne({"emailConfirmation.confirmationCode": code})
+        return UserModel.findOne({"emailConfirmation.confirmationCode": code})
     },
     async findUserByRecoveryCode(code: string) {
-        return usersCollection.findOne({"passwordRecovery.code": code})
+        return UserModel.findOne({"passwordRecovery.code": code})
     },
     async deleteUser(userId: ObjectId): Promise<boolean> {
-        const result = await usersCollection.deleteOne({_id: userId})
+        const result = await UserModel.deleteOne({_id: userId})
         return result.deletedCount === 1
     },
     async deleteAllUsers(): Promise<boolean> {
-        const result = await usersCollection.deleteMany({})
+        const result = await UserModel.deleteMany({})
         return result.deletedCount === 1
     },
     async updateConfirmation(id: ObjectId): Promise<boolean> {
-        let result = await usersCollection.updateOne({_id: id}, {$set: {"emailConfirmation.isConfirmed": true}})
+        let result = await UserModel.updateOne({_id: id}, {$set: {"emailConfirmation.isConfirmed": true}})
         return result.modifiedCount === 1
     },
     async resendConfirmation(id: ObjectId): Promise<boolean> {
@@ -39,7 +39,7 @@ export const usersRepository = {
             hours: 1,
             minutes: 1
         })
-        let result = await usersCollection.updateOne({_id: id}, {
+        let result = await UserModel.updateOne({_id: id}, {
             $set: {
                 "emailConfirmation.confirmationCode": newCode,
                 "emailConfirmation.expirationDate": newDate
@@ -53,7 +53,7 @@ export const usersRepository = {
             hours: 1,
             minutes: 1
         })
-        let result = await usersCollection.updateOne({_id: id}, {
+        let result = await UserModel.updateOne({_id: id}, {
             $set: {
                 "passwordRecovery.code": code,
                 "passwordRecovery.expirationDate": date
@@ -62,7 +62,7 @@ export const usersRepository = {
         return result.modifiedCount === 1
     },
     async updatePassword(id: ObjectId, passwordHash: string): Promise<boolean> {
-        let result = await usersCollection.updateOne({_id: id}, {$set: {"accountData.passwordHash": passwordHash}})
+        let result = await UserModel.updateOne({_id: id}, {$set: {"accountData.passwordHash": passwordHash}})
         return result.modifiedCount === 1
     },
 }
