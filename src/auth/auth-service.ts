@@ -1,6 +1,6 @@
 import {usersRepository} from "../users/users-repository";
 import {ObjectId} from "mongodb";
-import {findUserType, userType} from "../db/types";
+import {findUserType, userType} from "../db/DB-types";
 import bcrypt from "bcrypt"
 import {v4 as uuidv4} from "uuid"
 import add from "date-fns/add"

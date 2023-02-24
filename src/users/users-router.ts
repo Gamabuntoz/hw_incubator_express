@@ -1,5 +1,5 @@
 import {Request, Response, Router} from "express";
-import {findUsersType, findUserType} from "../db/types";
+import {findUsersType, findUserType} from "../db/DB-types";
 import {sendStatus} from "../db/status-collection";
 import {
     inputUsersValidation,

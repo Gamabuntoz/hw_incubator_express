@@ -1,6 +1,6 @@
 import {postsCommandsRepository} from "./posts-commands-repository";
 import {ObjectId} from "mongodb";
-import {commentsType, findUserType, postsType} from "../db/types";
+import {commentsType, findUserType, postsType} from "../db/DB-types";
 import {blogsService} from "../blogs/blogs-service";
 import {commentsRepository} from "../comments/comments-repository";
 

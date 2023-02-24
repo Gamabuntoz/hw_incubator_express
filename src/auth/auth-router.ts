@@ -2,7 +2,7 @@ import {Request, Response, Router} from "express";
 import {inputUsersValidation, inputValidationErrors} from "../middlewares/input-validation-middleware";
 import {sendStatus} from "../db/status-collection";
 import {jwtService} from "../application/jwt-service"
-import {deviceAuthSessionsType} from "../db/types";
+import {deviceAuthSessionsType} from "../db/DB-types";
 import {authService} from "./auth-service";
 import {usersRepository} from "../users/users-repository";
 import {v4 as uuidv4} from "uuid"

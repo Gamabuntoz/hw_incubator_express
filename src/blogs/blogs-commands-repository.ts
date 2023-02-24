@@ -1,27 +1,27 @@
 import {ObjectId} from "mongodb";
-import {blogsCollection} from "../db/db";
-import {blogsType} from "../db/types";
+import {BlogModel} from "../db/db";
+import {blogDBType} from "../db/DB-types";
 
 
 export const blogsCommandsRepository = {
-    async findBlogById(blogId: ObjectId): Promise<null | blogsType> {
-        return blogsCollection.findOne({_id: blogId})
+    async findBlogById(blogId: ObjectId): Promise<null | blogDBType> {
+        return BlogModel.findOne({_id: blogId})
     },
-    async createBlog(newBlog: blogsType): Promise<blogsType> {
-        const result = await blogsCollection.insertOne(newBlog)
+    async createBlog(newBlog: blogDBType): Promise<blogDBType> {
+        await BlogModel.create(newBlog)
         return newBlog
     },
     async updateBlog(postId: ObjectId, name: string, description: string, website: string): Promise<boolean> {
-        const result = await blogsCollection
+        const result = await BlogModel
             .updateOne({_id: postId}, {$set: {name: name, description: description, websiteUrl: website}})
         return result.matchedCount === 1
     },
     async deleteBlog(postId: ObjectId): Promise<boolean> {
-        const result = await blogsCollection.deleteOne({_id: postId})
+        const result = await BlogModel.deleteOne({_id: postId})
         return result.deletedCount === 1
     },
     async deleteAllBlogs(): Promise<boolean> {
-        const result = await blogsCollection.deleteMany({})
+        const result = await BlogModel.deleteMany({})
         return result.deletedCount === 1
     }
 }

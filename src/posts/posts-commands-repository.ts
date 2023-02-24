@@ -1,10 +1,10 @@
-import {postsCollection} from "../db/db";
+import {PostModel} from "../db/db";
 import {ObjectId} from "mongodb";
-import {postsArrayType, postsType} from "../db/types";
+import {postDBType} from "../db/DB-types";
 
 export const postsCommandsRepository = {
-    async findAllPosts(): Promise<postsArrayType> {
-        const result = await postsCollection.find({}).toArray()
+    async findAllPosts(): Promise<postType[]> {
+        const result = await PostModel.find({}).lean()
         return result.map(p => ({
                 id: p._id!.toString(),
                 title: p.title,
@@ -24,7 +24,7 @@ export const postsCommandsRepository = {
             console.log(e)
             return false
         }
-        const result = await postsCollection.findOne({_id: postId})
+        const result = await PostModel.findOne({_id: postId})
         if (!result) {
             return false
         }
@@ -41,11 +41,11 @@ export const postsCommandsRepository = {
 
 
     async createPost(newPost: postsType): Promise<postsType> {
-        const result = await postsCollection.insertOne(newPost)
+        const result = await PostModel.create(newPost)
         return newPost
     },
     async updatePost(postId: ObjectId, title: string, shortDescription: string, content: string, blogId: string): Promise<boolean> {
-        const result = await postsCollection
+        const result = await PostModel
             .updateOne({_id: postId}, {
                 $set: {
                     title: title,
@@ -57,11 +57,11 @@ export const postsCommandsRepository = {
         return result.matchedCount === 1
     },
     async deletePost(postId: ObjectId): Promise<boolean> {
-        const result = await postsCollection.deleteOne({_id: postId})
+        const result = await PostModel.deleteOne({_id: postId})
         return result.deletedCount === 1
     },
     async deleteAllPosts(): Promise<boolean> {
-        const result = await postsCollection.deleteMany({})
+        const result = await PostModel.deleteMany({})
         return result.deletedCount === 1
     }
 }

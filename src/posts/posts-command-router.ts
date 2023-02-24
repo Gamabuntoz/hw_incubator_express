@@ -1,5 +1,5 @@
 import {Request, Response, Router} from "express";
-import {commentsType, postsType} from "../db/types";
+import {commentsType, postsType} from "../db/DB-types";
 import {sendStatus} from "../db/status-collection";
 import {
     inputCommentsValidation,

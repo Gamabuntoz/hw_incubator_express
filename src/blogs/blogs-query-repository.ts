@@ -1,11 +1,12 @@
 import {Filter, ObjectId} from "mongodb";
-import {blogsType, findBlogsType, findPostsType} from "../db/types";
-import {blogsCollection, postsCollection} from "../db/db";
+import {BlogModel, PostModel} from "../db/db";
+import {allBlogsUIType, allPostsUIType, blogUIType} from "../db/UI-types";
+import {blogDBType} from "../db/DB-types";
 
 
 export const blogsQueryRepository = {
-    async findAllBlogs(searchNameTerm: string | undefined, sortBy: string | undefined, sortDirection: string | undefined, pageNumber: number, pageSize: number): Promise<findBlogsType> {
-        const filter: Filter<blogsType> = {}
+    async findAllBlogs(searchNameTerm: string, sortBy: string, sortDirection: string, pageNumber: number, pageSize: number): Promise<allBlogsUIType> {
+        const filter: Filter<blogDBType> = {}
         if (searchNameTerm) {
             filter.name = {$regex: searchNameTerm, $options: "$i"}
         }
@@ -13,14 +14,13 @@ export const blogsQueryRepository = {
         if (sortBy) {
             sort = sortBy
         }
-        const totalCount = await blogsCollection.countDocuments(filter)
-        const findAll = await blogsCollection
+        const totalCount = await BlogModel.countDocuments(filter)
+        const findAll = await BlogModel
             .find(filter)
             .sort({[sort]: sortDirection === "asc" ? 1 : -1})
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
-            .toArray()
-
+            .lean()
         return {
             pagesCount: Math.ceil(totalCount / pageSize),
             page: pageNumber,
@@ -31,38 +31,38 @@ export const blogsQueryRepository = {
                     name: b.name,
                     description: b.description,
                     websiteUrl: b.websiteUrl,
-                    createdAt: b.createdAt
+                    createdAt: b.createdAt,
+                    isMembership: b.isMembership
                 })
             )
         }
     },
 
-    async findBlogById(blogId: ObjectId): Promise<null | blogsType> {
-        const result = await blogsCollection.findOne({_id: blogId})
-        if (!result) {
-            return null
-        }
+    async findBlogById(blogId: ObjectId): Promise<null | blogUIType> {
+        const result = await BlogModel.findOne({_id: blogId})
+        if (!result) return null
         return {
-            id: result._id!.toString(),
+            id: result._id.toString(),
             name: result.name,
             description: result.description,
             websiteUrl: result.websiteUrl,
-            createdAt: result.createdAt
+            createdAt: result.createdAt,
+            isMembership: result.isMembership
         }
     },
 
-    async findAllPostsByBlogId(blogId: string, sortBy: string | undefined, sortDirection: string | undefined, pageNumber: number, pageSize: number): Promise<null | findPostsType> {
+    async findAllPostsByBlogId(blogId: string, sortBy: string, sortDirection: string, pageNumber: number, pageSize: number): Promise<null | allPostsUIType> {
         let sort = "createdAt"
         if (sortBy) {
             sort = sortBy
         }
-        const totalCount = await postsCollection.countDocuments({blogId: blogId})
-        const findAll = await postsCollection
+        const totalCount = await PostModel.countDocuments({blogId: blogId})
+        const findAll = await PostModel
             .find({blogId: blogId})
             .sort({[sort]: sortDirection === "asc" ? 1 : -1})
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
-            .toArray()
+            .lean()
         return {
             pagesCount: Math.ceil(totalCount / pageSize),
             page: pageNumber,
