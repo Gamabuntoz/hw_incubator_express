@@ -1,8 +1,6 @@
-import {MongoClient, ObjectId} from "mongodb"
 import * as dotenv from "dotenv"
-import {blogsType, commentsType, postsType, userType} from "./DB-types";
 import mongoose from "mongoose";
-import {postSchema, blogSchema, attemptSchema, commentSchema, deviceSchema, userSchema, adminSchema} from "./schems";
+import {adminSchema, attemptSchema, blogSchema, commentSchema, deviceSchema, postSchema, userSchema} from "./schems";
 
 dotenv.config()
 

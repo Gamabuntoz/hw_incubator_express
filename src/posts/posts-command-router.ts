@@ -1,5 +1,4 @@
 import {Request, Response, Router} from "express";
-import {commentsType, postsType} from "../db/DB-types";
 import {sendStatus} from "../db/status-collection";
 import {
     inputCommentsValidation,
@@ -9,6 +8,7 @@ import {
 } from "../middlewares/input-validation-middleware";
 import {postsService} from "./posts-service";
 import {authMiddlewareBasic, authMiddlewareBearer} from "../middlewares/authorization-middleware";
+import {commentUIType, postUIType} from "../db/UI-types";
 
 export const postsCommandRouter = Router()
 
@@ -25,7 +25,7 @@ postsCommandRouter.post("/",
         const shortDescription = req.body.shortDescription
         const content = req.body.content
         const blogId = req.body.blogId
-        const newPost: postsType | boolean = await postsService.createPost(title, shortDescription, content, blogId)
+        const newPost: postUIType | boolean = await postsService.createPost(title, shortDescription, content, blogId)
         res.status(sendStatus.CREATED_201).send(newPost)
     })
 postsCommandRouter.post("/:id/comments",
@@ -36,7 +36,7 @@ postsCommandRouter.post("/:id/comments",
     async (req: Request, res: Response) => {
         const postId = req.params.id
         const content = req.body.content
-        const newComment: commentsType = await postsService.createCommentByPostId(content, req.user, postId)
+        const newComment: commentUIType = await postsService.createCommentByPostId(content, req.user, postId)
         res.status(sendStatus.CREATED_201).send(newComment)
     })
 postsCommandRouter.put("/:id",

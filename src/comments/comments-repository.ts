@@ -1,12 +1,12 @@
-import {commentType} from "../db/DB-types";
+import {commentDBType} from "../db/DB-types";
 import {CommentModel} from "../db/db";
 import {ObjectId} from "mongodb";
 
 export const commentsRepository = {
-    async findComment(commentId: ObjectId): Promise<commentType | null> {
+    async findComment(commentId: ObjectId): Promise<commentDBType | null> {
         return CommentModel.findOne({_id: commentId})
     },
-    async createComment(newComment: commentType): Promise<commentType> {
+    async createComment(newComment: commentDBType): Promise<commentDBType> {
         await CommentModel.create(newComment)
         return newComment
     },

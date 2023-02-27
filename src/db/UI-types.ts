@@ -1,8 +1,3 @@
-import {blogDBType, commentDBType, postDBType, userDBType} from "./DB-types";
-import {ObjectId} from "mongodb";
-
-
-
 export type blogUIType = {
     id: string
     name: string

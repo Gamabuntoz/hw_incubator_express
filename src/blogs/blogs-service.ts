@@ -33,7 +33,8 @@ export const blogsService = {
     async updateBlog(id: string, name: string, description: string, website: string): Promise<boolean> {
         const postId = tryObjectId(id)
         if (!postId) return false
-        return blogsCommandsRepository.updateBlog(postId, name, description, website)
+        const result = await blogsCommandsRepository.updateBlog(postId, name, description, website)
+        return result
     },
     async createPostById(title: string, shortDescription: string, content: string, id: string): Promise<postUIType | boolean> {
         const blogId = tryObjectId(id)

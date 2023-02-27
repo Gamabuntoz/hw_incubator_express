@@ -1,14 +1,15 @@
 import {usersRepository} from "./users-repository";
 import {ObjectId} from "mongodb";
-import {findUsersType, findUserType, userType} from "../db/DB-types";
 import bcrypt from "bcrypt"
-import {usersCollection} from "../db/db"
+import {UserModel} from "../db/db"
 import {v4 as uuidv4} from "uuid";
 import add from "date-fns/add";
+import {allUsersUIType, userUIType} from "../db/UI-types";
+import {userDBType} from "../db/DB-types";
 
 export const usersService = {
-    async findUserById(userId: ObjectId): Promise<findUserType | null> {
-        const result = await usersCollection.findOne({_id: userId})
+    async findUserById(userId: ObjectId): Promise<userUIType | null> {
+        const result = await UserModel.findOne({_id: userId})
         if (!result) {
             return null
         }
@@ -19,29 +20,25 @@ export const usersService = {
             createdAt: result.accountData.createdAt
         }
     },
-    async findAllUsers(sortBy: string | undefined, sortDirection: string | undefined, pageNumber: number, pageSize: number, searchLoginTerm: string, searchEmailTerm: string): Promise<findUsersType> {
+    async findAllUsers(sortBy: string | undefined, sortDirection: string | undefined, pageNumber: number, pageSize: number, searchLoginTerm: string, searchEmailTerm: string): Promise<allUsersUIType> {
         let filter = {}
         if (searchLoginTerm || searchEmailTerm) {
             filter = {
-                $or: [{login: {$regex: searchLoginTerm, $options: "$i"}}, {
-                    email: {
-                        $regex: searchEmailTerm,
-                        $options: "$i"
-                    }
-                }]
+                $or: [{login: {$regex: searchLoginTerm, $options: "$i"}},
+                    {email: {$regex: searchEmailTerm, $options: "$i"}}]
             }
         }
         let sort = "createdAt"
         if (sortBy) {
             sort = sortBy
         }
-        const totalCount = await usersCollection.countDocuments(filter)
-        const findAll = await usersCollection
+        const totalCount = await UserModel.countDocuments(filter)
+        const findAll = await UserModel
             .find(filter)
             .sort({[sort]: sortDirection === "asc" ? 1 : -1})
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
-            .toArray()
+            .lean()
         return {
             pagesCount: Math.ceil(totalCount / pageSize),
             page: pageNumber,
@@ -56,10 +53,10 @@ export const usersService = {
             )
         }
     },
-    async createUser(login: string, password: string, email: string): Promise<findUserType | null> {
+    async createUser(login: string, password: string, email: string): Promise<userUIType | null> {
         const passwordSalt = await bcrypt.genSalt(10)
         const passwordHash = await this._generateHash(password, passwordSalt)
-        const newUser: userType = {
+        const newUser: userDBType = {
             _id: new ObjectId(),
             accountData: {
                 login: login,
@@ -74,6 +71,10 @@ export const usersService = {
                     hours: 1,
                     minutes: 1
                 }),
+            },
+            passwordRecovery: {
+                code: "string",
+                expirationDate: new Date()
             }
         }
         const result = await usersRepository.createUser(newUser)
@@ -97,7 +98,7 @@ export const usersService = {
     async deleteAllUsers(): Promise<boolean> {
         return usersRepository.deleteAllUsers()
     },
-    async checkCredentials(loginOrEmail: string, password: string): Promise<userType | boolean> {
+    async checkCredentials(loginOrEmail: string, password: string): Promise<userDBType | boolean> {
         const user = await usersRepository.findUserByLoginOrEmail(loginOrEmail)
         if (!user) return false
         const passwordHash = await this._generateHash(password, user.accountData.passwordHash!.slice(0, 29))

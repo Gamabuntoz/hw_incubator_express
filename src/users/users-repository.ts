@@ -1,11 +1,11 @@
 import {UserModel} from "../db/db";
-import {userType} from "../db/DB-types";
+import {userDBType} from "../db/DB-types";
 import {ObjectId} from "mongodb";
 import {v4 as uuidv4} from "uuid"
 import add from "date-fns/add";
 
 export const usersRepository = {
-    async createUser(user: userType): Promise<userType> {
+    async createUser(user: userDBType): Promise<userDBType> {
         await UserModel.create(user)
         return user
     },

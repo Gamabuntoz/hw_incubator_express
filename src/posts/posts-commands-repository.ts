@@ -1,9 +1,11 @@
 import {PostModel} from "../db/db";
 import {ObjectId} from "mongodb";
 import {postDBType} from "../db/DB-types";
+import {postUIType} from "../db/UI-types";
+import {tryObjectId} from "../middlewares/input-validation-middleware";
 
 export const postsCommandsRepository = {
-    async findAllPosts(): Promise<postType[]> {
+    async findAllPosts(): Promise<postUIType[]> {
         const result = await PostModel.find({}).lean()
         return result.map(p => ({
                 id: p._id!.toString(),
@@ -16,14 +18,9 @@ export const postsCommandsRepository = {
             })
         )
     },
-    async findPostById(id: string): Promise<postsType | null | boolean> {
-        let postId: ObjectId;
-        try {
-            postId = new ObjectId(id)
-        } catch (e) {
-            console.log(e)
-            return false
-        }
+    async findPostById(id: string): Promise<postUIType | boolean> {
+        const postId = tryObjectId(id)
+        if (!postId) return false
         const result = await PostModel.findOne({_id: postId})
         if (!result) {
             return false
@@ -39,8 +36,7 @@ export const postsCommandsRepository = {
         }
     },
 
-
-    async createPost(newPost: postsType): Promise<postsType> {
+    async createPost(newPost: postDBType): Promise<postDBType> {
         const result = await PostModel.create(newPost)
         return newPost
     },

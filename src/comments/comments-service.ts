@@ -1,14 +1,13 @@
 import {ObjectId} from "mongodb";
-import {commentsType} from "../db/DB-types";
-import {commentsCollection} from "../db/db";
+import {CommentModel} from "../db/db";
 import {commentsRepository} from "./comments-repository";
+import {commentUIType} from "../db/UI-types";
+import {tryObjectId} from "../middlewares/input-validation-middleware";
 
 export const commentsService = {
-    async findCommentById(commentId: ObjectId): Promise<commentsType | boolean | null> {
-        const result = await commentsCollection.findOne({_id: commentId})
-        if (!result) {
-            return false
-        }
+    async findCommentById(commentId: ObjectId): Promise<commentUIType | boolean> {
+        const result = await CommentModel.findOne({_id: commentId})
+        if (!result) return false
         return {
             id: result._id.toString(),
             content: result.content,
@@ -16,14 +15,9 @@ export const commentsService = {
             createdAt: result.createdAt
         }
     },
-    async updateComment(content: string, id: string): Promise<commentsType | boolean> {
-        let commentId: ObjectId;
-        try {
-            commentId = new ObjectId(id)
-        } catch (e) {
-            console.log(e)
-            return false
-        }
+    async updateComment(content: string, id: string): Promise<boolean> {
+        const commentId = tryObjectId(id)
+        if (!commentId) return false
         return commentsRepository.updateComment(content, commentId)
     },
     async deleteComment(id: ObjectId): Promise<boolean> {

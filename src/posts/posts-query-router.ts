@@ -1,9 +1,9 @@
 import {Request, Response, Router} from "express";
-import {findCommentsType, findPostsType, postsType} from "../db/DB-types";
 import {sendStatus} from "../db/status-collection";
 import {postsQueryRepository} from "./posts-query-repository";
 import {ObjectId} from "mongodb";
-import {postIdQueryMiddleware} from "../middlewares/input-validation-middleware";
+import {postIdQueryMiddleware, tryObjectId} from "../middlewares/input-validation-middleware";
+import {allCommentsUIType, allPostsUIType, postUIType} from "../db/UI-types";
 
 export const postsQueryRouter = Router()
 
@@ -12,19 +12,14 @@ postsQueryRouter.get("/", async (req: Request, res: Response) => {
     const sortDirection = req.query.sortDirection
     const pageNumber = +(req.query.pageNumber ?? 1)
     const pageSize = +(req.query.pageSize ?? 10)
-    const allPosts: findPostsType = await postsQueryRepository
+    const allPosts: allPostsUIType = await postsQueryRepository
         .findAllPosts(sortBy as string, sortDirection as string, pageNumber, pageSize)
     res.status(sendStatus.OK_200).send(allPosts)
 })
 postsQueryRouter.get("/:id", async (req: Request, res: Response) => {
-    let postId: ObjectId;
-    try {
-        postId = new ObjectId(req.params.id)
-    } catch (e) {
-        res.sendStatus(sendStatus.NOT_FOUND_404)
-        return false
-    }
-    const foundPost: postsType | null | boolean = await postsQueryRepository.findPostById(postId)
+    const postId = tryObjectId(req.params.id)
+    if (!postId) return res.sendStatus(sendStatus.NOT_FOUND_404)
+    const foundPost: postUIType | boolean = await postsQueryRepository.findPostById(postId)
     if (!foundPost) {
         return res.sendStatus(sendStatus.NOT_FOUND_404)
     }
@@ -38,8 +33,7 @@ postsQueryRouter.get("/:id/comments",
         const pageNumber = +(req.query.pageNumber ?? 1)
         const pageSize = +(req.query.pageSize ?? 10)
         const postId = req.params.id
-        const allCommentsByPostId: findCommentsType | null = await postsQueryRepository
+        const allCommentsByPostId: allCommentsUIType = await postsQueryRepository
             .findAllCommentsByPostId(sortBy as string, sortDirection as string, pageNumber, pageSize, postId)
-
         res.status(sendStatus.OK_200).send(allCommentsByPostId)
     })

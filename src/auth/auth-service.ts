@@ -1,16 +1,17 @@
 import {usersRepository} from "../users/users-repository";
 import {ObjectId} from "mongodb";
-import {findUserType, userType} from "../db/DB-types";
 import bcrypt from "bcrypt"
 import {v4 as uuidv4} from "uuid"
 import add from "date-fns/add"
 import {emailAdapter} from "../application/email-adapters";
+import {userDBType} from "../db/DB-types";
+import {userUIType} from "../db/UI-types";
 
 export const authService = {
-    async createUser(login: string, password: string, email: string): Promise<userType | null> {
+    async createUser(login: string, password: string, email: string): Promise<userDBType> {
         const passwordSalt = await bcrypt.genSalt(10)
         const passwordHash = await this._generateHash(password, passwordSalt)
-        const newUser: userType = {
+        const newUser: userDBType = {
             _id: new ObjectId(),
             accountData: {
                 login: login,
@@ -25,16 +26,20 @@ export const authService = {
                     hours: 1,
                     minutes: 1
                 }),
+            },
+            passwordRecovery: {
+                code: "string",
+                expirationDate: new Date()
             }
         }
-        const result = await usersRepository.createUser(newUser)
+        await usersRepository.createUser(newUser)
         await emailAdapter.sendEmail(newUser)
         return newUser
     },
-    async createUserByAdmin(login: string, password: string, email: string): Promise<findUserType | null> {
+    async createUserByAdmin(login: string, password: string, email: string): Promise<userUIType> {
         const passwordSalt = await bcrypt.genSalt(10)
         const passwordHash = await this._generateHash(password, passwordSalt)
-        const newUser: userType = {
+        const newUser: userDBType = {
             _id: new ObjectId(),
             accountData: {
                 login: login,
@@ -49,6 +54,10 @@ export const authService = {
                     hours: 1,
                     minutes: 1
                 }),
+            },
+            passwordRecovery: {
+                code: "string",
+                expirationDate: new Date()
             }
         }
         await usersRepository.createUser(newUser)
@@ -64,8 +73,8 @@ export const authService = {
         if (!user) return "User dont exist"
         if (user.emailConfirmation.isConfirmed) return "Email already confirmed"
         await usersRepository.resendConfirmation(user._id)
-        await usersRepository.findUserByLoginOrEmail(email)
-        await emailAdapter.sendEmail(user)
+        user = await usersRepository.findUserByLoginOrEmail(email)
+        await emailAdapter.sendEmail(user as userDBType)
         return true
     },
     async confirmEmail(code: string): Promise<boolean | string> {
@@ -76,16 +85,12 @@ export const authService = {
         let result = await usersRepository.updateConfirmation(user._id)
         return result
     },
-    async checkCredentials(loginOrEmail: string, password: string): Promise<userType | boolean> {
+    async checkCredentials(loginOrEmail: string, password: string): Promise<userDBType | boolean> {
         const user = await usersRepository.findUserByLoginOrEmail(loginOrEmail)
         if (!user) return false
-        if (!user.emailConfirmation.isConfirmed) {
-            return false
-        }
+        if (!user.emailConfirmation.isConfirmed) return false
         const passwordHash = await this._generateHash(password, user.accountData.passwordHash!.slice(0, 29))
-        if (user.accountData.passwordHash !== passwordHash) {
-            return false
-        }
+        if (user.accountData.passwordHash !== passwordHash) return false
         return user
     },
     async passwordRecovery(email: string): Promise<boolean | string> {

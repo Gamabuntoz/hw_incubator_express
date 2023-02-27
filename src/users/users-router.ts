@@ -1,5 +1,4 @@
 import {Request, Response, Router} from "express";
-import {findUsersType, findUserType} from "../db/DB-types";
 import {sendStatus} from "../db/status-collection";
 import {
     inputUsersValidation,
@@ -8,6 +7,7 @@ import {
 import {usersService} from "./users-service";
 import {authService} from "../auth/auth-service";
 import {authMiddlewareBasic} from "../middlewares/authorization-middleware";
+import {allUsersUIType, userUIType} from "../db/UI-types";
 
 export const usersRouter = Router()
 
@@ -20,7 +20,7 @@ usersRouter.get("/",
         const pageSize = +(req.query.pageSize ?? 10)
         const searchLoginTerm = req.query.searchLoginTerm
         const searchEmailTerm = req.query.searchEmailTerm
-        const allUsers: findUsersType = await usersService
+        const allUsers: allUsersUIType = await usersService
             .findAllUsers(sortBy as string, sortDirection as string, pageNumber, pageSize, searchLoginTerm as string, searchEmailTerm as string)
         res.status(sendStatus.OK_200).send(allUsers)
     })
@@ -34,7 +34,7 @@ usersRouter.post("/",
         const login = req.body.login
         const password = req.body.password
         const email = req.body.email
-        const newUser: findUserType | null = await authService.createUserByAdmin(login, password, email)
+        const newUser: userUIType | null = await authService.createUserByAdmin(login, password, email)
         res.status(sendStatus.CREATED_201).send(newUser)
     })
 usersRouter.delete("/:id",

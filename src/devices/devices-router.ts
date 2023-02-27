@@ -13,7 +13,7 @@ devicesRouter.get("/devices",
         const refreshToken = req.cookies.refreshToken
         const checkUserToken = await jwtService.checkRefreshToken(refreshToken)
         const allUserDevices = await devicesRepository.findAllUserDevices(checkUserToken!.userId)
-        res.status(sendStatus.OK_200).send(allUserDevices.map(c => ({
+        res.status(sendStatus.OK_200).send(allUserDevices!.map(c => ({
                 ip: c.ipAddress,
                 title: c.deviceName,
                 lastActiveDate: new Date(c.issueAt).toISOString(),
