@@ -4,6 +4,7 @@ import {sendStatus} from "../db/status-collection";
 import {blogsCommandsRepository} from "../blogs/blogs-commands-repository";
 import {ObjectId} from "mongodb";
 import {postsCommandsRepository} from "../posts/posts-commands-repository";
+import {commentsRepository} from "../comments/comments-repository";
 
 export const blogIdQueryMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     let blogId: ObjectId;
@@ -26,6 +27,19 @@ export const postIdQueryMiddleware = async (req: Request, res: Response, next: N
         return res.sendStatus(sendStatus.NOT_FOUND_404)
     }
     const findBlog = await postsCommandsRepository.findPostById(postId.toString())
+    if (!findBlog) {
+        return res.sendStatus(sendStatus.NOT_FOUND_404)
+    }
+    next()
+}
+export const commentIdQueryMiddleware = async (req: Request, res: Response, next: NextFunction) => {
+    let commentId: ObjectId;
+    try {
+        commentId = new ObjectId(req.params.id)
+    } catch (e) {
+        return res.sendStatus(sendStatus.NOT_FOUND_404)
+    }
+    const findBlog = await commentsRepository.findComment(commentId)
     if (!findBlog) {
         return res.sendStatus(sendStatus.NOT_FOUND_404)
     }

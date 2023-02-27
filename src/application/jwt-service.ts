@@ -1,12 +1,12 @@
 import jwt from "jsonwebtoken"
-import {userType} from "../db/DB-types";
+import {userDBType} from "../db/DB-types";
 import {settings} from "../db/db";
 
 export const jwtService = {
-    async createAccessJWT(user: userType) {
+    async createAccessJWT(user: userDBType) {
         return jwt.sign({userId: user._id}, settings.JWT_SECRET, {expiresIn: "1h"})
     },
-    async createRefreshJWT(user: userType, deviceId: string, issueAt: number) {
+    async createRefreshJWT(user: userDBType, deviceId: string, issueAt: number) {
         return jwt.sign({userId: user._id, deviceId: deviceId, issueAt: issueAt}, settings.JWT_SECRET, {expiresIn: settings.EXPIRATION_JWT_REFRESH_TOKEN})
     },
     async checkRefreshToken(token: string) {

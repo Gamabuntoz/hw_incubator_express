@@ -1,14 +1,17 @@
 import {postsCommandsRepository} from "./posts-commands-repository";
 import {ObjectId} from "mongodb";
-import {commentsType, findUserType, postsType} from "../db/DB-types";
 import {blogsService} from "../blogs/blogs-service";
 import {commentsRepository} from "../comments/comments-repository";
+import {commentDBType, postDBType} from "../db/DB-types";
+import {commentUIType, postUIType, userUIType} from "../db/UI-types";
+import {tryObjectId} from "../middlewares/input-validation-middleware";
 
 export const postsService = {
-    async createPost(title: string, shortDescription: string, content: string, blogId: string): Promise<postsType | boolean> {
+    async createPost(title: string, shortDescription: string, content: string, blogId: string): Promise<postUIType | boolean> {
         const blogById = await blogsService.findBlogById(new ObjectId(blogId))
         if (!blogById) return false
-        const newPost: postsType = {
+        const newPost: postDBType = {
+            _id: new ObjectId(),
             title: title,
             shortDescription: shortDescription,
             content: content,
@@ -27,8 +30,9 @@ export const postsService = {
             createdAt: result.createdAt,
         }
     },
-    async createCommentByPostId(content: string, user: findUserType | null, postId: string): Promise<commentsType> {
-        const newComment: commentsType = {
+    async createCommentByPostId(content: string, user: userUIType | null, postId: string): Promise<commentUIType> {
+        const newComment: commentDBType = {
+            _id: new ObjectId(),
             postId: postId,
             content: content,
             commentatorInfo: {
@@ -46,23 +50,13 @@ export const postsService = {
         }
     },
     async updatePost(id: string, title: string, shortDescription: string, content: string, blogId: string): Promise<boolean> {
-        let postId: ObjectId;
-        try {
-            postId = new ObjectId(id)
-        } catch (e) {
-            console.log(e)
-            return false
-        }
+        const postId = tryObjectId(id)
+        if (!postId) return false
         return postsCommandsRepository.updatePost(postId, title, shortDescription, content, blogId)
     },
     async deletePost(id: string): Promise<boolean> {
-        let postId: ObjectId;
-        try {
-            postId = new ObjectId(id)
-        } catch (e) {
-            console.log(e)
-            return false
-        }
+        const postId = tryObjectId(id)
+        if (!postId) return false
         return postsCommandsRepository.deletePost(postId)
     },
     async deleteAllPosts(): Promise<boolean> {

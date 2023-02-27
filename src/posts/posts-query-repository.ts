@@ -1,9 +1,9 @@
 import {ObjectId} from "mongodb";
-import {findCommentsType, findPostsType, postsType} from "../db/DB-types";
 import {CommentModel, PostModel} from "../db/db";
+import {allCommentsUIType, allPostsUIType, postUIType} from "../db/UI-types";
 
 export const postsQueryRepository = {
-    async findAllPosts(sortBy: string, sortDirection: string, pageNumber: number, pageSize: number): Promise<findPostsType> {
+    async findAllPosts(sortBy: string, sortDirection: string, pageNumber: number, pageSize: number): Promise<allPostsUIType> {
         let sort = "createdAt"
         if (sortBy) {
             sort = sortBy
@@ -33,11 +33,9 @@ export const postsQueryRepository = {
             )
         }
     },
-    async findPostById(postId: ObjectId): Promise<postsType | null | boolean> {
+    async findPostById(postId: ObjectId): Promise<postUIType | boolean> {
         const result = await PostModel.findOne({_id: postId})
-        if (!result) {
-            return false
-        }
+        if (!result) return false
         return {
             id: result._id!.toString(),
             title: result.title,
@@ -48,7 +46,7 @@ export const postsQueryRepository = {
             createdAt: result.createdAt
         }
     },
-    async findAllCommentsByPostId(sortBy: string | undefined, sortDirection: string | undefined, pageNumber: number, pageSize: number, postId: string): Promise<null | findCommentsType> {
+    async findAllCommentsByPostId(sortBy: string | undefined, sortDirection: string | undefined, pageNumber: number, pageSize: number, postId: string): Promise<allCommentsUIType> {
         let sort = "createdAt"
         if (sortBy) {
             sort = sortBy
@@ -59,7 +57,7 @@ export const postsQueryRepository = {
             .sort({[sort]: sortDirection === "asc" ? 1 : -1})
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
-            .toArray()
+            .lean()
         return {
             pagesCount: Math.ceil(totalCount / pageSize),
             page: pageNumber,

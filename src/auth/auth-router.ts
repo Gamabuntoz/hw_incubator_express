@@ -2,7 +2,6 @@ import {Request, Response, Router} from "express";
 import {inputUsersValidation, inputValidationErrors} from "../middlewares/input-validation-middleware";
 import {sendStatus} from "../db/status-collection";
 import {jwtService} from "../application/jwt-service"
-import {deviceAuthSessionsType} from "../db/DB-types";
 import {authService} from "./auth-service";
 import {usersRepository} from "../users/users-repository";
 import {v4 as uuidv4} from "uuid"
@@ -15,6 +14,7 @@ import {
 import {settings} from "../db/db"
 import {ObjectId} from "mongodb"
 import {devicesRepository} from "../devices/devices-repository"
+import {authDeviceDBType} from "../db/DB-types";
 
 export const authRouter = Router({})
 
@@ -109,7 +109,7 @@ authRouter.post("/login",
         }
         const accessToken = await jwtService.createAccessJWT(checkUserToken)
         const refreshToken = await jwtService.createRefreshJWT(checkUserToken, device.deviceId, device.issueAt)
-        await devicesRepository.insertDeviceInfo(device as deviceAuthSessionsType)
+        await devicesRepository.insertDeviceInfo(device as authDeviceDBType)
         res.cookie("refreshToken", refreshToken, {
             secure: true,
             httpOnly: true

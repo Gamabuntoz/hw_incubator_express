@@ -1,5 +1,5 @@
 import nodemailer from "nodemailer";
-import {userType} from "../db/DB-types";
+import {userDBType} from "../db/DB-types";
 
 const senderData = {
     service: "gmail",
@@ -10,7 +10,7 @@ const senderData = {
 }
 
 export const emailAdapter = {
-    async sendEmail(user: userType) {
+    async sendEmail(user: userDBType) {
         let transporter = nodemailer.createTransport(senderData);
         let result = await transporter.sendMail({
             from: "SAMURAIS-API, <bonypiper@gmail.com>",
@@ -23,7 +23,7 @@ export const emailAdapter = {
         });
         return result
     },
-    async sendEmailForPasswordRecovery(user: userType) {
+    async sendEmailForPasswordRecovery(user: userDBType) {
         let transporter = nodemailer.createTransport(senderData);
         let result = await transporter.sendMail({
             from: "SAMURAIS-API, <bonypiper@gmail.com>",

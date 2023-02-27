@@ -1,14 +1,13 @@
-import {Filter, ObjectId} from "mongodb";
+import {ObjectId} from "mongodb";
 import {BlogModel, PostModel} from "../db/db";
 import {allBlogsUIType, allPostsUIType, blogUIType} from "../db/UI-types";
-import {blogDBType} from "../db/DB-types";
 
 
 export const blogsQueryRepository = {
     async findAllBlogs(searchNameTerm: string, sortBy: string, sortDirection: string, pageNumber: number, pageSize: number): Promise<allBlogsUIType> {
-        const filter: Filter<blogDBType> = {}
+        let filter = {}
         if (searchNameTerm) {
-            filter.name = {$regex: searchNameTerm, $options: "$i"}
+            filter = {name: {$regex: searchNameTerm, $options: "$i"}}
         }
         let sort = "createdAt"
         if (sortBy) {
