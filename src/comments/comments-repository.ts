@@ -14,6 +14,10 @@ export const commentsRepository = {
         await CommentLikesModelClass.create(like)
         return like
     },
+    async updateLike(likeStatus: string, commentId: string, userId: string) {
+        const result = await CommentLikesModelClass.updateOne({commentId: commentId, userId: userId}, {$set: {status: likeStatus}})
+        return result.matchedCount === 1
+    },
     async updateComment(content: string, commentId: ObjectId): Promise<boolean> {
         const result = await CommentModelClass
             .updateOne({_id: commentId}, {$set: {content: content}})
