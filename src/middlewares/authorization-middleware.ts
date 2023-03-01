@@ -101,8 +101,3 @@ export const authAttemptsChecker = async (req: Request, res: Response, next: Nex
         return
     }
 }
-export const deleteAttemptsDB = {
-    async deleteAllAuthAttempt() {
-        return AuthAttemptModelClass.deleteMany({})
-    }
-}

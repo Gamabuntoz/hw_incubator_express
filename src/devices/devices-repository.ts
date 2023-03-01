@@ -30,8 +30,5 @@ export const devicesRepository = {
     async deleteAllUserDeviceExceptCurrent(issueAt: number, userId: ObjectId): Promise<boolean> {
         const result = await DeviceModelClass.deleteMany({issueAt: {$ne: issueAt}, userId: userId})
         return result.deletedCount === 1
-    },
-    async deleteAllDevicesInfo() {
-        return DeviceModelClass.deleteMany({})
     }
 }
