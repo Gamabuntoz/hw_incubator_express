@@ -1,5 +1,5 @@
 import {ObjectId} from "mongodb";
-import {CommentModelClass, PostModelClass} from "../db/db";
+import {CommentLikesModelClass, CommentModelClass, PostModelClass} from "../db/db";
 import {allCommentsUIType, allPostsUIType, postUIType} from "../db/UI-types";
 
 export const postsQueryRepository = {
@@ -46,7 +46,7 @@ export const postsQueryRepository = {
             createdAt: result.createdAt
         }
     },
-    async findAllCommentsByPostId(sortBy: string | undefined, sortDirection: string | undefined, pageNumber: number, pageSize: number, postId: string): Promise<allCommentsUIType> {
+    async findAllCommentsByPostId(sortBy: string | undefined, sortDirection: string | undefined, pageNumber: number, pageSize: number, postId: string, userId: string): Promise<allCommentsUIType> {
         let sort = "createdAt"
         if (sortBy) {
             sort = sortBy
@@ -58,6 +58,7 @@ export const postsQueryRepository = {
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
             .lean()
+        const allCommentLikes = await CommentLikesModelClass.find({}).lean()
         return {
             pagesCount: Math.ceil(totalCount / pageSize),
             page: pageNumber,
@@ -67,7 +68,14 @@ export const postsQueryRepository = {
                     id: c._id!.toString(),
                     content: c.content,
                     commentatorInfo: c.commentatorInfo,
-                    createdAt: c.createdAt
+                    createdAt: c.createdAt,
+                    likesInfo: {
+                        dislikesCount: allCommentLikes.filter(d => d.commentId === c._id.toString() && d.status === "Dislike").length,
+                        likesCount: allCommentLikes.filter(l => l.commentId === c._id.toString() && l.status === "Like").length,
+                        myStatus: allCommentLikes.find(s => s.commentId === c._id.toString() && s.userId === userId)
+                            ? allCommentLikes.filter(v => v.commentId === c._id.toString() && v.userId === userId)[0].status
+                            : "None",
+                    }
                 })
             )
         }

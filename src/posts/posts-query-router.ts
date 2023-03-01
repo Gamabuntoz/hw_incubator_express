@@ -4,6 +4,7 @@ import {postsQueryRepository} from "./posts-query-repository";
 import {ObjectId} from "mongodb";
 import {postIdQueryMiddleware, tryObjectId} from "../middlewares/input-validation-middleware";
 import {allCommentsUIType, allPostsUIType, postUIType} from "../db/UI-types";
+import {optionalAuthCheck} from "../middlewares/authorization-middleware";
 
 export const postsQueryRouter = Router()
 
@@ -26,6 +27,7 @@ postsQueryRouter.get("/:id", async (req: Request, res: Response) => {
     res.status(sendStatus.OK_200).send(foundPost)
 })
 postsQueryRouter.get("/:id/comments",
+    optionalAuthCheck,
     postIdQueryMiddleware,
     async (req: Request, res: Response) => {
         const sortBy = req.query.sortBy
@@ -34,6 +36,6 @@ postsQueryRouter.get("/:id/comments",
         const pageSize = +(req.query.pageSize ?? 10)
         const postId = req.params.id
         const allCommentsByPostId: allCommentsUIType = await postsQueryRepository
-            .findAllCommentsByPostId(sortBy as string, sortDirection as string, pageNumber, pageSize, postId)
+            .findAllCommentsByPostId(sortBy as string, sortDirection as string, pageNumber, pageSize, postId, req.user.id)
         res.status(sendStatus.OK_200).send(allCommentsByPostId)
     })
