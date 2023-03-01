@@ -9,7 +9,7 @@ import {ObjectId} from "mongodb";
 import {commentsService} from "./comments-service";
 import {commentsRepository} from "./comments-repository";
 import {authMiddlewareBearer, optionalAuthCheck} from "../middlewares/authorization-middleware";
-import {commentUIType, userUIType} from "../db/UI-types";
+import {commentUIType} from "../db/UI-types";
 import {commentDBType} from "../db/DB-types";
 
 export const commentsRouter = Router()
