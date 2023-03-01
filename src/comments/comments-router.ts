@@ -43,7 +43,7 @@ commentsRouter.put("/:id/like-status",
     inputValidationErrors,
     commentIdQueryMiddleware,
     async (req: Request, res: Response) => {
-        const likeStatus = req.body.likeStatu
+        const likeStatus = req.body.likeStatus
         const updateLike = await commentsService.updateLike(likeStatus, req.params.id, req.user.id)
         if (updateLike) res.sendStatus(sendStatus.NO_CONTENT_204)
         const setLike: boolean = await commentsService.setLike(likeStatus, req.params.id, req.user.id)
