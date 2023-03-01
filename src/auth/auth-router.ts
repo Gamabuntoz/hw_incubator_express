@@ -99,9 +99,10 @@ authRouter.post("/login",
         }
         const userIpAddress = req.ip
         const userDeviceName = req.headers['user-agent']
-        const device = {
+        const device: authDeviceDBType = {
+            _id: new ObjectId(),
             ipAddress: userIpAddress,
-            deviceName: userDeviceName,
+            deviceName: userDeviceName as string,
             deviceId: uuidv4(),
             issueAt: new Date().getTime(),
             expiresAt: new Date().getTime() + settings.EXPIRATION_JWT_REFRESH_TOKEN,

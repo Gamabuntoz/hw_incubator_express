@@ -5,6 +5,8 @@ import {jwtService} from "../application/jwt-service";
 import {usersService} from "../users/users-service";
 import {devicesRepository} from "../devices/devices-repository";
 import {ObjectId} from "mongodb";
+import {commentLikesSchema} from "../db/schems";
+import {attemptDBType} from "../db/DB-types";
 
 // export const authCheckLoginOrEmail = async (req: Request, res: Response, next: NextFunction) => {
 //     const findUserByEmail = await UserModelClass.findOne({"accountData.email": req.body.email})
@@ -82,13 +84,16 @@ export const authRefreshTokenMiddleware = async (req: Request, res: Response, ne
     next()
 }
 export const authAttemptsChecker = async (req: Request, res: Response, next: NextFunction) => {
+    const authAttempt: attemptDBType = {
+        _id: new ObjectId(),
+        ip: req.ip,
+        url: req.url,
+        time: new Date(),
+    }
     const interval = 10 * 1000
-    const ip = req.ip
-    const currentTime = new Date()
-    const url = req.url
-    const attemptTime = new Date(currentTime.getTime() - interval)
-    const attemptCount = await AuthAttemptModelClass.countDocuments({ip, url, time: {$gt: attemptTime}})
-    await AuthAttemptModelClass.create({ip, url, time: currentTime})
+    const attemptTime = new Date(authAttempt.time.getTime() - interval)
+    const attemptCount = await AuthAttemptModelClass.countDocuments({ip: authAttempt.ip, url: authAttempt.url, time: {$gt: attemptTime}})
+    await AuthAttemptModelClass.create(authAttempt)
     if (attemptCount < 5) {
         next()
     } else {
