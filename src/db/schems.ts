@@ -1,6 +1,14 @@
 import mongoose from "mongoose";
 import {ObjectId} from "mongodb";
-import {attemptDBType, authDeviceDBType, blogDBType, commentDBType, postDBType, userDBType} from "./DB-types";
+import {
+    attemptDBType,
+    authDeviceDBType,
+    blogDBType,
+    commentDBType,
+    commentsLikesDBType,
+    postDBType,
+    userDBType
+} from "./DB-types";
 
 
 export const postSchema = new mongoose.Schema<postDBType>({
@@ -11,7 +19,7 @@ export const postSchema = new mongoose.Schema<postDBType>({
     blogId: String,
     blogName: String,
     createdAt: String
-})
+}, {collection: 'posts'})
 
 export const blogSchema = new mongoose.Schema<blogDBType>({
     _id: ObjectId,
@@ -20,12 +28,12 @@ export const blogSchema = new mongoose.Schema<blogDBType>({
     description: String,
     websiteUrl: String,
     isMembership: Boolean
-})
+}, {collection: 'blogs'})
 
 export const userSchema = new mongoose.Schema<userDBType>({
     _id: ObjectId,
     accountData: {
-        login: String,
+        login: {type: String, unique: true, minlength: 3, maxlength: 10},
         email: String,
         passwordHash: String,
         createdAt: String,
@@ -39,7 +47,7 @@ export const userSchema = new mongoose.Schema<userDBType>({
         code: String,
         expirationDate: Date,
     }
-})
+}, {collection: 'users'})
 
 export const deviceSchema = new mongoose.Schema<authDeviceDBType>({
     _id: ObjectId,
@@ -49,7 +57,7 @@ export const deviceSchema = new mongoose.Schema<authDeviceDBType>({
     issueAt: Date,
     expiresAt: Date,
     userId: String
-})
+}, {collection: 'devices'})
 
 export const commentSchema = new mongoose.Schema<commentDBType>({
     _id: ObjectId,
@@ -60,16 +68,23 @@ export const commentSchema = new mongoose.Schema<commentDBType>({
         userLogin: String,
     },
     createdAt: String,
-})
+}, {collection: 'comments'})
 
 export const adminSchema = new mongoose.Schema({
     _id: ObjectId,
     loginPass: String
-})
+}, {collection: 'admin'})
 
 export const attemptSchema = new mongoose.Schema<attemptDBType>({
     _id: ObjectId,
     ip: String,
     url: String,
     time: Date
-})
+}, {collection: 'authAttempts'})
+
+export const commentLikesSchema = new mongoose.Schema<commentsLikesDBType>({
+    _id: ObjectId,
+    userId: String,
+    commentId: String,
+    status: Date
+}, {collection: 'commentsLikes'})

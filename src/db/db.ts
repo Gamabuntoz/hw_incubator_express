@@ -1,6 +1,15 @@
 import * as dotenv from "dotenv"
 import mongoose from "mongoose";
-import {adminSchema, attemptSchema, blogSchema, commentSchema, deviceSchema, postSchema, userSchema} from "./schems";
+import {
+    adminSchema,
+    attemptSchema,
+    blogSchema,
+    commentLikesSchema,
+    commentSchema,
+    deviceSchema,
+    postSchema,
+    userSchema
+} from "./schems";
 
 dotenv.config()
 
@@ -14,13 +23,14 @@ if (!settings.MONGO_URI) {
     throw new Error("URL doesn't found")
 }
 
-export const PostModel = mongoose.model("posts", postSchema)
-export const BlogModel = mongoose.model("blogs", blogSchema)
-export const UserModel = mongoose.model("users", userSchema)
-export const AdminModel = mongoose.model("admin", adminSchema)
-export const DeviceModel = mongoose.model("devices", deviceSchema)
-export const CommentModel = mongoose.model("comments", commentSchema)
-export const AuthAttemptModel = mongoose.model("authAttempts", attemptSchema)
+export const PostModelClass = mongoose.model("posts", postSchema)
+export const BlogModelClass = mongoose.model("blogs", blogSchema)
+export const UserModelClass = mongoose.model("users", userSchema)
+export const AdminModelClass = mongoose.model("admin", adminSchema)
+export const DeviceModelClass = mongoose.model("devices", deviceSchema)
+export const CommentModelClass = mongoose.model("comments", commentSchema)
+export const AuthAttemptModelClass = mongoose.model("authAttempts", attemptSchema)
+export const CommentLikesModelClass = mongoose.model("commentsLikes", commentLikesSchema)
 
 export async function runDb() {
     try {

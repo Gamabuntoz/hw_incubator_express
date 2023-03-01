@@ -40,6 +40,11 @@ export type commentUIType = {
     content: string
     commentatorInfo: commentatorInfoType
     createdAt: string
+    likesInfo: {
+        likesCount: number,
+        dislikesCount: number,
+        myStatus: string
+    }
 }
 export type allCommentsUIType = {
     pagesCount: number

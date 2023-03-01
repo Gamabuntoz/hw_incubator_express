@@ -1,7 +1,7 @@
 import {usersRepository} from "./users-repository";
 import {ObjectId} from "mongodb";
 import bcrypt from "bcrypt"
-import {UserModel} from "../db/db"
+import {UserModelClass} from "../db/db"
 import {v4 as uuidv4} from "uuid";
 import add from "date-fns/add";
 import {allUsersUIType, userUIType} from "../db/UI-types";
@@ -9,7 +9,7 @@ import {userDBType} from "../db/DB-types";
 
 export const usersService = {
     async findUserById(userId: ObjectId): Promise<userUIType | null> {
-        const result = await UserModel.findOne({_id: userId})
+        const result = await UserModelClass.findOne({_id: userId})
         if (!result) {
             return null
         }
@@ -32,8 +32,8 @@ export const usersService = {
         if (sortBy) {
             sort = sortBy
         }
-        const totalCount = await UserModel.countDocuments(filter)
-        const findAll = await UserModel
+        const totalCount = await UserModelClass.countDocuments(filter)
+        const findAll = await UserModelClass
             .find(filter)
             .sort({[sort]: sortDirection === "asc" ? 1 : -1})
             .skip((pageNumber - 1) * pageSize)

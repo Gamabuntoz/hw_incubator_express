@@ -5,6 +5,7 @@ import {blogsCommandsRepository} from "../blogs/blogs-commands-repository";
 import {ObjectId} from "mongodb";
 import {postsCommandsRepository} from "../posts/posts-commands-repository";
 import {commentsRepository} from "../comments/comments-repository";
+import {usersRepository} from "../users/users-repository";
 
 export const blogIdQueryMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     let blogId: ObjectId;
@@ -98,12 +99,22 @@ export const inputUsersValidation = {
     login: body("login")
         .isString().trim().withMessage("Must be a string")
         .isLength({min: 3, max: 10}).withMessage("Length must be from 3 to 10 symbols")
-        .matches(/^[a-zA-Z0-9_-]*$/).withMessage("Incorrect symbols"),
+        .matches(/^[a-zA-Z0-9_-]*$/).withMessage("Incorrect symbols")
+        .custom(async v => {
+            const user = await usersRepository.findUserByLoginOrEmail(v)
+            if (user) throw new Error("Login already exist")
+            return true
+        }),
     password: body("password")
         .isString().trim().withMessage("Must be a string")
         .isLength({min: 6, max: 20}).withMessage("Length must be from 6 to 20 symbols"),
     email: body("email")
-        .isEmail().withMessage("Incorrect email"),
+        .isEmail().withMessage("Incorrect email")
+        .custom(async v => {
+            const user = await usersRepository.findUserByLoginOrEmail(v)
+            if (user) throw new Error("Email already exist")
+            return true
+        }),
     loginOrEmail: body("loginOrEmail")
         .isString().trim().withMessage("Must be a string")
         .isLength({min: 3, max: 30}).withMessage("Length must be from 3 to 10 symbols"),
@@ -115,7 +126,12 @@ export const inputCommentsValidation = {
     content: body("content")
         .isString().trim().withMessage("Must be a string")
         .isLength({min: 20, max: 300}).withMessage("Length must be from 1 to 15 symbols"),
-    }
+    likeStatus: body("likeStatus")
+        .custom(v => {
+            if (v !== "None" || v !== "Like" || v !== "Dislike") throw new Error("Invalid data")
+            return true
+        }),
+}
 export const inputValidationErrors = (req: Request, res: Response, next: NextFunction) => {
     const errorFormat = ({msg, param}: ValidationError) => {
         return {message: msg, field: param}

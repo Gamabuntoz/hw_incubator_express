@@ -1,26 +1,29 @@
-import {ObjectId} from "mongodb";
+import {WithId} from "mongodb";
 
-export type blogDBType = {
-    _id: ObjectId
+export type blogDBType = WithId<{
     createdAt: string
     name: string
     description: string
     websiteUrl: string
     isMembership: boolean
-}
+}>
 
-export type postDBType = {
-    _id: ObjectId
+export type postDBType = WithId<{
     title: string
     shortDescription: string
     content: string
     blogId: string
     blogName: string
     createdAt: string
-}
+}>
 
-export type userDBType = {
-    _id: ObjectId
+export type commentsLikesDBType = WithId<{
+    userId: string
+    commentId: string
+    status: string
+}>
+
+export type userDBType = WithId<{
     accountData: {
         login: string
         email: string
@@ -36,37 +39,34 @@ export type userDBType = {
         code: string
         expirationDate: Date
     }
-}
+}>
 
 type commentatorInfoType = {
     userId: string
     userLogin: string
 }
 
-export type commentDBType = {
-    _id: ObjectId
+export type commentDBType = WithId<{
     postId: string
     content: string
     commentatorInfo: commentatorInfoType
     createdAt: string
-}
+}>
 
-export type authDeviceDBType = {
-    _id: ObjectId
+export type authDeviceDBType = WithId<{
     issueAt: number
     expiresAt: number
     ipAddress: string
     deviceName: string
     userId: string
     deviceId: string
-}
+}>
 
-export type attemptDBType = {
-    _id: ObjectId
+export type attemptDBType = WithId<{
     ip: string
     url: string
     time: Date
-}
+}>
 
 
 

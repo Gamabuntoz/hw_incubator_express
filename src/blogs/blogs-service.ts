@@ -1,7 +1,7 @@
 import {blogsCommandsRepository} from "./blogs-commands-repository";
 import {ObjectId} from "mongodb";
 import {blogDBType, postDBType} from "../db/DB-types";
-import {BlogModel} from "../db/db";
+import {BlogModelClass} from "../db/db";
 import {postsCommandsRepository} from "../posts/posts-commands-repository";
 import {blogUIType, postUIType} from "../db/UI-types";
 import {tryObjectId} from "../middlewares/input-validation-middleware";
@@ -9,7 +9,7 @@ import {tryObjectId} from "../middlewares/input-validation-middleware";
 
 export const blogsService = {
     async findBlogById(blogId: ObjectId): Promise<null | blogDBType> {
-        return BlogModel.findOne({_id: blogId})
+        return BlogModelClass.findOne({_id: blogId})
     },
     async createBlog(name: string, description: string, website: string): Promise<blogUIType> {
         const newBlog: blogDBType = {
