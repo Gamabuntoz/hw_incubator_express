@@ -64,8 +64,5 @@ export const postsService = {
         const postId = tryObjectId(id)
         if (!postId) return false
         return postsCommandsRepository.deletePost(postId)
-    },
-    async deleteAllPosts(): Promise<boolean> {
-        return postsCommandsRepository.deleteAllPosts()
     }
 }
