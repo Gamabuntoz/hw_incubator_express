@@ -5,6 +5,7 @@ import {commentsRepository} from "../comments/comments-repository";
 import {commentDBType, postDBType} from "../db/DB-types";
 import {commentUIType, postUIType, userUIType} from "../db/UI-types";
 import {tryObjectId} from "../middlewares/input-validation-middleware";
+import {CommentLikesModelClass} from "../db/db";
 
 export const postsService = {
     async createPost(title: string, shortDescription: string, content: string, blogId: string): Promise<postUIType | boolean> {
@@ -46,7 +47,12 @@ export const postsService = {
             id: newComment._id!.toString(),
             content: newComment.content,
             commentatorInfo: newComment.commentatorInfo,
-            createdAt: newComment.createdAt
+            createdAt: newComment.createdAt,
+            likesInfo: {
+                dislikesCount: 0,
+                likesCount: 0,
+                myStatus: "None",
+            }
         }
     },
     async updatePost(id: string, title: string, shortDescription: string, content: string, blogId: string): Promise<boolean> {
