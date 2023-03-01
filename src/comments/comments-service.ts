@@ -36,6 +36,11 @@ export const commentsService = {
         await commentsRepository.setLike(like)
         return true
     },
+    async updateLike(likeStatus: string, commentId: string, userId: string) {
+        const findLike = await commentsRepository.updateLike(likeStatus, commentId, userId)
+        if (!findLike) return false
+        return true
+    },
     async updateComment(content: string, id: string): Promise<boolean> {
         const commentId = tryObjectId(id)
         if (!commentId) return false
