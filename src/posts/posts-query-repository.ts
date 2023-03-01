@@ -58,26 +58,27 @@ export const postsQueryRepository = {
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
             .lean()
-        const allCommentLikes = await CommentLikesModelClass.find({}).lean()
         return {
             pagesCount: Math.ceil(totalCount / pageSize),
             page: pageNumber,
             pageSize: pageSize,
             totalCount: totalCount,
-            items: findAll.map(c => ({
-                    id: c._id!.toString(),
+            items: await Promise.all(findAll.map( async (c) => {
+                let likeInfo
+                if (likeInfo) {
+                    likeInfo = await CommentLikesModelClass.findOne({commentId: c._id.toString(), userId: userId})
+                }
+                    return {id: c._id!.toString(),
                     content: c.content,
                     commentatorInfo: c.commentatorInfo,
                     createdAt: c.createdAt,
                     likesInfo: {
-                        dislikesCount: allCommentLikes.filter(d => d.commentId === c._id.toString() && d.status === "Dislike").length,
-                        likesCount: allCommentLikes.filter(l => l.commentId === c._id.toString() && l.status === "Like").length,
-                        myStatus: allCommentLikes.find(s => s.commentId === c._id.toString() && s.userId === userId)
-                            ? allCommentLikes.filter(v => v.commentId === c._id.toString() && v.userId === userId)[0].status
-                            : "None",
-                    }
-                })
-            )
+                        dislikesCount: await CommentLikesModelClass.countDocuments({commentId: c._id.toString(), status: "Dislike"}),
+                        likesCount: await CommentLikesModelClass.countDocuments({commentId: c._id.toString(), status: "Like"}),
+                        myStatus: likeInfo ? likeInfo.status : "None"
+                    }}
+                }
+            ))
         }
     }
 }

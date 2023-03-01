@@ -1,7 +1,6 @@
 import {Request, Response, Router} from "express";
 import {sendStatus} from "../db/status-collection";
 import {postsQueryRepository} from "./posts-query-repository";
-import {ObjectId} from "mongodb";
 import {postIdQueryMiddleware, tryObjectId} from "../middlewares/input-validation-middleware";
 import {allCommentsUIType, allPostsUIType, postUIType} from "../db/UI-types";
 import {optionalAuthCheck} from "../middlewares/authorization-middleware";
@@ -36,6 +35,6 @@ postsQueryRouter.get("/:id/comments",
         const pageSize = +(req.query.pageSize ?? 10)
         const postId = req.params.id
         const allCommentsByPostId: allCommentsUIType = await postsQueryRepository
-            .findAllCommentsByPostId(sortBy as string, sortDirection as string, pageNumber, pageSize, postId, req.user.id)
+            .findAllCommentsByPostId(sortBy as string, sortDirection as string, pageNumber, pageSize, postId, req.user?.id)
         res.status(sendStatus.OK_200).send(allCommentsByPostId)
     })

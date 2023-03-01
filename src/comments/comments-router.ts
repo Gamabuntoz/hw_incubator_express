@@ -19,7 +19,7 @@ commentsRouter.get("/:id",
     optionalAuthCheck,
     async (req: Request, res: Response) => {
         const findCommentById: commentUIType | boolean = await commentsService
-            .findCommentById(new ObjectId(req.params.id), req.user!.id)
+            .findCommentById(new ObjectId(req.params.id), req.user?.id)
         res.status(sendStatus.OK_200).send(findCommentById)
     })
 commentsRouter.put("/:id",

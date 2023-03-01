@@ -9,7 +9,10 @@ export const commentsService = {
         const result = await CommentModelClass.findOne({_id: commentId})
         const likesInfo = await CommentLikesModelClass.countDocuments({commentId: commentId.toString(), status: "Like"})
         const dislikesInfo = await CommentLikesModelClass.countDocuments({commentId: commentId.toString(), status: "Dislike"})
-        const like = await CommentLikesModelClass.findOne({commentId: commentId.toString(), userId: userId})
+        let like
+        if (userId) {
+            like = await CommentLikesModelClass.findOne({commentId: commentId.toString(), userId: userId})
+        }
         if (!result) return false
         return {
             id: result._id.toString(),

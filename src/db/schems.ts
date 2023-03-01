@@ -86,5 +86,5 @@ export const commentLikesSchema = new mongoose.Schema<commentsLikesDBType>({
     _id: ObjectId,
     userId: String,
     commentId: String,
-    status: Date
+    status: String
 }, {collection: 'commentsLikes'})

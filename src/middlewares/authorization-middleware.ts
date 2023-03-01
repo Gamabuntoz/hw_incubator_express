@@ -59,10 +59,10 @@ export const authMiddlewareBearer = async (req: Request, res: Response, next: Ne
 }
 export const optionalAuthCheck = async (req: Request, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization
-    if (!authHeader) return false
+    if (!authHeader) return next()
     const token = authHeader.split(" ")[1]
     const userInfo = await jwtService.checkRefreshToken(token)
-    if (!userInfo) return false
+    if (!userInfo) return next()
     req.user = await usersService.findUserById(new ObjectId(userInfo.userId))
     next()
 }
