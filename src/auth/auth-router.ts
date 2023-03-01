@@ -7,7 +7,7 @@ import {usersRepository} from "../users/users-repository";
 import {v4 as uuidv4} from "uuid"
 import {
     authAttemptsChecker,
-    authCheckLoginOrEmail,
+    //authCheckLoginOrEmail,
     authMiddlewareBearer,
     authRefreshTokenMiddleware
 } from "../middlewares/authorization-middleware";
@@ -20,7 +20,7 @@ export const authRouter = Router({})
 
 authRouter.post("/registration",
     authAttemptsChecker,
-    authCheckLoginOrEmail,
+    //authCheckLoginOrEmail,
     inputUsersValidation.login,
     inputUsersValidation.password,
     inputUsersValidation.email,

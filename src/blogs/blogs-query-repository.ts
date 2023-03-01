@@ -1,5 +1,5 @@
 import {ObjectId} from "mongodb";
-import {BlogModel, PostModel} from "../db/db";
+import {BlogModelClass, PostModelClass} from "../db/db";
 import {allBlogsUIType, allPostsUIType, blogUIType} from "../db/UI-types";
 
 
@@ -13,8 +13,8 @@ export const blogsQueryRepository = {
         if (sortBy) {
             sort = sortBy
         }
-        const totalCount = await BlogModel.countDocuments(filter)
-        const findAll = await BlogModel
+        const totalCount = await BlogModelClass.countDocuments(filter)
+        const findAll = await BlogModelClass
             .find(filter)
             .sort({[sort]: sortDirection === "asc" ? 1 : -1})
             .skip((pageNumber - 1) * pageSize)
@@ -38,7 +38,7 @@ export const blogsQueryRepository = {
     },
 
     async findBlogById(blogId: ObjectId): Promise<null | blogUIType> {
-        const result = await BlogModel.findOne({_id: blogId})
+        const result = await BlogModelClass.findOne({_id: blogId})
         if (!result) return null
         return {
             id: result._id.toString(),
@@ -55,8 +55,8 @@ export const blogsQueryRepository = {
         if (sortBy) {
             sort = sortBy
         }
-        const totalCount = await PostModel.countDocuments({blogId: blogId})
-        const findAll = await PostModel
+        const totalCount = await PostModelClass.countDocuments({blogId: blogId})
+        const findAll = await PostModelClass
             .find({blogId: blogId})
             .sort({[sort]: sortDirection === "asc" ? 1 : -1})
             .skip((pageNumber - 1) * pageSize)

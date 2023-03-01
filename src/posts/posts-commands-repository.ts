@@ -1,4 +1,4 @@
-import {PostModel} from "../db/db";
+import {PostModelClass} from "../db/db";
 import {ObjectId} from "mongodb";
 import {postDBType} from "../db/DB-types";
 import {postUIType} from "../db/UI-types";
@@ -6,7 +6,7 @@ import {tryObjectId} from "../middlewares/input-validation-middleware";
 
 export const postsCommandsRepository = {
     async findAllPosts(): Promise<postUIType[]> {
-        const result = await PostModel.find({}).lean()
+        const result = await PostModelClass.find({}).lean()
         return result.map(p => ({
                 id: p._id!.toString(),
                 title: p.title,
@@ -21,7 +21,7 @@ export const postsCommandsRepository = {
     async findPostById(id: string): Promise<postUIType | boolean> {
         const postId = tryObjectId(id)
         if (!postId) return false
-        const result = await PostModel.findOne({_id: postId})
+        const result = await PostModelClass.findOne({_id: postId})
         if (!result) {
             return false
         }
@@ -37,11 +37,11 @@ export const postsCommandsRepository = {
     },
 
     async createPost(newPost: postDBType): Promise<postDBType> {
-        const result = await PostModel.create(newPost)
+        const result = await PostModelClass.create(newPost)
         return newPost
     },
     async updatePost(postId: ObjectId, title: string, shortDescription: string, content: string, blogId: string): Promise<boolean> {
-        const result = await PostModel
+        const result = await PostModelClass
             .updateOne({_id: postId}, {
                 $set: {
                     title: title,
@@ -53,11 +53,11 @@ export const postsCommandsRepository = {
         return result.matchedCount === 1
     },
     async deletePost(postId: ObjectId): Promise<boolean> {
-        const result = await PostModel.deleteOne({_id: postId})
+        const result = await PostModelClass.deleteOne({_id: postId})
         return result.deletedCount === 1
     },
     async deleteAllPosts(): Promise<boolean> {
-        const result = await PostModel.deleteMany({})
+        const result = await PostModelClass.deleteMany({})
         return result.deletedCount === 1
     }
 }

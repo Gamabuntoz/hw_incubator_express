@@ -8,17 +8,18 @@ import {
 import {ObjectId} from "mongodb";
 import {commentsService} from "./comments-service";
 import {commentsRepository} from "./comments-repository";
-import {authMiddlewareBearer} from "../middlewares/authorization-middleware";
-import {commentUIType} from "../db/UI-types";
+import {authMiddlewareBearer, optionalAuthCheck} from "../middlewares/authorization-middleware";
+import {commentUIType, userUIType} from "../db/UI-types";
 import {commentDBType} from "../db/DB-types";
 
 export const commentsRouter = Router()
 
 commentsRouter.get("/:id",
     commentIdQueryMiddleware,
+    optionalAuthCheck,
     async (req: Request, res: Response) => {
         const findCommentById: commentUIType | boolean = await commentsService
-            .findCommentById(new ObjectId(req.params.id))
+            .findCommentById(new ObjectId(req.params.id), req.user!.id)
         res.status(sendStatus.OK_200).send(findCommentById)
     })
 commentsRouter.put("/:id",
@@ -34,6 +35,17 @@ commentsRouter.put("/:id",
         const content = req.body.content
         const updateComment: boolean = await commentsService.updateComment(content, req.params.id)
         if (!updateComment) return res.sendStatus(sendStatus.NOT_FOUND_404)
+        res.sendStatus(sendStatus.NO_CONTENT_204)
+    })
+commentsRouter.put("/:id/like-status",
+    authMiddlewareBearer,
+    inputCommentsValidation.likeStatus,
+    inputValidationErrors,
+    commentIdQueryMiddleware,
+    async (req: Request, res: Response) => {
+        const likeStatus = req.body.content
+        const setLike: boolean = await commentsService.setLike(likeStatus, req.params.id, req.user.id)
+        if (!setLike) return res.sendStatus(sendStatus.NOT_FOUND_404)
         res.sendStatus(sendStatus.NO_CONTENT_204)
     })
 commentsRouter.delete("/:id",

@@ -1,5 +1,5 @@
 import {ObjectId} from "mongodb";
-import {CommentModel, PostModel} from "../db/db";
+import {CommentModelClass, PostModelClass} from "../db/db";
 import {allCommentsUIType, allPostsUIType, postUIType} from "../db/UI-types";
 
 export const postsQueryRepository = {
@@ -8,8 +8,8 @@ export const postsQueryRepository = {
         if (sortBy) {
             sort = sortBy
         }
-        const totalCount = await PostModel.countDocuments({})
-        const findAll = await PostModel
+        const totalCount = await PostModelClass.countDocuments({})
+        const findAll = await PostModelClass
             .find({})
             .sort({[sort]: sortDirection === "asc" ? 1 : -1})
             .skip((pageNumber - 1) * pageSize)
@@ -34,7 +34,7 @@ export const postsQueryRepository = {
         }
     },
     async findPostById(postId: ObjectId): Promise<postUIType | boolean> {
-        const result = await PostModel.findOne({_id: postId})
+        const result = await PostModelClass.findOne({_id: postId})
         if (!result) return false
         return {
             id: result._id!.toString(),
@@ -51,8 +51,8 @@ export const postsQueryRepository = {
         if (sortBy) {
             sort = sortBy
         }
-        const totalCount = await CommentModel.countDocuments({postId: postId})
-        const findAll = await CommentModel
+        const totalCount = await CommentModelClass.countDocuments({postId: postId})
+        const findAll = await CommentModelClass
             .find({postId: postId})
             .sort({[sort]: sortDirection === "asc" ? 1 : -1})
             .skip((pageNumber - 1) * pageSize)

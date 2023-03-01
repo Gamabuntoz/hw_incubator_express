@@ -1,42 +1,42 @@
 import {NextFunction, Request, Response} from "express";
-import {AdminModel, AuthAttemptModel, UserModel} from "../db/db";
+import {AdminModelClass, AuthAttemptModelClass, UserModelClass} from "../db/db";
 import {sendStatus} from "../db/status-collection";
 import {jwtService} from "../application/jwt-service";
 import {usersService} from "../users/users-service";
 import {devicesRepository} from "../devices/devices-repository";
 import {ObjectId} from "mongodb";
 
-export const authCheckLoginOrEmail = async (req: Request, res: Response, next: NextFunction) => {
-    const findUserByEmail = await UserModel.findOne({"accountData.email": req.body.email})
-    const findUserByLogin = await UserModel.findOne({"accountData.login": req.body.login})
-    if (findUserByEmail) {
-        return res.status(sendStatus.BAD_REQUEST_400).send(
-            {
-                errorsMessages: [
-                    {
-                        message: "Email already exist",
-                        field: "email"
-                    }
-                ]
-            }
-        )
-    }
-    if (findUserByLogin) {
-        return res.status(sendStatus.BAD_REQUEST_400).send(
-            {
-                errorsMessages: [
-                    {
-                        message: "Login already exist",
-                        field: "login"
-                    }
-                ]
-            }
-        )
-    }
-    next()
-}
+// export const authCheckLoginOrEmail = async (req: Request, res: Response, next: NextFunction) => {
+//     const findUserByEmail = await UserModelClass.findOne({"accountData.email": req.body.email})
+//     const findUserByLogin = await UserModelClass.findOne({"accountData.login": req.body.login})
+//     if (findUserByEmail) {
+//         return res.status(sendStatus.BAD_REQUEST_400).send(
+//             {
+//                 errorsMessages: [
+//                     {
+//                         message: "Email already exist",
+//                         field: "email"
+//                     }
+//                 ]
+//             }
+//         )
+//     }
+//     if (findUserByLogin) {
+//         return res.status(sendStatus.BAD_REQUEST_400).send(
+//             {
+//                 errorsMessages: [
+//                     {
+//                         message: "Login already exist",
+//                         field: "login"
+//                     }
+//                 ]
+//             }
+//         )
+//     }
+//     next()
+// }
 export const authMiddlewareBasic = async (req: Request, res: Response, next: NextFunction) => {
-    const findUser = await AdminModel.findOne({loginPass: req.headers.authorization})
+    const findUser = await AdminModelClass.findOne({loginPass: req.headers.authorization})
     if (!findUser) {
         return res.sendStatus(sendStatus.UNAUTHORIZED_401)
     }
@@ -52,6 +52,15 @@ export const authMiddlewareBearer = async (req: Request, res: Response, next: Ne
     if (!userInfo) {
         return res.sendStatus(sendStatus.UNAUTHORIZED_401)
     }
+    req.user = await usersService.findUserById(new ObjectId(userInfo.userId))
+    next()
+}
+export const optionalAuthCheck = async (req: Request, res: Response, next: NextFunction) => {
+    const authHeader = req.headers.authorization
+    if (!authHeader) return false
+    const token = authHeader.split(" ")[1]
+    const userInfo = await jwtService.checkRefreshToken(token)
+    if (!userInfo) return false
     req.user = await usersService.findUserById(new ObjectId(userInfo.userId))
     next()
 }
@@ -78,8 +87,8 @@ export const authAttemptsChecker = async (req: Request, res: Response, next: Nex
     const currentTime = new Date()
     const url = req.url
     const attemptTime = new Date(currentTime.getTime() - interval)
-    const attemptCount = await AuthAttemptModel.countDocuments({ip, url, time: {$gt: attemptTime}})
-    await AuthAttemptModel.create({ip, url, time: currentTime})
+    const attemptCount = await AuthAttemptModelClass.countDocuments({ip, url, time: {$gt: attemptTime}})
+    await AuthAttemptModelClass.create({ip, url, time: currentTime})
     if (attemptCount < 5) {
         next()
     } else {
@@ -89,7 +98,7 @@ export const authAttemptsChecker = async (req: Request, res: Response, next: Nex
 }
 export const deleteAttemptsDB = {
     async deleteAllAuthSessionAllUsers() {
-        const result = await AuthAttemptModel.deleteMany({})
+        const result = await AuthAttemptModelClass.deleteMany({})
         return result.deletedCount === 1
     }
 }
