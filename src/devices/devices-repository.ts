@@ -31,7 +31,7 @@ export const devicesRepository = {
         const result = await DeviceModelClass.deleteMany({issueAt: {$ne: issueAt}, userId: userId})
         return result.deletedCount === 1
     },
-    async deleteAllAuthSessionAllUsers() {
+    async deleteAllDevicesInfo() {
         return DeviceModelClass.deleteMany({})
     }
 }
