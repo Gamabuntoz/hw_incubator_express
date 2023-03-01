@@ -23,8 +23,10 @@ export const commentsRepository = {
         const result = await CommentModelClass.deleteOne({_id: commentId})
         return result.deletedCount === 1
     },
-    async deleteAllComments(): Promise<boolean> {
-        const result = await CommentModelClass.deleteMany({})
-        return result.deletedCount === 1
+    async deleteAllComments() {
+        return CommentModelClass.deleteMany({})
+    },
+    async deleteAllCommentsLikes() {
+        return CommentLikesModelClass.deleteMany({})
     }
 }

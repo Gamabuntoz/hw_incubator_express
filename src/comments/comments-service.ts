@@ -43,8 +43,5 @@ export const commentsService = {
     },
     async deleteComment(id: ObjectId): Promise<boolean> {
         return commentsRepository.deleteComment(id)
-    },
-    async deleteAllComments(): Promise<boolean> {
-        return commentsRepository.deleteAllComments()
     }
 }

@@ -102,8 +102,7 @@ export const authAttemptsChecker = async (req: Request, res: Response, next: Nex
     }
 }
 export const deleteAttemptsDB = {
-    async deleteAllAuthSessionAllUsers() {
-        const result = await AuthAttemptModelClass.deleteMany({})
-        return result.deletedCount === 1
+    async deleteAllAuthAttempt() {
+        return AuthAttemptModelClass.deleteMany({})
     }
 }
