@@ -128,7 +128,7 @@ export const inputCommentsValidation = {
         .isLength({min: 20, max: 300}).withMessage("Length must be from 1 to 15 symbols"),
     likeStatus: body("likeStatus")
         .custom(v => {
-            if (v === "None" || v === "Like" || v === "Dislike") return true
+            if (v === "None" || v === "Like" || v === "Dislike" || v === "none" || v === "like" || v === "dislike") return true
             throw new Error("Invalid data")
         }),
 }
