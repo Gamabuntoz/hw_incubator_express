@@ -65,7 +65,7 @@ export const postsQueryRepository = {
             totalCount: totalCount,
             items: await Promise.all(findAll.map( async (c) => {
                 let likeInfo
-                if (likeInfo) {
+                if (userId) {
                     likeInfo = await CommentLikesModelClass.findOne({commentId: c._id.toString(), userId: userId})
                 }
                     return {id: c._id!.toString(),
