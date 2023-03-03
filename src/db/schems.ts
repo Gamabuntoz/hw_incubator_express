@@ -92,7 +92,7 @@ export const commentLikesSchema = new mongoose.Schema<commentsLikesDBType>({
 export const postLikesSchema = new mongoose.Schema<postsLikesDBType>({
     _id: ObjectId,
     userId: String,
-    commentId: String,
+    postId: String,
     status: String,
     addedAt: Date
 }, {collection: 'postsLikes'})
