@@ -59,14 +59,17 @@ export const blogsService = {
             blogId: newPost.blogId,
             blogName: newPost.blogName,
             createdAt: newPost.createdAt,
+            extendedLikesInfo: {
+                likesCount: 0,
+                dislikesCount: 0,
+                myStatus: "None",
+                newestLikes: []
+            }
         }
     },
     async deleteBlog(id: string): Promise<boolean> {
         const blogId = tryObjectId(id)
         if (!blogId) return false
         return blogsCommandsRepository.deleteBlog(blogId)
-    },
-    async deleteAllBlogs(): Promise<boolean> {
-        return blogsCommandsRepository.deleteAllBlogs()
     }
 }
