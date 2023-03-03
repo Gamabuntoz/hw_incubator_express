@@ -2,10 +2,9 @@ import {postsCommandsRepository} from "./posts-commands-repository";
 import {ObjectId} from "mongodb";
 import {blogsService} from "../blogs/blogs-service";
 import {commentsRepository} from "../comments/comments-repository";
-import {commentDBType, postDBType} from "../db/DB-types";
+import {commentDBType, postDBType, postsLikesDBType} from "../db/DB-types";
 import {commentUIType, postUIType, userUIType} from "../db/UI-types";
 import {tryObjectId} from "../middlewares/input-validation-middleware";
-import {CommentLikesModelClass} from "../db/db";
 
 export const postsService = {
     async createPost(title: string, shortDescription: string, content: string, blogId: string): Promise<postUIType | boolean> {
@@ -29,6 +28,18 @@ export const postsService = {
             blogId: result.blogId,
             blogName: result.blogName,
             createdAt: result.createdAt,
+            extendedLikesInfo: {
+                likesCount: 0,
+                dislikesCount: 0,
+                myStatus: "None",
+                newestLikes: [
+                    {
+                        addedAt: "2023-03-03T10:24:28.850Z",
+                        userId: "string",
+                        login: "string"
+                    }
+                ]
+            }
         }
     },
     async createCommentByPostId(content: string, user: userUIType | null, postId: string): Promise<commentUIType> {
@@ -64,5 +75,22 @@ export const postsService = {
         const postId = tryObjectId(id)
         if (!postId) return false
         return postsCommandsRepository.deletePost(postId)
-    }
+    },
+    async setLike(likeStatus: string, postId: string, userId: string) {
+        const like: postsLikesDBType = {
+            _id: new ObjectId(),
+            userId: userId,
+            postId: postId,
+            status: likeStatus,
+            addedAt: new Date()
+        }
+        await postsCommandsRepository.setLike(like)
+        return true
+    },
+    async updateLike(likeStatus: string, postId: string, userId: string) {
+        const addedAt = new Date()
+        const updateLike = await postsCommandsRepository.updateLike(likeStatus, postId, userId, addedAt)
+        if (!updateLike) return false
+        return true
+    },
 }

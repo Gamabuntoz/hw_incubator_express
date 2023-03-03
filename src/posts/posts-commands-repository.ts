@@ -1,43 +1,10 @@
-import {PostModelClass} from "../db/db";
+import {PostLikesModelClass, PostModelClass} from "../db/db";
 import {ObjectId} from "mongodb";
-import {postDBType} from "../db/DB-types";
-import {postUIType} from "../db/UI-types";
-import {tryObjectId} from "../middlewares/input-validation-middleware";
+import {postDBType, postsLikesDBType} from "../db/DB-types";
 
 export const postsCommandsRepository = {
-    async findAllPosts(): Promise<postUIType[]> {
-        const result = await PostModelClass.find({}).lean()
-        return result.map(p => ({
-                id: p._id!.toString(),
-                title: p.title,
-                shortDescription: p.shortDescription,
-                content: p.content,
-                blogId: p.blogId,
-                blogName: p.blogName,
-                createdAt: p.createdAt
-            })
-        )
-    },
-    async findPostById(id: string): Promise<postUIType | boolean> {
-        const postId = tryObjectId(id)
-        if (!postId) return false
-        const result = await PostModelClass.findOne({_id: postId})
-        if (!result) {
-            return false
-        }
-        return {
-            id: result._id!.toString(),
-            title: result.title,
-            shortDescription: result.shortDescription,
-            content: result.content,
-            blogId: result.blogId,
-            blogName: result.blogName,
-            createdAt: result.createdAt
-        }
-    },
-
     async createPost(newPost: postDBType): Promise<postDBType> {
-        const result = await PostModelClass.create(newPost)
+        await PostModelClass.create(newPost)
         return newPost
     },
     async updatePost(postId: ObjectId, title: string, shortDescription: string, content: string, blogId: string): Promise<boolean> {
@@ -55,5 +22,13 @@ export const postsCommandsRepository = {
     async deletePost(postId: ObjectId): Promise<boolean> {
         const result = await PostModelClass.deleteOne({_id: postId})
         return result.deletedCount === 1
-    }
+    },
+    async setLike(like: postsLikesDBType) {
+        await PostLikesModelClass.create(like)
+        return like
+    },
+    async updateLike(likeStatus: string, postId: string, userId: string, addedAt: Date) {
+        const result = await PostLikesModelClass.updateOne({postId: postId, userId: userId}, {$set: {status: likeStatus, addedAt: addedAt}})
+        return result.matchedCount === 1
+    },
 }

@@ -23,6 +23,13 @@ export type commentsLikesDBType = WithId<{
     status: string
 }>
 
+export type postsLikesDBType = WithId<{
+    userId: string
+    postId: string
+    status: string
+    addedAt: Date
+}>
+
 export type userDBType = WithId<{
     accountData: {
         login: string

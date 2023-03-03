@@ -6,7 +6,7 @@ import {
     blogSchema,
     commentLikesSchema,
     commentSchema,
-    deviceSchema,
+    deviceSchema, postLikesSchema,
     postSchema,
     userSchema
 } from "./schems";
@@ -31,6 +31,7 @@ export const DeviceModelClass = mongoose.model("devices", deviceSchema)
 export const CommentModelClass = mongoose.model("comments", commentSchema)
 export const AuthAttemptModelClass = mongoose.model("authAttempts", attemptSchema)
 export const CommentLikesModelClass = mongoose.model("commentsLikes", commentLikesSchema)
+export const PostLikesModelClass = mongoose.model("postsLikes", postLikesSchema)
 
 export async function runDb() {
     try {

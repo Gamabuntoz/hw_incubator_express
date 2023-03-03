@@ -4,6 +4,7 @@ import {tryObjectId} from "../middlewares/input-validation-middleware";
 import {blogsQueryRepository} from "./blogs-query-repository";
 import {blogIdQueryMiddleware} from "../middlewares/input-validation-middleware";
 import {allBlogsUIType, allPostsUIType, blogUIType} from "../db/UI-types";
+import {optionalAuthCheck} from "../middlewares/authorization-middleware";
 
 export const blogsQueryRouter = Router()
 
@@ -29,6 +30,7 @@ blogsQueryRouter.get("/:id", async (req: Request, res: Response) => {
 
 blogsQueryRouter.get("/:id/posts",
     blogIdQueryMiddleware,
+    optionalAuthCheck,
     async (req: Request, res: Response) => {
         const sortBy = req.query.sortBy
         const sortDirection = req.query.sortDirection
@@ -36,7 +38,7 @@ blogsQueryRouter.get("/:id/posts",
         const pageSize = +(req.query.pageSize ?? 10)
         const blogId = req.params.id
         const allPostsByBlogId: allPostsUIType | null = await blogsQueryRepository
-            .findAllPostsByBlogId(blogId, sortBy as string, sortDirection as string, pageNumber, pageSize)
+            .findAllPostsByBlogId(blogId, sortBy as string, sortDirection as string, pageNumber, pageSize, req.user?.id)
         res.status(sendStatus.OK_200).send(allPostsByBlogId)
     })
 
