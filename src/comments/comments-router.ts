@@ -2,7 +2,7 @@ import {Request, Response, Router} from "express";
 import {sendStatus} from "../db/status-collection";
 import {
     commentIdQueryMiddleware,
-    inputCommentsValidation,
+    inputCommentsValidation, inputLikesValidation,
     inputValidationErrors
 } from "../middlewares/input-validation-middleware";
 import {ObjectId} from "mongodb";
@@ -39,7 +39,7 @@ commentsRouter.put("/:id",
     })
 commentsRouter.put("/:id/like-status",
     authMiddlewareBearer,
-    inputCommentsValidation.likeStatus,
+    inputLikesValidation.likeStatus,
     inputValidationErrors,
     commentIdQueryMiddleware,
     async (req: Request, res: Response) => {

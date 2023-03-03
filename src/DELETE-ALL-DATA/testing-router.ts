@@ -4,7 +4,7 @@ import {
     BlogModelClass,
     CommentLikesModelClass,
     CommentModelClass,
-    DeviceModelClass,
+    DeviceModelClass, PostLikesModelClass,
     PostModelClass,
     UserModelClass
 } from "../db/db";
@@ -19,5 +19,6 @@ testingRouter.delete("/all-data", async (req: Request, res: Response) => {
     await DeviceModelClass.deleteMany({})
     await AuthAttemptModelClass.deleteMany({})
     await CommentLikesModelClass.deleteMany({})
+    await PostLikesModelClass.deleteMany({})
     res.sendStatus(204)
 })

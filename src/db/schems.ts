@@ -6,7 +6,7 @@ import {
     blogDBType,
     commentDBType,
     commentsLikesDBType,
-    postDBType,
+    postDBType, postsLikesDBType,
     userDBType
 } from "./DB-types";
 
@@ -88,3 +88,11 @@ export const commentLikesSchema = new mongoose.Schema<commentsLikesDBType>({
     commentId: String,
     status: String
 }, {collection: 'commentsLikes'})
+
+export const postLikesSchema = new mongoose.Schema<postsLikesDBType>({
+    _id: ObjectId,
+    userId: String,
+    commentId: String,
+    status: String,
+    addedAt: Date
+}, {collection: 'postsLikes'})

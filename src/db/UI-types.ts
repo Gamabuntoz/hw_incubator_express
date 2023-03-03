@@ -14,6 +14,12 @@ export type allBlogsUIType = {
     items: blogUIType[]
 }
 
+type newestLikesType = {
+    addedAt: string
+    userId: string
+    login: string
+}
+
 export type postUIType = {
     id: string
     title: string
@@ -22,6 +28,12 @@ export type postUIType = {
     blogId: string
     blogName: string
     createdAt: string
+    extendedLikesInfo: {
+        likesCount: number
+        dislikesCount: number
+        myStatus: string
+        newestLikes: newestLikesType[]
+    }
 }
 export type allPostsUIType = {
     pagesCount: number

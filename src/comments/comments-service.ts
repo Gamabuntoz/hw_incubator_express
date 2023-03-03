@@ -3,17 +3,18 @@ import {CommentLikesModelClass, CommentModelClass} from "../db/db";
 import {commentsRepository} from "./comments-repository";
 import {commentUIType} from "../db/UI-types";
 import {tryObjectId} from "../middlewares/input-validation-middleware";
+import {commentsLikesDBType} from "../db/DB-types";
 
 export const commentsService = {
     async findCommentById(commentId: ObjectId, userId: string): Promise<commentUIType | boolean> {
         const result = await CommentModelClass.findOne({_id: commentId})
+        if (!result) return false
         const likesInfo = await CommentLikesModelClass.countDocuments({commentId: commentId.toString(), status: "Like"})
         const dislikesInfo = await CommentLikesModelClass.countDocuments({commentId: commentId.toString(), status: "Dislike"})
         let like
         if (userId) {
             like = await CommentLikesModelClass.findOne({commentId: commentId.toString(), userId: userId})
         }
-        if (!result) return false
         return {
             id: result._id.toString(),
             content: result.content,
@@ -27,7 +28,7 @@ export const commentsService = {
         }
     },
     async setLike(likeStatus: string, commentId: string, userId: string) {
-        const like = {
+        const like: commentsLikesDBType = {
             _id: new ObjectId(),
             userId: userId,
             commentId: commentId,

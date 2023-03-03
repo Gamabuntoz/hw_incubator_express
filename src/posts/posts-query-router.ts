@@ -7,19 +7,23 @@ import {optionalAuthCheck} from "../middlewares/authorization-middleware";
 
 export const postsQueryRouter = Router()
 
-postsQueryRouter.get("/", async (req: Request, res: Response) => {
+postsQueryRouter.get("/",
+    optionalAuthCheck,
+    async (req: Request, res: Response) => {
     const sortBy = req.query.sortBy
     const sortDirection = req.query.sortDirection
     const pageNumber = +(req.query.pageNumber ?? 1)
     const pageSize = +(req.query.pageSize ?? 10)
     const allPosts: allPostsUIType = await postsQueryRepository
-        .findAllPosts(sortBy as string, sortDirection as string, pageNumber, pageSize)
+        .findAllPosts(sortBy as string, sortDirection as string, pageNumber, pageSize, req.user?.id)
     res.status(sendStatus.OK_200).send(allPosts)
 })
-postsQueryRouter.get("/:id", async (req: Request, res: Response) => {
+postsQueryRouter.get("/:id",
+    optionalAuthCheck,
+    async (req: Request, res: Response) => {
     const postId = tryObjectId(req.params.id)
     if (!postId) return res.sendStatus(sendStatus.NOT_FOUND_404)
-    const foundPost: postUIType | boolean = await postsQueryRepository.findPostById(postId)
+    const foundPost: postUIType | boolean = await postsQueryRepository.findPostById(postId, req.user?.id)
     if (!foundPost) {
         return res.sendStatus(sendStatus.NOT_FOUND_404)
     }

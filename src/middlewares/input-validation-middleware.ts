@@ -3,9 +3,9 @@ import {body, ValidationError, validationResult} from "express-validator";
 import {sendStatus} from "../db/status-collection";
 import {blogsCommandsRepository} from "../blogs/blogs-commands-repository";
 import {ObjectId} from "mongodb";
-import {postsCommandsRepository} from "../posts/posts-commands-repository";
 import {commentsRepository} from "../comments/comments-repository";
 import {usersRepository} from "../users/users-repository";
+import {postsQueryRepository} from "../posts/posts-query-repository";
 
 export const blogIdQueryMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     let blogId: ObjectId;
@@ -27,7 +27,7 @@ export const postIdQueryMiddleware = async (req: Request, res: Response, next: N
     } catch (e) {
         return res.sendStatus(sendStatus.NOT_FOUND_404)
     }
-    const findBlog = await postsCommandsRepository.findPostById(postId.toString())
+    const findBlog = await postsQueryRepository.findPostById(postId, "")
     if (!findBlog) {
         return res.sendStatus(sendStatus.NOT_FOUND_404)
     }
@@ -126,7 +126,9 @@ export const inputCommentsValidation = {
     content: body("content")
         .isString().trim().withMessage("Must be a string")
         .isLength({min: 20, max: 300}).withMessage("Length must be from 1 to 15 symbols"),
-    likeStatus: body("likeStatus")
+}
+export const inputLikesValidation = {
+   likeStatus: body("likeStatus")
         .custom(v => {
             if (v === "None" || v === "Like" || v === "Dislike") return true
             throw new Error("Invalid data")
