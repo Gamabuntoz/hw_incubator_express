@@ -32,13 +32,7 @@ export const postsService = {
                 likesCount: 0,
                 dislikesCount: 0,
                 myStatus: "None",
-                newestLikes: [
-                    {
-                        addedAt: "2023-03-03T10:24:28.850Z",
-                        userId: "string",
-                        login: "string"
-                    }
-                ]
+                newestLikes: []
             }
         }
     },
