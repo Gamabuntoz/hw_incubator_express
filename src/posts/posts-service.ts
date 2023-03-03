@@ -73,8 +73,8 @@ export const postsService = {
     async setLike(likeStatus: string, postId: string, userId: string) {
         const like: postsLikesDBType = {
             _id: new ObjectId(),
-            userId: userId,
             postId: postId,
+            userId: userId,
             status: likeStatus,
             addedAt: new Date()
         }

@@ -75,9 +75,10 @@ postsCommandRouter.put("/:id/like-status",
     postIdQueryMiddleware,
     async (req: Request, res: Response) => {
         const likeStatus = req.body.likeStatus
-        const updateLike = await postsService.updateLike(likeStatus, req.params.id, req.user.id)
+        const postId = req.params.id
+        const updateLike = await postsService.updateLike(likeStatus, postId, req.user.id)
         if (updateLike) return res.sendStatus(sendStatus.NO_CONTENT_204)
-        const setLike: boolean = await postsService.setLike(likeStatus, req.params.id, req.user.id)
+        const setLike: boolean = await postsService.setLike(likeStatus, postId, req.user.id)
         if (!setLike) return res.sendStatus(sendStatus.NOT_FOUND_404)
         res.sendStatus(sendStatus.NO_CONTENT_204)
     })
