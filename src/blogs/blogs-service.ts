@@ -4,7 +4,7 @@ import {blogDBType, postDBType} from "../db/DB-types";
 import {BlogModelClass} from "../db/db";
 import {postsCommandsRepository} from "../posts/posts-commands-repository";
 import {blogUIType, postUIType} from "../db/UI-types";
-import {tryObjectId} from "../middlewares/input-validation-middleware";
+import {tryObjectId} from "../middlewares/input-validation-middleware"
 
 
 export const blogsService = {
