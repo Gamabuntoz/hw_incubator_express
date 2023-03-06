@@ -24,9 +24,9 @@ export const postsQueryRepository = {
             items: await Promise.all(findAll.map(async (p) => {
                     let likeInfo
                     if (userId) {
-                        likeInfo = await CommentLikesModelClass.findOne({postId: p._id.toString(), userId: userId})
+                        likeInfo = await PostLikesModelClass.findOne({postId: p._id.toString(), userId: userId}).lean()
                     }
-                const lastPostLikes = await this.findLastPostLikes(p._id!.toString())
+                    const lastPostLikes = await this.findLastPostLikes(p._id!.toString())
                     return {
                         id: p._id!.toString(),
                         title: p.title,
@@ -36,8 +36,14 @@ export const postsQueryRepository = {
                         blogName: p.blogName,
                         createdAt: p.createdAt,
                         extendedLikesInfo: {
-                            likesCount: await PostLikesModelClass.countDocuments({postId: p._id!.toString(), status: "Like"}),
-                            dislikesCount: await PostLikesModelClass.countDocuments({postId: p._id!.toString(), status: "Dislike"}),
+                            likesCount: await PostLikesModelClass.countDocuments({
+                                postId: p._id!.toString(),
+                                status: "Like"
+                            }),
+                            dislikesCount: await PostLikesModelClass.countDocuments({
+                                postId: p._id!.toString(),
+                                status: "Dislike"
+                            }),
                             myStatus: likeInfo ? likeInfo.status : "None",
                             newestLikes: await Promise.all(lastPostLikes.map(async (l) => {
                                         let user = await UserModelClass.findOne({_id: new ObjectId(l.userId)})
