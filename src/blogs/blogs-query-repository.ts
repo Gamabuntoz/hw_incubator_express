@@ -71,7 +71,7 @@ export const blogsQueryRepository = {
             items: await Promise.all(findAll.map(async (p) => {
                     let likeInfo
                     if (userId) {
-                        likeInfo = await CommentLikesModelClass.findOne({postId: p._id.toString(), userId: userId})
+                        likeInfo = await PostLikesModelClass.findOne({postId: p._id.toString(), userId: userId})
                     }
                     const lastPostLikes = await postsQueryRepository.findLastPostLikes(p._id!.toString())
                     return {
