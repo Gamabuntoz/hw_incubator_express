@@ -1,5 +1,5 @@
 import {ObjectId} from "mongodb";
-import {BlogModelClass, CommentLikesModelClass, PostLikesModelClass, PostModelClass, UserModelClass} from "../db/db";
+import {BlogModelClass, PostLikesModelClass, PostModelClass, UserModelClass} from "../db/db";
 import {allBlogsUIType, allPostsUIType, blogUIType} from "../db/UI-types";
 import {postsQueryRepository} from "../posts/posts-query-repository";
 
