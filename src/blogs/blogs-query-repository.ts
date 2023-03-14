@@ -21,34 +21,36 @@ export const blogsQueryRepository = {
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
             .lean()
-        return {
-            pagesCount: Math.ceil(totalCount / pageSize),
-            page: pageNumber,
-            pageSize: pageSize,
-            totalCount: totalCount,
-            items: findAll.map(b => ({
-                    id: b._id!.toString(),
-                    name: b.name,
-                    description: b.description,
-                    websiteUrl: b.websiteUrl,
-                    createdAt: b.createdAt,
-                    isMembership: b.isMembership
-                })
-            )
-        }
+
+        const allBlogs = new allBlogsUIType(
+            Math.ceil(totalCount / pageSize),
+            pageNumber,
+            pageSize,
+            totalCount,
+            findAll.map(b => new blogUIType(
+                b._id.toString(),
+                b.name,
+                b.description,
+                b.websiteUrl,
+                b.createdAt,
+                b.isMembership
+            ))
+        )
+        return allBlogs
     },
 
     async findBlogById(blogId: ObjectId): Promise<null | blogUIType> {
         const result = await BlogModelClass.findOne({_id: blogId})
         if (!result) return null
-        return {
-            id: result._id.toString(),
-            name: result.name,
-            description: result.description,
-            websiteUrl: result.websiteUrl,
-            createdAt: result.createdAt,
-            isMembership: result.isMembership
-        }
+        const blog = new blogUIType(
+            result._id.toString(),
+            result.name,
+            result.description,
+            result.websiteUrl,
+            result.createdAt,
+            result.isMembership
+        )
+        return blog
     },
 
     async findAllPostsByBlogId(blogId: string, sortBy: string, sortDirection: string, pageNumber: number, pageSize: number, userId: string): Promise<null | allPostsUIType> {
@@ -63,6 +65,9 @@ export const blogsQueryRepository = {
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
             .lean()
+
+
+
         return {
             pagesCount: Math.ceil(totalCount / pageSize),
             page: pageNumber,
@@ -83,8 +88,14 @@ export const blogsQueryRepository = {
                         blogName: p.blogName,
                         createdAt: p.createdAt,
                         extendedLikesInfo: {
-                            likesCount: await PostLikesModelClass.countDocuments({postId: p._id!.toString(), status: "Like"}),
-                            dislikesCount: await PostLikesModelClass.countDocuments({postId: p._id!.toString(), status: "Dislike"}),
+                            likesCount: await PostLikesModelClass.countDocuments({
+                                postId: p._id!.toString(),
+                                status: "Like"
+                            }),
+                            dislikesCount: await PostLikesModelClass.countDocuments({
+                                postId: p._id!.toString(),
+                                status: "Dislike"
+                            }),
                             myStatus: likeInfo ? likeInfo.status : "None",
                             newestLikes: await Promise.all(lastPostLikes.map(async (l) => {
                                         let user = await UserModelClass.findOne({_id: new ObjectId(l.userId)})

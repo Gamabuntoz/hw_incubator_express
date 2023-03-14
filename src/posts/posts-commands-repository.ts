@@ -27,7 +27,7 @@ export const postsCommandsRepository = {
         await PostLikesModelClass.create(like)
         return like
     },
-    async updateLike(likeStatus: string, postId: string, userId: string, addedAt: Date) {
+    async updateLike(likeStatus: string, postId: string, userId: string) {
         const result = await PostLikesModelClass.updateOne({postId: postId, userId: userId}, {$set: {status: likeStatus}})
         return result.matchedCount === 1
     },
