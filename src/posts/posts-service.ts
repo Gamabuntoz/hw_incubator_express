@@ -82,8 +82,7 @@ export const postsService = {
         return true
     },
     async updateLike(likeStatus: string, postId: string, userId: string) {
-        const addedAt = new Date()
-        const updateLike = await postsCommandsRepository.updateLike(likeStatus, postId, userId, addedAt)
+        const updateLike = await postsCommandsRepository.updateLike(likeStatus, postId, userId)
         if (!updateLike) return false
         return true
     },

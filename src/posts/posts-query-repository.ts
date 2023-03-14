@@ -14,7 +14,7 @@ export const postsQueryRepository = {
             .sort({[sort]: sortDirection === "asc" ? 1 : -1})
             .skip((pageNumber - 1) * pageSize)
             .limit(pageSize)
-            .lean()
+            .exec()
 
         return {
             pagesCount: Math.ceil(totalCount / pageSize),

@@ -19,9 +19,5 @@ export const blogsCommandsRepository = {
     async deleteBlog(postId: ObjectId): Promise<boolean> {
         const result = await BlogModelClass.deleteOne({_id: postId})
         return result.deletedCount === 1
-    },
-    async deleteAllBlogs(): Promise<boolean> {
-        const result = await BlogModelClass.deleteMany({})
-        return result.deletedCount === 1
     }
 }

@@ -17,9 +17,9 @@ import {authDeviceDBType} from "../db/DB-types";
 
 export const authRouter = Router({})
 
+
 authRouter.post("/registration",
     authAttemptsChecker,
-    //authCheckLoginOrEmail,
     inputUsersValidation.login,
     inputUsersValidation.password,
     inputUsersValidation.email,

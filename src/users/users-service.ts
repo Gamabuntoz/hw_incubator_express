@@ -2,10 +2,7 @@ import {usersRepository} from "./users-repository";
 import {ObjectId} from "mongodb";
 import bcrypt from "bcrypt"
 import {UserModelClass} from "../db/db"
-import {v4 as uuidv4} from "uuid";
-import add from "date-fns/add";
 import {allUsersUIType, userUIType} from "../db/UI-types";
-import {userDBType} from "../db/DB-types";
 
 export const usersService = {
     async findUserById(userId: ObjectId): Promise<userUIType | null> {
@@ -53,38 +50,6 @@ export const usersService = {
             )
         }
     },
-    async createUser(login: string, password: string, email: string): Promise<userUIType | null> {
-        const passwordSalt = await bcrypt.genSalt(10)
-        const passwordHash = await this._generateHash(password, passwordSalt)
-        const newUser: userDBType = {
-            _id: new ObjectId(),
-            accountData: {
-                login: login,
-                email: email,
-                passwordHash: passwordHash,
-                createdAt: new Date().toISOString()
-            },
-            emailConfirmation: {
-                confirmationCode: uuidv4(),
-                isConfirmed: false,
-                expirationDate: add(new Date(), {
-                    hours: 1,
-                    minutes: 1
-                }),
-            },
-            passwordRecovery: {
-                code: "string",
-                expirationDate: new Date()
-            }
-        }
-        const result = await usersRepository.createUser(newUser)
-        return {
-            id: result._id!.toString(),
-            login: result.accountData.login,
-            email: result.accountData.email,
-            createdAt: result.accountData.createdAt
-        }
-    },
     async deleteUser(id: string): Promise<boolean> {
         let userId: ObjectId;
         try {
@@ -94,18 +59,6 @@ export const usersService = {
             return false
         }
         return usersRepository.deleteUser(userId)
-    },
-    async deleteAllUsers(): Promise<boolean> {
-        return usersRepository.deleteAllUsers()
-    },
-    async checkCredentials(loginOrEmail: string, password: string): Promise<userDBType | boolean> {
-        const user = await usersRepository.findUserByLoginOrEmail(loginOrEmail)
-        if (!user) return false
-        const passwordHash = await this._generateHash(password, user.accountData.passwordHash!.slice(0, 29))
-        if (user.accountData.passwordHash !== passwordHash) {
-            return false
-        }
-        return user
     },
     async _generateHash(password: string, salt: string) {
         return await bcrypt.hash(password, salt)
