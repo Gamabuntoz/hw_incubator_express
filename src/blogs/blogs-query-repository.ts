@@ -1,10 +1,11 @@
 import {ObjectId} from "mongodb";
-import {BlogModelClass, PostLikesModelClass, PostModelClass, UserModelClass} from "../db/db";
+import {BlogModelClass, PostLikesModelClass, PostModelClass} from "../db/db";
 import {allBlogsUIType, allPostsUIType, blogUIType} from "../db/UI-types";
 import {postsQueryRepository} from "../posts/posts-query-repository";
+import {postsService} from "../posts/posts-service";
 
 
-export const blogsQueryRepository = {
+export class BlogsQueryRepository {
     async findAllBlogs(searchNameTerm: string, sortBy: string, sortDirection: string, pageNumber: number, pageSize: number): Promise<allBlogsUIType> {
         let filter = {}
         if (searchNameTerm) {
@@ -22,7 +23,7 @@ export const blogsQueryRepository = {
             .limit(pageSize)
             .lean()
 
-        const allBlogs = new allBlogsUIType(
+        return new allBlogsUIType(
             Math.ceil(totalCount / pageSize),
             pageNumber,
             pageSize,
@@ -36,13 +37,12 @@ export const blogsQueryRepository = {
                 b.isMembership
             ))
         )
-        return allBlogs
-    },
+    }
 
     async findBlogById(blogId: ObjectId): Promise<null | blogUIType> {
         const result = await BlogModelClass.findOne({_id: blogId})
         if (!result) return null
-        const blog = new blogUIType(
+        return new blogUIType(
             result._id.toString(),
             result.name,
             result.description,
@@ -50,8 +50,7 @@ export const blogsQueryRepository = {
             result.createdAt,
             result.isMembership
         )
-        return blog
-    },
+    }
 
     async findAllPostsByBlogId(blogId: string, sortBy: string, sortDirection: string, pageNumber: number, pageSize: number, userId: string): Promise<null | allPostsUIType> {
         let sort = "createdAt"
@@ -66,8 +65,6 @@ export const blogsQueryRepository = {
             .limit(pageSize)
             .lean()
 
-
-
         return {
             pagesCount: Math.ceil(totalCount / pageSize),
             page: pageNumber,
@@ -79,36 +76,7 @@ export const blogsQueryRepository = {
                         likeInfo = await PostLikesModelClass.findOne({postId: p._id.toString(), userId: userId})
                     }
                     const lastPostLikes = await postsQueryRepository.findLastPostLikes(p._id!.toString())
-                    return {
-                        id: p._id!.toString(),
-                        title: p.title,
-                        shortDescription: p.shortDescription,
-                        content: p.content,
-                        blogId: p.blogId,
-                        blogName: p.blogName,
-                        createdAt: p.createdAt,
-                        extendedLikesInfo: {
-                            likesCount: await PostLikesModelClass.countDocuments({
-                                postId: p._id!.toString(),
-                                status: "Like"
-                            }),
-                            dislikesCount: await PostLikesModelClass.countDocuments({
-                                postId: p._id!.toString(),
-                                status: "Dislike"
-                            }),
-                            myStatus: likeInfo ? likeInfo.status : "None",
-                            newestLikes: await Promise.all(lastPostLikes.map(async (l) => {
-                                        let user = await UserModelClass.findOne({_id: new ObjectId(l.userId)})
-                                        return {
-                                            addedAt: l.addedAt.toISOString(),
-                                            userId: l.userId,
-                                            login: user!.accountData.login
-                                        }
-                                    }
-                                )
-                            )
-                        }
-                    }
+                    return postsService.postsInfo(p, lastPostLikes, likeInfo)
                 }
             ))
         }

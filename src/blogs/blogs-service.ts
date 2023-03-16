@@ -1,4 +1,4 @@
-import {blogsCommandsRepository} from "./blogs-commands-repository";
+import {BlogsCommandsRepository} from "./blogs-commands-repository";
 import {ObjectId} from "mongodb";
 import {blogDBType, postDBType} from "../db/DB-types";
 import {BlogModelClass} from "../db/db";
@@ -7,10 +7,13 @@ import {blogUIType, postUIType} from "../db/UI-types";
 import {tryObjectId} from "../middlewares/input-validation-middleware"
 
 
-export const blogsService = {
+export class BlogsService {
+    constructor(protected blogsCommandsRepository: BlogsCommandsRepository) {}
+
     async findBlogById(blogId: ObjectId): Promise<null | blogDBType> {
         return BlogModelClass.findOne({_id: blogId})
-    },
+    }
+
     async createBlog(name: string, description: string, website: string): Promise<blogUIType> {
         const newBlog: blogDBType = {
             _id: new ObjectId(),
@@ -20,7 +23,7 @@ export const blogsService = {
             websiteUrl: website,
             isMembership: false
         }
-        await blogsCommandsRepository.createBlog(newBlog)
+        await this.blogsCommandsRepository.createBlog(newBlog)
         return {
             id: newBlog._id!.toString(),
             name: newBlog.name,
@@ -29,17 +32,18 @@ export const blogsService = {
             createdAt: newBlog.createdAt,
             isMembership: newBlog.isMembership
         }
-    },
+    }
+
     async updateBlog(id: string, name: string, description: string, website: string): Promise<boolean> {
         const postId = tryObjectId(id)
         if (!postId) return false
-        const result = await blogsCommandsRepository.updateBlog(postId, name, description, website)
-        return result
-    },
+        return await this.blogsCommandsRepository.updateBlog(postId, name, description, website)
+    }
+
     async createPostById(title: string, shortDescription: string, content: string, id: string): Promise<postUIType | boolean> {
         const blogId = tryObjectId(id)
         if (!blogId) return false
-        const blogById = await blogsService.findBlogById(blogId)
+        const blogById = await this.findBlogById(blogId)
         if (!blogById) return false
         const newPost: postDBType = {
             _id: new ObjectId(),
@@ -51,25 +55,29 @@ export const blogsService = {
             createdAt: new Date().toISOString()
         }
         await postsCommandsRepository.createPost(newPost)
-        return {
-            id: newPost._id!.toString(),
-            title: newPost.title,
-            shortDescription: newPost.shortDescription,
-            content: newPost.content,
-            blogId: newPost.blogId,
-            blogName: newPost.blogName,
-            createdAt: newPost.createdAt,
-            extendedLikesInfo: {
+
+        return new postUIType(
+            newPost._id!.toString(),
+            newPost.title,
+            newPost.shortDescription,
+            newPost.content,
+            newPost.blogId,
+            newPost.blogName,
+            newPost.createdAt,
+            {
                 likesCount: 0,
                 dislikesCount: 0,
                 myStatus: "None",
                 newestLikes: []
             }
-        }
-    },
+        )
+    }
+
     async deleteBlog(id: string): Promise<boolean> {
         const blogId = tryObjectId(id)
         if (!blogId) return false
-        return blogsCommandsRepository.deleteBlog(blogId)
+        return this.blogsCommandsRepository.deleteBlog(blogId)
     }
 }
+const blogsRepoForPost = new BlogsCommandsRepository()
+export const blogsService = new BlogsService(blogsRepoForPost)
