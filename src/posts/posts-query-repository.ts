@@ -1,6 +1,7 @@
 import {ObjectId} from "mongodb";
 import {CommentLikesModelClass, CommentModelClass, PostLikesModelClass, PostModelClass, UserModelClass} from "../db/db";
 import {allCommentsUIType, allPostsUIType, postUIType} from "../db/UI-types";
+import {postsService} from "./posts-service";
 
 export const postsQueryRepository = {
     async findAllPosts(sortBy: string, sortDirection: string, pageNumber: number, pageSize: number, userId: string): Promise<allPostsUIType> {
@@ -27,36 +28,7 @@ export const postsQueryRepository = {
                         likeInfo = await PostLikesModelClass.findOne({postId: p._id.toString(), userId: userId}).lean()
                     }
                     const lastPostLikes = await this.findLastPostLikes(p._id!.toString())
-                    return {
-                        id: p._id!.toString(),
-                        title: p.title,
-                        shortDescription: p.shortDescription,
-                        content: p.content,
-                        blogId: p.blogId,
-                        blogName: p.blogName,
-                        createdAt: p.createdAt,
-                        extendedLikesInfo: {
-                            likesCount: await PostLikesModelClass.countDocuments({
-                                postId: p._id!.toString(),
-                                status: "Like"
-                            }),
-                            dislikesCount: await PostLikesModelClass.countDocuments({
-                                postId: p._id!.toString(),
-                                status: "Dislike"
-                            }),
-                            myStatus: likeInfo ? likeInfo.status : "None",
-                            newestLikes: await Promise.all(lastPostLikes.map(async (l) => {
-                                        let user = await UserModelClass.findOne({_id: new ObjectId(l.userId)})
-                                        return {
-                                            addedAt: l.addedAt.toISOString(),
-                                            userId: l.userId,
-                                            login: user!.accountData.login
-                                        }
-                                    }
-                                )
-                            )
-                        }
-                    }
+                    return postsService.postsInfo(p, lastPostLikes, likeInfo)
                 }
             ))
         }
@@ -140,11 +112,10 @@ export const postsQueryRepository = {
         }
     },
     async findLastPostLikes(postId: string) {
-        const result = await PostLikesModelClass
+        return PostLikesModelClass
             .find({postId: postId, status: "Like"})
             .sort({addedAt: -1})
             .limit(3)
             .lean()
-        return result
     }
 }

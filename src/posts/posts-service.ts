@@ -5,6 +5,8 @@ import {commentsRepository} from "../comments/comments-repository";
 import {commentDBType, postDBType, postsLikesDBType} from "../db/DB-types";
 import {commentUIType, postUIType, userUIType} from "../db/UI-types";
 import {tryObjectId} from "../middlewares/input-validation-middleware";
+import {PostLikesModelClass, UserModelClass} from "../db/db";
+
 
 export const postsService = {
     async createPost(title: string, shortDescription: string, content: string, blogId: string): Promise<postUIType | boolean> {
@@ -86,4 +88,36 @@ export const postsService = {
         if (!updateLike) return false
         return true
     },
+    async postsInfo(p: postDBType, lastPostLikes: postsLikesDBType[], likeInfo?: postsLikesDBType | null,) {
+        return {
+            id: p._id!.toString(),
+            title: p.title,
+            shortDescription: p.shortDescription,
+            content: p.content,
+            blogId: p.blogId,
+            blogName: p.blogName,
+            createdAt: p.createdAt,
+            extendedLikesInfo: {
+                likesCount: await PostLikesModelClass.countDocuments({
+                    postId: p._id!.toString(),
+                    status: "Like"
+                }),
+                dislikesCount: await PostLikesModelClass.countDocuments({
+                    postId: p._id!.toString(),
+                    status: "Dislike"
+                }),
+                myStatus: likeInfo ? likeInfo.status : "None",
+                newestLikes: await Promise.all(lastPostLikes.map(async (l) => {
+                            let user = await UserModelClass.findOne({_id: new ObjectId(l.userId)})
+                            return {
+                                addedAt: l.addedAt.toISOString(),
+                                userId: l.userId,
+                                login: user!.accountData.login
+                            }
+                        }
+                    )
+                )
+            }
+        }
+    }
 }

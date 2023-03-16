@@ -47,64 +47,89 @@ export class postUIType {
 }
 
 
-export type allPostsUIType = {
-    pagesCount: number
-    page: number
-    pageSize: number
-    totalCount: number
-    items: postUIType[]
-}
-
-type commentatorInfoType = {
-    userId: string
-    userLogin: string
-}
-export type commentUIType = {
-    id: string
-    content: string
-    commentatorInfo: commentatorInfoType
-    createdAt: string
-    likesInfo: {
-        likesCount: number,
-        dislikesCount: number,
-        myStatus: string
+export class allPostsUIType {
+    constructor(
+        public pagesCount: number,
+        public page: number,
+        public pageSize: number,
+        public totalCount: number,
+        public items: postUIType[]
+    ) {
     }
 }
-export type allCommentsUIType = {
-    pagesCount: number
-    page: number
-    pageSize: number
-    totalCount: number
-    items: commentUIType[]
+
+export class commentUIType {
+    constructor(
+        public id: string,
+        public content: string,
+        public commentatorInfo: {
+            userId: string,
+            userLogin: string
+        },
+        public createdAt: string,
+        public likesInfo: {
+            likesCount: number,
+            dislikesCount: number,
+            myStatus: string
+        }
+    ) {
+    }
 }
 
-export type authDeviceUIType = {
-    id: string
-    title: string
-    lastActiveDate: string
-    deviceId: string
+export class allCommentsUIType {
+    constructor(
+        public pagesCount: number,
+        public page: number,
+        public pageSize: number,
+        public totalCount: number,
+        public items: commentUIType[]
+    ) {
+    }
 }
 
-export type userUIType = {
-    id: string
-    login: string
-    email: string
-    createdAt: string
-}
-export type allUsersUIType = {
-    pagesCount: number
-    page: number
-    pageSize: number
-    totalCount: number
-    items: userUIType[]
+export class authDeviceUIType {
+    constructor(
+        public id: string,
+        public title: string,
+        public lastActiveDate: string,
+        public deviceId: string,
+    ) {
+    }
 }
 
-export type authCurrentUserUIType = {
-    userId: string
-    login: string
-    email: string
+export class userUIType {
+    constructor(
+        public id: string,
+        public login: string,
+        public email: string,
+        public createdAt: string,
+    ) {
+    }
 }
 
-export type accessTokenUIType = {
-    accessToken: string
+export class allUsersUIType {
+    constructor(
+        public pagesCount: number,
+        public page: number,
+        public pageSize: number,
+        public totalCount: number,
+        public items: userUIType[]
+    ) {
+    }
+}
+
+export class authCurrentUserUIType {
+    constructor(
+        public userId: string,
+        public login: string,
+        public email: string,
+    ) {
+    }
+}
+
+export class accessTokenUIType {
+    constructor(
+        public accessToken: string,
+    ) {
+    }
 }
