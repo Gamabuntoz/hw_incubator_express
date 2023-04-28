@@ -5,38 +5,9 @@ import {jwtService} from "../application/jwt-service";
 import {usersService} from "../users/users-service";
 import {devicesRepository} from "../devices/devices-repository";
 import {ObjectId} from "mongodb";
-import {commentLikesSchema} from "../db/schems";
 import {attemptDBType} from "../db/DB-types";
 
-// export const authCheckLoginOrEmail = async (req: Request, res: Response, next: NextFunction) => {
-//     const findUserByEmail = await UserModelClass.findOne({"accountData.email": req.body.email})
-//     const findUserByLogin = await UserModelClass.findOne({"accountData.login": req.body.login})
-//     if (findUserByEmail) {
-//         return res.status(sendStatus.BAD_REQUEST_400).send(
-//             {
-//                 errorsMessages: [
-//                     {
-//                         message: "Email already exist",
-//                         field: "email"
-//                     }
-//                 ]
-//             }
-//         )
-//     }
-//     if (findUserByLogin) {
-//         return res.status(sendStatus.BAD_REQUEST_400).send(
-//             {
-//                 errorsMessages: [
-//                     {
-//                         message: "Login already exist",
-//                         field: "login"
-//                     }
-//                 ]
-//             }
-//         )
-//     }
-//     next()
-// }
+
 export const authMiddlewareBasic = async (req: Request, res: Response, next: NextFunction) => {
     const findUser = await AdminModelClass.findOne({loginPass: req.headers.authorization})
     if (!findUser) {
